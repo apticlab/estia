@@ -1,7 +1,5 @@
 @tailwind base;
 
-@import "./themify-icons.css";
-@import "./font.css";
 @import "./calendar.css";
 @import "~vue2-timepicker/dist/VueTimepicker.css";
 
