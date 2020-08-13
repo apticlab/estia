@@ -10,12 +10,14 @@ import { helpers } from "./utils/helpers";
 import { EventBus } from "./utils/event-bus.js";
 import { api } from "./utils/api";
 import filters from "./utils/filters";
-import "./utils/components";
-import "./utils/routes";
+import routes from "./utils/routes";
+import components from "./utils/components";
+
 import "./assets/css/app.css";
 
 export default {
   install(Vue, options) {
+    components(Vue);
     Object.keys(filters).forEach(key => Vue.filter(key, filters[key]));
     Object.keys(helpers).forEach(key => (Vue.prototype[key] = helpers[key]));
 
