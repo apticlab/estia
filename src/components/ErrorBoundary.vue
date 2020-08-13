@@ -10,17 +10,16 @@
 export default {
   name: "ErrorBoundary",
   props: {
-    stopPropagation: Boolean
+    stopPropagation: Boolean,
   },
-  mixins: [AccountChange],
   data() {
     return {
       errorStatus: null,
-      err: false
+      err: false,
     };
   },
   beforeMount() {
-    this.EventBus.$on("err-boundary", err => {
+    this.EventBus.$on("err-boundary", (err) => {
       this.reloadError(err);
     });
   },
@@ -41,14 +40,14 @@ export default {
       } else {
         this.errorStatus = 500;
       }
-    }
+    },
   },
   watch: {
     $route: {
       handler() {
         this.err = null;
-      }
-    }
-  }
+      },
+    },
+  },
 };
 </script>
