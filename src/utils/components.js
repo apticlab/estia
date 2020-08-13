@@ -32,7 +32,6 @@ Vue.component("awesome-table", AwesomeTable);
 Vue.component("color-swatch", ColorSwatch);
 Vue.component("avatar", Avatar);
 Vue.component("horizontal-pie-chart", HorizontalPieChart);
-Vue.component("engagement-detail", EngagementDetail);
 Vue.component("aw-datepicker", DateRangePicker);
 Vue.component("blr-image", BlurImage);
 Vue.component("svg-icon", SvgIcon);
