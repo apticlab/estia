@@ -11,6 +11,7 @@ import { EventBus } from "./utils/event-bus.js";
 import { api } from "./utils/api";
 import filters from "./utils/filters";
 import "./utils/components";
+import "./utils/routes";
 import "./assets/css/app.css";
 
 export default {
@@ -51,5 +52,8 @@ export default {
 
     Vue.mixin(Logger);
     Vue.mixin(MobileMix);
+
+    // Add default routes and router configuration
+    options.router.addRoutes(routes);
   }
 };
