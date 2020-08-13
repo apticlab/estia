@@ -1,5 +1,5 @@
 {
-  "name": "@aptic/estia",
+  "name": "@apticlab/estia",
   "version": "1.0.0",
   "description": "The easiest way to build site in Vue.",
   "main": "dist/estia.umd.js",
