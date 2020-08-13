@@ -54,6 +54,8 @@ export default {
     Vue.mixin(MobileMix);
 
     // Add default routes and router configuration
-    options.router.addRoutes(routes);
+    if (options.router) {
+      options.router.addRoutes(routes);
+    }
   }
 };
