@@ -14,7 +14,7 @@ const routes = [
     name: "logout",
     path: "/logout",
     component: Logout
-  },
+  }
 ];
 
 export { routes };
