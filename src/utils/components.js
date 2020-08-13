@@ -23,7 +23,7 @@ import RecursivityPicker from "../components/RecursivityPicker.vue";
 import RecursivityView from "../components/RecursivityView.vue";
 import EditResource from "../views/EditResource.vue";
 import ResourceJson from "../components/ResourceJson.vue";
-import ResourceSurvey from "../components/ResourceSurvey.vue";
+// import ResourceSurvey from "../components/ResourceSurvey.vue";
 import FileUploader from "../components/FileUploader.vue";
 
 Vue.component("loading", Loading);
@@ -49,6 +49,6 @@ Vue.component("recursivity-picker", RecursivityPicker);
 Vue.component("recursivity-view", RecursivityView);
 Vue.component("resource-edit", EditResource);
 Vue.component("resource-json", ResourceJson);
-Vue.component("resource-survey", ResourceSurvey);
+// Vue.component("resource-survey", ResourceSurvey);
 Vue.component("resource-image-uploader", ImageUploader);
 Vue.component("file-uploader", FileUploader);

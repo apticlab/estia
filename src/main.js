@@ -41,9 +41,6 @@ export default {
         json: {
           component: "resource-json"
         },
-        survey: {
-          component: "resource-survey"
-        },
         "image-uploader": {
           component: "resource-image-uploader"
         }
