@@ -1,17 +1,3 @@
-var flexGrowObject = {
-  default: 1
-};
-
-var maxWidthObject = {};
-
-for (let i = 0; i < 11; i++) {
-  flexGrowObject["" + i] = i;
-}
-
-for (let i = 0; i < 11; i++) {
-  maxWidthObject["" + i * 10] = i * 10 + "%";
-}
-
 module.exports = {
   purge: [
     "./src/**/*.html",
@@ -20,17 +6,12 @@ module.exports = {
     "./src/resources/*.js"
   ],
   theme: {
-    flexGrow: flexGrowObject,
     extend: {
       inset: {
         "10": "2rem",
         "14": "3rem"
       },
-      maxWidth: {
-        ...maxWidthObject
-      },
       maxHeight: {
-        ...maxWidthObject,
         "2": "4rem",
         "4": "8rem",
         "6": "16rem",
@@ -71,23 +52,6 @@ module.exports = {
         "76": "30rem",
         "78": "34rem"
       },
-      colors: {
-        blue: {
-          light: "#F2F6FA",
-          default: "#224A7C",
-          dark: "#152F51"
-        },
-        yellow: {
-          light: "#FFFBC0",
-          default: "#EEE700",
-          dark: "#C1BC01"
-        },
-        gray: {
-          light: "#D5D5D5",
-          default: "#979797",
-          dark: "#212121"
-        }
-      }
     }
   },
   variants: {
