@@ -12,7 +12,7 @@
     "./sfc": "src/estia.js"
   },
   "scripts": {
-    "build": "npm run build:esm & npm run build:umd & npm run build:iife & wait && echo \"Build complete:\nesm: $(gzip -c dist/estia.esm.js | wc -c)b gzip\numd: $(gzip -c dist/estia.umd.js | wc -c)b gzip\nmin: $(gzip -c dist/estia.min.js | wc -c)b gzip\"",
+    "build": "npm run build:esm & npm run build:umd && wait && echo \"Build complete:\nesm: $(gzip -c dist/estia.esm.js | wc -c)b gzip\numd: $(gzip -c dist/estia.umd.js | wc -c)b gzip\nmin: $(gzip -c dist/estia.min.js | wc -c)b gzip\"",
     "build:esm": "rollup --config build/rollup.config.js --format es --file dist/estia.esm.js",
     "build:umd": "rollup --config build/rollup.config.js --format umd --file dist/estia.umd.js",
     "build:iife": "rollup --config build/rollup.iife.config.js --format iife --file dist/estia.min.js",
