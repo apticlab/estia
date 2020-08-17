@@ -75,7 +75,6 @@
 <script>
 import { api } from "@/utils/api.js";
 import { mapState } from "vuex";
-import { resources } from "@/resources/index";
 
 const rest_resources = {
   profile: "users"
@@ -117,7 +116,7 @@ export default {
     this.resource_rest_name =
       rest_resources[this.resource_name] || this.resource_name;
 
-    this.actions = resources[this.resource_name].actions || [];
+    this.actions = this.resources[this.resource_name].actions || [];
 
     if (this.resource_id) {
       this.is_edit = true;
@@ -208,7 +207,7 @@ export default {
       user: state => state.user
     }),
     form_fields() {
-      let fields = resources[this.resource_name].fields || [];
+      let fields = this.resources[this.resource_name].fields || [];
 
       return fields.filter(field => {
         if (!field.scopes) {
@@ -225,7 +224,7 @@ export default {
       return this.is_edit ? "Modifica" : "Nuova";
     },
     resourceInfo() {
-      return resources[this.resource_name].info || {};
+      return this.resources[this.resource_name].info || {};
     },
     options() {
       return this.resourceInfo.singular || "Risorsa";

@@ -29,7 +29,6 @@
   </div>
 </template>
 <script>
-import { resources } from "@/resources/index";
 import { api } from "@/utils/api";
 
 export default {
@@ -56,10 +55,10 @@ export default {
       return;
     }
 
-    this.headers = resources[this.resourceName].headers || [];
-    this.actions = resources[this.resourceName].actions || [];
-    this.resourceInfo = resources[this.resourceName].info || {};
-    this.config = resources[this.resourceName].config || this.baseConfig;
+    this.headers = this.resources[this.resourceName].headers || [];
+    this.actions = this.resources[this.resourceName].actions || [];
+    this.resourceInfo = this.resources[this.resourceName].info || {};
+    this.config = this.resources[this.resourceName].config || this.baseConfig;
 
     await this.loadData();
   },

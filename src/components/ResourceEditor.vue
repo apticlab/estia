@@ -13,7 +13,6 @@
   </div>
 </template>
 <script>
-import { resources } from "@/resources/index";
 import _ from "lodash";
 
 export default {
@@ -21,26 +20,26 @@ export default {
   props: {
     context: {
       type: Object,
-      required: false
+      required: false,
     },
     resource: {
       required: false,
-      type: String
+      type: String,
     },
     readonly: {
       required: false,
-      default: false
+      default: false,
     },
     values: {
-      required: false
-    }
+      required: false,
+    },
   },
   data() {
     return {
       headers: [],
       actions: [],
       fields: [],
-      rows: []
+      rows: [],
     };
   },
   mounted() {
@@ -54,9 +53,9 @@ export default {
       this.rows = this.values;
     }
 
-    this.headers = resources[resourceName].headers;
-    this.actions = this.readonly ? [] : resources[resourceName].actions;
-    this.fields = resources[resourceName].fields;
+    this.headers = this.resources[resourceName].headers;
+    this.actions = this.readonly ? [] : this.resources[resourceName].actions;
+    this.fields = this.resources[resourceName].fields;
   },
   methods: {
     reloadRows(rows) {
@@ -69,8 +68,8 @@ export default {
       console.log(rows);
 
       this.$forceUpdate();
-    }
+    },
   },
-  computed: {}
+  computed: {},
 };
 </script>

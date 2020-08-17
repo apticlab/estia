@@ -9,6 +9,7 @@ import components from "./components";
 import mixins from "./mixins";
 import plugins from "./plugins";
 import filters from "./filters";
+import resources from "./resources";
 
 import "./assets/css/app.css";
 
@@ -18,6 +19,7 @@ export default {
     mixins(Vue);
     plugins(Vue);
     filters(Vue);
+    resources(Vue);
 
     Object.keys(helpers).forEach(key => (Vue.prototype[key] = helpers[key]));
 

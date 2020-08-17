@@ -46,7 +46,6 @@
   </div>
 </template>
 <script>
-import { resources } from "@/resources/index";
 import { api } from "@/utils/api";
 
 export default {
@@ -68,7 +67,7 @@ export default {
 
     this.resource = (await api.get(resourceName, resourceId)) || {};
 
-    let headers = resources[resourceName].fields || [];
+    let headers = this.resources[resourceName].fields || [];
     this.headers = headers.filter(field => {
       if (!field.scopes) {
         return true;
@@ -77,8 +76,8 @@ export default {
       return field.scopes.includes("view");
     });
 
-    this.actions = resources[resourceName].actions || [];
-    this.resourceInfo = resources[resourceName].info || {};
+    this.actions = this.resources[resourceName].actions || [];
+    this.resourceInfo = this.resources[resourceName].info || {};
 
     this.isLoading = false;
   },
