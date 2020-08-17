@@ -19,7 +19,7 @@ export default {
     mixins(Vue);
     plugins(Vue);
     filters(Vue);
-    resources(Vue);
+    resources(Vue, options.resources || {});
 
     Object.keys(helpers).forEach(key => (Vue.prototype[key] = helpers[key]));
 
