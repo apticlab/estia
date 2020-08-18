@@ -3,8 +3,9 @@ import App from "./App.vue";
 import estia from "@apticlab/estia";
 import VueRouter from "vue-router";
 
-import routes from './router/routes.js';
+import LoginPage from '@/components/LoginPage.vue';
 
+import routes from './router/routes.js';
 import './assets/css/app.css';
 
 const router = new VueRouter({
@@ -15,10 +16,11 @@ Vue.config.productionTip = false;
 
 Vue.use(VueRouter);
 Vue.use(estia, {
-  router
+  router,
+  baseComponents: {
+    login: LoginPage,
+  }
 });
-
-console.log(routes);
 
 router.addRoutes(routes);
 
