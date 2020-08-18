@@ -1,54 +1,55 @@
-import VueFormulate from "@braid/vue-formulate";
+import VueFormulate from '@braid/vue-formulate'
 
-import { helpers } from "./utils/helpers";
-import { EventBus } from "./utils/event-bus.js";
-import { api } from "./utils/api";
-import routes from "./utils/routes";
+import { helpers } from './utils/helpers'
+import { EventBus } from './utils/event-bus.js'
+import { api } from './utils/api'
 
-import components from "./components";
-import mixins from "./mixins";
-import plugins from "./plugins";
-import filters from "./filters";
-import resources from "./resources";
-
-import "./assets/css/app.css";
+import components from './components'
+import mixins from './mixins'
+import plugins from './plugins'
+import filters from './filters'
+import resources from './resources'
+import router from './router'
+import store from './store'
 
 export default {
-  install(Vue, options) {
-    components(Vue);
-    mixins(Vue);
-    plugins(Vue);
-    filters(Vue);
-    resources(Vue, options.resources || {});
+  install (Vue, options) {
+    components(Vue)
+    mixins(Vue)
+    plugins(Vue)
+    filters(Vue)
+    resources(Vue, options.resources || {})
+    store(Vue, options.store)
 
-    Object.keys(helpers).forEach(key => (Vue.prototype[key] = helpers[key]));
+    Object.keys(helpers).forEach(key => (Vue.prototype[key] = helpers[key]))
 
-    Vue.prototype.$api = api;
-    Vue.prototype.EventBus = EventBus;
+    Vue.prototype.$api = api
+    Vue.prototype.EventBus = EventBus
 
     Vue.use(VueFormulate, {
       library: {
-        "resource-select": {
-          component: "resource-select"
+        'resource-select': {
+          component: 'resource-select'
         },
         resource: {
-          component: "resource-editor"
+          component: 'resource-editor'
         },
-        "recursivity-picker": {
-          component: "recursivity-picker"
+        'recursivity-picker': {
+          component: 'recursivity-picker'
         },
         json: {
-          component: "resource-json"
+          component: 'resource-json'
         },
-        "image-uploader": {
-          component: "resource-image-uploader"
+        'image-uploader': {
+          component: 'resource-image-uploader'
         }
       }
-    });
+    })
 
     // Add default routes and router configuration
     if (options.router) {
-      options.router.addRoutes(routes);
+      router(options)
+      Vue.prototype.$routes = options.innerRoutes || []
     }
   }
-};
+}

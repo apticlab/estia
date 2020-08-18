@@ -1,21 +1,29 @@
 <template>
   <div
-    class="h-12 w-full bg-blue-dark text-white sm:text-blue-dark sm:bg-white fixed left-0 right-0 top-0 z-10 flex flex-row items-center justify-between duration-200 transition-all ease-in"
+    class="h-12 w-full bg-blue-dark sm:text-blue-dark sm:bg-white fixed left-0 right-0 top-0 z-10 flex flex-row items-center justify-between duration-200 transition-all ease-in"
     :class="is_collapsed ? 'pl-0 sm:pl-16' : 'pl-0 sm:pl-64'"
   >
-    <!-- <transition name="slide-fade" mode="out-in">
-      <div
-        :key="routeSectionTitle"
-        class="ml-8 mr-auto text-2xl text-green-600 font-medium select-none flex flex-col"
+    <div>
+      <slot
+        name="collapse"
+        :is_collapsed="is_collapsed"
+        :collapseSideBar="collapseSideBar"
       >
-        <span>{{ routeSectionTitle }}</span>
-      </div>
-    </transition>-->
+        <span
+          class="ml-3 hover:underline cursor-pointer"
+          @click="collapseSideBar()"
+        >{{ is_collapsed ? 'Espandi' : 'Chiudi' }}</span>
+      </slot>
+    </div>
+    <!--
     <div
       class="hover:bg-gray-200 pl-4 text-sm flex flex-row items-center justify-center cursor-pointer hover:text-gray-700 highlights-none"
       @click="collapseSideBar()"
     >
-      <div v-if="!is_mobile" class="flex flex-row select-none">
+      <div
+        v-if="!is_mobile"
+        class="flex flex-row select-none"
+      >
         <div
           class="flex flex-row items-center text-base w-full"
           :class="is_collapsed ? 'justify-center' : ''"
@@ -23,67 +31,60 @@
           <span
             class="ti-menu text-blue"
             :class="is_collapsed ? 'rotate-0-cw' : 'rotate-180-cw'"
-          ></span>
+          />
         </div>
       </div>
-      <div class="flex flex-row select-none" v-else>
+      <div
+        v-else
+        class="flex flex-row select-none"
+      >
         <div
           class="flex flex-row items-center text-base w-full"
           :class="is_collapsed ? 'justify-center' : ''"
         >
-          <span class :class="is_collapsed ? 'ti-menu' : 'ti-close'"></span>
+          <span
+            class
+            :class="is_collapsed ? 'ti-menu' : 'ti-close'"
+          />
         </div>
       </div>
     </div>
+    -->
     <div class="block sm:hidden h-full flex flex-row items-center">
-      <div
-        class="bg-contain bg-center bg-no-repeat w-32 ml-10 h-full"
-        :style="{
-          'background-image': 'url(\'/img/security_logo@2x.png\')'
-        }"
-      ></div>
+      <slot name="logo" />
     </div>
     <div class="flex flex-row">
-      <div
-        class="ml-0 sm:ml-auto py-1 px-3 cursor-pointer flex flex-row items-center flex-initial"
-      >
-        <i class="ti-bell text-gray-600 text-2xl"></i>
+      <div v-if="user">
+        <slot
+          name="userinfo"
+          :user="user"
+          :actions="actions"
+          :doUserAction="doUserAction"
+        />
       </div>
+      <!--
       <div
-        class="mr-1 sm:mr-4 flex flex-row items-center flex-initial"
         ref="popperTrigger"
+        class="mr-1 sm:mr-4 flex flex-row items-center flex-initial"
       >
         <popper
           :toggler="showUserMenu"
           transition="slide-down-fade"
           trigger="toggler"
           :options="{
-            position: 'bottom'
+            position: 'bottom',
           }"
-          v-on:hide="showUserMenu = false"
+          @hide="showUserMenu = false"
         >
           <div
             slot="reference"
-            @click="toggleUserMenu()"
             class="p-2 flex flex-row items-center bg-gray-100 rounded-lg cursor-pointer hover:bg-gray-200"
+            @click="toggleUserMenu()"
           >
-            <!-- <div class="flex flex-col items-center text-gray-700 mr-3">
-              <i class="zi-cheveron-up" />
-              <i class="zi-cheveron-down" />
-            </div>
-            <div class="flex flex-row items-center">
-              <avatar :user="user" class="w-8 h-8 mr-5"></avatar>
-              <div class="flex flex-col items-start">
-                <small class="text-gray-600">{{ fullName }}</small>
-                <span class="text-xs text-gray-500">{{
-                  user.role.name | uppercase
-                  }}</span>
-              </div>
-            </div>-->
             <div
               class="rounded-full h-8 w-8 bg-blue flex items-center justify-center"
             >
-              <i class="ti-user text-gray-light text-lg"></i>
+              <i class="ti-user text-gray-light text-lg" />
             </div>
           </div>
           <div
@@ -91,119 +92,115 @@
             style="min-width: 8rem"
           >
             <div
+              v-if="user"
               class="w-full py-3 px-5 border-b border-blue-light flex flex-col text-blue text-lg items-start"
             >
               <span class="w-full text-left">Ciao, {{ user.full_name }}!</span>
               <span
                 :style="'color: ' + user.role.color"
                 class="rounded uppercase text-xs mt-2 font-bold"
-                >{{ user.role.name }}</span
-              >
+              >{{ user.role.name }}</span>
             </div>
             <div
+              v-for="action in actions"
+              :key="action.name"
               class="w-64 cursor-pointer py-2 px-3 hover:bg-blue-light flex flex-row justify-start items-baseline hover:text-blue"
               @click="doUserAction(action)"
-              :key="action.name"
-              v-for="action in actions"
             >
-              <i :class="action.icon"></i>
+              <i :class="action.icon" />
               <span class="ml-3">{{ action.label }}</span>
             </div>
           </div>
         </popper>
       </div>
+        -->
     </div>
   </div>
 </template>
 
 <script>
-import { getProfile } from "@/utils/auth";
-import Popper from "@/components/Popper";
-import SideNavMixin from "@/mixin/SideNav.mixin.js";
-import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
+import { getProfile } from '@/utils/auth'
+import SideNavMixin from '@/mixins/sidenav.mixin.js'
+import { mapActions, mapGetters, mapState, mapMutations } from 'vuex'
 
 export default {
-  name: "top-bar",
+  name: 'TopBar',
   mixins: [SideNavMixin],
-  components: {
-    popper: Popper
-  },
   data: () => ({
     showUserMenu: false,
     userActions: [
       {
-        label: "Logout",
-        icon: "hi-lock-open",
-        callback: "logout",
-        roles: [
-          "superadmin",
-          "user_provider",
-          "company_manager",
-          "site_manager",
-          "officer"
-        ]
+        label: 'Logout',
+        icon: 'hi-lock-open',
+        callback: 'logout',
+        roles: ['*']
       }
     ]
   }),
-  beforeMount() {
-    this.reloadUser();
-    this.EventBus.$on("reload-user", this.reloadUser);
-    this.listenForSideNavCollapseEvent();
+  beforeMount () {
+    this.reloadUser()
+    this.EventBus.$on('reload-user', this.reloadUser)
+    this.listenForSideNavCollapseEvent()
   },
   methods: {
-    ...mapActions("user", ["set_user", "set_token"]),
-    toggleUserMenu() {
-      this.showUserMenu = !this.showUserMenu;
+    ...mapActions('user', ['set_user', 'set_token']),
+    toggleUserMenu () {
+      this.showUserMenu = !this.showUserMenu
     },
-    doUserAction(action) {
-      this.showUserMenu = false;
+    doUserAction (action) {
+      console.log(action)
+      this.showUserMenu = false
 
       if (this[action.callback] != null) {
-        this[action.callback]();
+        this[action.callback]()
       }
     },
-    logout() {
-      this.$router.push({ name: "logout" });
+    logout () {
+      this.$router.push('./logout')
     },
-    logoutUser() {
-      this.remove_logged_account();
-      this.$router.push("/users");
+    logoutUser () {
+      this.remove_logged_account()
+      this.$router.push('/users')
     },
-    async reloadUser() {
-      let user = getProfile();
-      this.set_user(user);
+    async reloadUser () {
+      let user = getProfile()
+      this.set_user(user)
     }
   },
   computed: {
-    ...mapState("user", {
-      user: state => state.user
+    ...mapState('user', {
+      user: (state) => state.user
     }),
-    ...mapState("page_info", {
-      updated_at: state => state.updated_at || state.last_updated,
-      post_num: state => state.post_num,
-      story_num: state => state.story_num
+    ...mapState('page_info', {
+      updated_at: (state) => state.updated_at || state.last_updated,
+      post_num: (state) => state.post_num,
+      story_num: (state) => state.story_num
     }),
-    ...mapGetters("page_info", ["reference_period"]),
-    routeSectionTitle() {
-      this.lastUpdate = null;
+    ...mapGetters('page_info', ['reference_period']),
+    routeSectionTitle () {
+      this.lastUpdate = null
 
       let labels = this.$route.matched
-        .map(route => (route.meta ? route.meta.label : null))
-        .reverse();
+        .map((route) => (route.meta ? route.meta.label : null))
+        .reverse()
 
       // Return the first not null && not undefined label
-      return labels.find(label => !!label);
+      return labels.find((label) => !!label)
     },
-    fullName() {
-      return this.user.name + " " + this.user.surname;
+    fullName () {
+      return this.user.name + ' ' + this.user.surname
     },
-    actions() {
-      return this.userActions.filter(action => {
-        return action.roles.includes(this.user.role.code);
-      });
+    actions () {
+      return this.userActions.filter((action) => {
+        if (action.roles.includes('*')) {
+          return true
+        }
+
+        return action.roles.includes(this.user.role.code)
+      })
     }
   }
-};
+}
 </script>
 
 <style>

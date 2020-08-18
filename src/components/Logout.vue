@@ -1,14 +1,14 @@
 <template>
-  <div></div>
+  <div />
 </template>
 <script>
-import { logout } from "../utils/auth";
+import { logout } from '../utils/auth'
 
 export default {
-  mounted() {
-    logout();
+  mounted () {
+    logout()
 
-    this.$router.push("/");
+    this.$router.push('/login')
   }
-};
+}
 </script>

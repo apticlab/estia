@@ -1,111 +1,146 @@
-import Vue from "vue";
-import VueRouter from "vue-router";
-import axios from "axios";
+import axios from 'axios'
 
-import { routes } from "@/utils/routes";
 import {
   isLoggedIn,
   isUserActive,
   isUserEnabled,
   getProfile
-} from "@/utils/auth";
+} from '@/utils/auth'
 
-const noAuthRouteList = ["password_reset", "welcome"];
+import Login from '@/components/Login.vue'
+import Logout from '@/components/Logout.vue'
+import Main from '@/views/Main.vue'
 
-const router = new VueRouter({
-  routes: routes,
-  mode: "history"
-});
+const defaultNoAuthRouteList = [
+]
 
-Vue.use(VueRouter);
+export default function (options) {
+  let router = options.router
+  let noAuthRouteList = options.noAuthRouteList ? options.noAuthRouteList : defaultNoAuthRouteList
 
-// Is Authenticated
-router.beforeEach((to, from, next) => {
-  let authUser = getProfile();
-  let routeRequiresAuth = to.matched.some(route => {
-    return route.meta && route.meta.requiresAuth;
-  });
+  // Is Authenticated
+  router.beforeEach((to, from, next) => {
+    if (noAuthRouteList.includes(to.name)) {
+      next()
+      return
+    }
 
-  if (!routeRequiresAuth) {
-    next();
-    return;
-  }
+    let authUser = getProfile()
+    let routeRequiresAuth = to.matched.some(route => {
+      return route.meta && route.meta.requiresAuth
+    })
 
-  if (!authUser) {
-    router.push("/login");
-    return;
-  }
+    if (!routeRequiresAuth) {
+      next()
+      return
+    }
 
-  if (noAuthRouteList.indexOf(to.name) == -1) {
+    if (!authUser) {
+      router.push('/login')
+      return
+    }
+
     if (to.matched.some(record => record.meta.requiresAuth)) {
-      var redirectPath = to.path.split("/")[1];
+      var redirectPath = to.path.split('/')[1]
 
       if (!isLoggedIn()) {
-        router.push("/login?redirect=" + redirectPath);
-        next(false);
+        router.push('/login?redirect=' + redirectPath)
+        next(false)
+        return
+      }
+    }
+
+    next()
+  })
+
+  // Role based auth
+  router.beforeEach((to, from, next) => {
+    if (to.matched.some(record => record.meta.roles)) {
+      var user = getProfile()
+
+      if (!user) {
+        router.push('/login')
+        next(false)
+      }
+
+      var roleHolder = null
+
+      // Get the last route role guard
+      for (var index in to.matched) {
+        var path = to.matched[index]
+
+        if (path.meta && path.meta.roles) {
+          roleHolder = path.meta.roles
+        }
+      }
+
+      if (roleHolder != null && user != null) {
+        let userRole = user.role.code.toLowerCase()
+
+        if (user.role.code == 'superadmin' && user.account) {
+          userRole = 'user'
+        }
+
+        let userHasRole = roleHolder.indexOf(userRole) != -1
+
+        if (userHasRole) {
+          next()
+        } else {
+          router.push('/login')
+          next(false)
+        }
       } else {
-        next();
-      }
-    } else {
-      next();
-    }
-  } else {
-    next();
-  }
-});
-
-// Role based auth
-router.beforeEach((to, from, next) => {
-  if (to.matched.some(record => record.meta.roles)) {
-    var user = getProfile();
-
-    if (!user) {
-      router.push("/login");
-      next(false);
-    }
-
-    var roleHolder = null;
-
-    // Get the last route role guard
-    for (var index in to.matched) {
-      var path = to.matched[index];
-
-      if (path.meta && path.meta.roles) {
-        roleHolder = path.meta.roles;
-      }
-    }
-
-    if (roleHolder != null && user != null) {
-      let userRole = user.role.code.toLowerCase();
-
-      if (user.role.code == "superadmin" && user.account) {
-        userRole = "user";
-      }
-
-      let userHasRole = roleHolder.indexOf(userRole) != -1;
-
-      if (userHasRole) {
-        next();
-      } else {
-        router.push("/login");
-        next(false);
-      }
-    } else {
       // If no roles are provided, simply let the user in
-      next();
+        next()
+      }
+    } else {
+      next()
     }
-  } else {
-    next();
+  })
+
+  let innerRoutes = options.innerRoutes || []
+  let outerRoutes = options.outerRoutes || []
+
+  let baseComponents = {
+    login: Login,
+    main: Main,
+    ...options.baseComponents
   }
-});
 
-axios.interceptors.response.use(undefined, function(err) {
-  if (err.response.status == 401) {
-    router.push("/login");
-    return Promise.reject(err);
-  }
+  let routes = [
+    {
+      path: '/login',
+      name: 'login',
+      component: baseComponents.login,
+      meta: {
+        requiresAuth: false
+      }
+    },
+    {
+      name: 'logout',
+      path: '/logout',
+      component: Logout
+    },
+    {
+      path: '/',
+      name: 'main',
+      component: baseComponents.main,
+      meta: {
+        requiresAuth: true
+      },
+      children: innerRoutes
+    },
+    ...outerRoutes
+  ]
 
-  return Promise.reject(err);
-});
+  router.addRoutes(routes)
 
-export default router;
+  axios.interceptors.response.use(undefined, function (err) {
+    if (err.response.status === 401) {
+      router.push('/login')
+      return Promise.reject(err)
+    }
+
+    return Promise.reject(err)
+  })
+}
