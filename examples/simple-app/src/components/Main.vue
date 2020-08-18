@@ -2,7 +2,12 @@
   <div class="h-screen">
     <side-nav class="w-64">
       <template v-slot:logo="{ is_collapsed }">
-        LOGO
+        <span v-if="!is_collapsed">
+          LOGO ESTESO
+        </span>
+        <span v-if="is_collapsed">
+          LE
+        </span>
       </template>
       <template v-slot:nav-item="{ item, selected, is_collapsed }">
         <div

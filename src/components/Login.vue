@@ -4,7 +4,9 @@
     class="bg-gray-100 flex flex-col items-center justify-center h-screen px-4 sm:px-0 bg-no-repeat bg-cover bg-center"
   >
     <div
-      class="sm:w-76 px-10 py-10 rounded-md flex flex-col flex-grow-0 bg-white overflow-hidden mt-2 max-w-screen-sm border border-gray-200"
+      :class="{
+        [cardClass]: true,
+      }"
     >
       <div class="w-full bg-white flex flex-row items-center justify-center">
         <slot name="logo">
@@ -108,6 +110,14 @@ import { login, resetPassword } from '../utils/auth'
 
 export default {
   name: 'Login',
+  props: {
+    cardClass: {
+      required: false,
+      type: String,
+      default:
+        'px-10 py-10 rounded-md flex flex-col flex-grow-0 bg-white overflow-hidden mt-2 max-w-screen-sm border border-gray-200'
+    }
+  },
   data () {
     return {
       email: '',
