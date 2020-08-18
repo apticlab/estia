@@ -12,14 +12,11 @@
       v-if="!is_mobile"
       class="h-12 text-center flex flex-col justify-center font-medium text-xl pt-3"
     >
-      <div
-        :class="{ hidden: is_collapsed }"
-        class="px-3 py-4"
-      >
-        <template v-if="show_text">
+      <div class="px-3 py-4">
+        <template>
           <slot
             name="logo"
-            :is_collapsed="is_collapsed"
+            :is_collapsed="!show_text"
           />
         </template>
       </div>
@@ -39,7 +36,7 @@
             name="nav-item"
             :selected="linkIsCurrentLink(item)"
             :item="item"
-            :is_collapsed="is_collapsed"
+            :is_collapsed="!show_text"
           >
             {{ item.meta.label }}
           </slot>

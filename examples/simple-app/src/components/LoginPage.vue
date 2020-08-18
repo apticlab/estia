@@ -1,6 +1,6 @@
 <template>
   <div>
-    <login>
+    <login cardClass="w-1/4 flex flex-col bg-white p-8 rounded">
       <template v-slot:logo="">
         <img
           src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse1.mm.bing.net%2Fth%3Fid%3DOIP.x26BYzb1DV7gSp5zyqhpRwAAAA%26pid%3DApi%26h%3D160&f=1"
