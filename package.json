@@ -22,7 +22,7 @@
     "test:coverage": "NODE_ENV=test jest --config test/jest.conf.js --coverage",
     "build:size": "gzip -c dist/estia.esm.js | wc -c",
     "preversion": "npm run build && git add .",
-    "postversion": "npm push",
+    "postversion": "npm publish",
     "dev": "vue-cli-service serve --port=7872 examples/simple-app/src/main.js",
     "dev:build": "vue-cli-service serve src/main.js"
   },
