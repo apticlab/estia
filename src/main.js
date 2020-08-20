@@ -1,4 +1,5 @@
 import VueFormulate from '@braid/vue-formulate'
+import VueSVGIcon from 'vue-svgicon'
 
 import { helpers } from './utils/helpers'
 import { EventBus } from './utils/event-bus.js'
@@ -45,6 +46,8 @@ export default {
         }
       }
     })
+
+    Vue.use(VueSVGIcon)
 
     // Add default routes and router configuration
     if (options.router) {

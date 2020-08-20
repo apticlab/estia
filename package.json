@@ -1,6 +1,6 @@
 {
   "name": "@apticlab/estia",
-  "version": "1.1.8",
+  "version": "1.1.9",
   "description": "The easiest way to build site in Vue.",
   "main": "dist/estia.umd.js",
   "module": "dist/estia.esm.js",
@@ -90,6 +90,7 @@
     "vue": "^2.6.11",
     "vue-jest": "^3.0.5",
     "vue-runtime-helpers": "^1.1.2",
+    "vue-svgicon": "^3.2.8",
     "vue-template-compiler": "^2.6.11",
     "vue-template-es2015-compiler": "^1.9.1",
     "watch": "^1.0.2"
