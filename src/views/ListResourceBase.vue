@@ -34,6 +34,21 @@
             :rows="rows"
             @act="actOnRow"
           />
+          <div
+            v-if="pagination"
+            class="flex flex-row w-full my-3"
+          >
+            <t-pagination
+              class="mx-auto"
+              :total-items="pagination.totalItems"
+              :per-page="pagination.perPage"
+              :num-pages="pagination.numPages"
+              :limit="5"
+              :classes="paginationClasses"
+              :value="currentPage"
+              @change="changePage"
+            />
+          </div>
         </div>
       </transition>
     </div>
@@ -66,10 +81,29 @@ export default {
       required: false,
       type: Boolean,
       default: false
+    },
+    paginationClasses: {
+      required: false,
+      type: Object,
+      default () {
+        return {
+          wrapper: 'flex',
+          element: 'w-8 h-8 mx-1',
+          disabledElement: 'w-8 h-8 mx-1',
+          ellipsisElement: 'w-8 h-8 mx-1',
+          activeButton: 'bg-blue-500 w-full h-full text-white rounded-full ',
+          disabledButton:
+            'opacity-25 w-full h-full cursor-not-allowed rounded-full',
+          button: 'hover:bg-blue-100 w-full h-full text-blue-500 rounded-full ',
+          ellipsis: 'text-gray-500'
+        }
+      }
     }
   },
   data () {
     return {
+      pagination: null,
+      currentPage: 1,
       isLoading: true,
       rows: null,
       headers: null,
@@ -114,10 +148,30 @@ export default {
     await this.loadData()
   },
   methods: {
+    async changePage (newCurrentPage) {
+      console.log('Changing page: ' + newCurrentPage)
+      this.currentPage = newCurrentPage
+      await this.loadData()
+    },
     async loadData () {
       this.isLoading = true
       try {
-        this.rows = (await this.$api.list(this.resourceName)) || []
+        let response = await this.$api.list(this.resourceName, {
+          page: this.currentPage
+        })
+
+        console.log(response)
+
+        if (response.data) {
+          this.pagination = {
+            totalItems: response.total,
+            perPage: response.per_page
+          }
+
+          this.rows = response.data
+        } else {
+          this.rows = response || []
+        }
       } catch (e) {
         this.rows = []
       }
@@ -143,8 +197,6 @@ export default {
       this.$router.push(`edit/${resource.id}`)
     },
     async delete (resource) {
-      console.log(resource)
-
       if (confirm('Vuoi davvero eliminare questa risorsa?')) {
         this.isLoading = true
         this.$api.delete(this.resourceName, resource.id)

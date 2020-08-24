@@ -10,6 +10,7 @@
         class="max-w-screen-xl mx-auto px-4 pt-6 py-4 flex-grow w-full flex flex-col"
       >
         <router-view
+          :key="$route.fullPath"
           class="max-w-screen-xl mx-auto px-4 pt-6 py-4 flex-grow w-full flex flex-col overflow-y-auto"
         />
       </error-boundary>
