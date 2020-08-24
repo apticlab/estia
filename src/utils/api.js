@@ -55,7 +55,7 @@ const api = {
 }
 
 export default function (options) {
-  if (options.test.apiTest) {
+  if (options.test && options.test.apiTest) {
     return testApi(options.test.resources)
   }
 

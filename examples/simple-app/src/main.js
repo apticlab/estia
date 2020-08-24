@@ -29,10 +29,6 @@ console.log(testResources);
 console.log(resources);
 
 Vue.use(estia, {
-  test: {
-    apiTest: true,
-    resources: testResources
-  },
   resources,
   router,
   store,
