@@ -1,7 +1,7 @@
 <template>
   <div
-    :style="{ 'background-image': 'url(./img/login_bg.jpg)' }"
-    class="bg-gray-100 flex flex-col items-center justify-center h-screen px-4 sm:px-0 bg-no-repeat bg-cover bg-center"
+    :style="{ 'background-image': bgImage }"
+    class="flex flex-col items-center justify-center h-screen px-4 sm:px-0 bg-no-repeat bg-cover bg-center"
   >
     <div
       :class="{
@@ -17,19 +17,17 @@
       <div class="mt-12">
         <div class="py-3 px-1 sm:px-4">
           <slot name="title">
-            <h1 class="text-blue-dark text-3xl font-semibold">
+            <h1 class="text-gray-600 ext-3xl font-semibold">
               Accedi
             </h1>
           </slot>
           <div class="flex flex-col mb-4 mt-4">
-            <slot
-              name="username"
-              :credentials="credentials"
-            >
+            <slot name="username" :credentials="credentials">
               <label
                 for="username"
                 class="text-gray-600 text-xs mb-1 ml-2 text-blue-dark"
-              >Username</label>
+                >Username</label
+              >
               <input
                 id="username"
                 ref="username"
@@ -37,25 +35,23 @@
                 placeholder="Inserisci username"
                 class="py-2"
                 type="text"
-              >
+              />
             </slot>
           </div>
           <div class="flex flex-col mb-4">
-            <slot
-              name="password"
-              :credentials="credentials"
-            >
+            <slot name="password" :credentials="credentials">
               <label
                 for="password"
                 class="text-gray-600 text-xs mb-1 ml-2 text-blue-dark"
-              >Password</label>
+                >Password</label
+              >
               <input
                 id="password"
                 v-model="credentials.password"
                 placeholder="Inserisci password"
                 class="py-2"
                 type="password"
-              >
+              />
             </slot>
             <slot name="forgot-password">
               <span
@@ -86,10 +82,7 @@
               {{ submitText }}
             </button>
           </slot>
-          <slot
-            name="error"
-            :errorText="errorText"
-          >
+          <slot name="error" :errorText="errorText">
             <div
               :class="{
                 'opacity-0': errorText == '',
@@ -106,7 +99,7 @@
   </div>
 </template>
 <script>
-import { login, resetPassword } from '../utils/auth'
+import { login, resetPassword } from '../utils/auth';
 
 export default {
   name: 'Login',
@@ -115,103 +108,108 @@ export default {
       required: false,
       type: String,
       default:
-        'px-10 py-10 rounded-md flex flex-col flex-grow-0 bg-white overflow-hidden mt-2 max-w-screen-sm border border-gray-200'
-    }
+        'px-10 py-10 rounded-md flex flex-col flex-grow-0 bg-white overflow-hidden mt-2 max-w-screen-sm border border-gray-200',
+    },
+    bgImage: {
+      required: false,
+      type: String,
+      default: '',
+    },
   },
-  data () {
+  data() {
     return {
       email: '',
       loginStep: 'login',
       credentials: {
         username: '',
-        password: ''
+        password: '',
       },
       isLoading: false,
       errorText: '',
       errorCodeDict: {
         user_not_found: 'Matricola non appartenente a nessun utente',
         username_not_sent: 'Inserisci una matricola nel campo di testo',
-        password_not_insert: 'Inserire la password'
-      }
-    }
+        password_not_insert: 'Inserire la password',
+      },
+    };
   },
   computed: {
-    canLogin: function () {
+    canLogin: function() {
       return (
         this.credentials.username !== '' && this.credentials.password !== ''
-      )
+      );
     },
-    submitDisabled: function () {
-      return !this.canLogin || this.isLoading
+    submitDisabled: function() {
+      return !this.canLogin || this.isLoading;
     },
-    submitText: function () {
+    submitText: function() {
       if (this.isLoading) {
-        return 'Caricamento'
+        return 'Caricamento';
       }
 
-      return this.errorText === '' ? 'Login' : 'Errore'
-    }
+      return this.errorText === '' ? 'Login' : 'Errore';
+    },
   },
-  mounted () {
+  mounted() {
     if (this.$refs.username) {
-      this.$refs.username.focus()
+      this.$refs.username.focus();
     }
   },
   methods: {
-    async login () {
-      var $route = this.$route
-      var $router = this.$router
+    async login() {
+      var $route = this.$route;
+      var $router = this.$router;
 
-      this.errorText = ''
+      this.errorText = '';
 
-      this.isLoading = true
+      this.isLoading = true;
 
       let loginData = await login(
         this.credentials.username,
-        this.credentials.password
-      )
+        this.credentials.password,
+      );
 
       if (loginData.error) {
-        this.isLoading = false
-        this.errorText = 'Credenziali non valide'
-        return
+        this.isLoading = false;
+        this.errorText = 'Credenziali non valide';
+        return;
       }
 
-      var redirect = $route.query.redirect || ''
+      var redirect = $route.query.redirect || '';
 
-      this.isLoading = false
-      $router.push('/' + redirect)
+      this.isLoading = false;
+      $router.push('/' + redirect);
     },
-    sendPasswordReset: function () {
-      this.isLoading = true
-      this.errorText = ''
+    sendPasswordReset: function() {
+      this.isLoading = true;
+      this.errorText = '';
 
       resetPassword(this.email).then(
         (data) => {
-          this.isLoading = false
-          this.email = ''
-          this.loginStep = 'success'
+          this.isLoading = false;
+          this.email = '';
+          this.loginStep = 'success';
         },
         (err) => {
-          this.email = ''
-          this.errorText = this.errorCodeDict[err.code]
-          this.isLoading = false
-        }
-      )
+          this.email = '';
+          this.errorText = this.errorCodeDict[err.code];
+          this.isLoading = false;
+        },
+      );
     },
-    resetPassword: function ($event) {
-      $event.stopPropagation()
-      $event.preventDefault()
+    resetPassword: function($event) {
+      $event.stopPropagation();
+      $event.preventDefault();
 
-      this.errorText = ''
-      this.loginStep = 'passwordreset'
+      this.errorText = '';
+      this.loginStep = 'passwordreset';
     },
-    goBack: function () {
-      this.loginStep = 'login'
-      this.errorText = ''
-    }
-  }
-}
+    goBack: function() {
+      this.loginStep = 'login';
+      this.errorText = '';
+    },
+  },
+};
 </script>
 <style>
 ::placeholder {
