@@ -12,44 +12,9 @@
         <span
           class="ml-3 hover:underline cursor-pointer"
           @click="collapseSideBar()"
-        >{{ is_collapsed ? 'Espandi' : 'Chiudi' }}</span>
+        >{{ is_collapsed ? "Espandi" : "Chiudi" }}</span>
       </slot>
     </div>
-    <!--
-    <div
-      class="hover:bg-gray-200 pl-4 text-sm flex flex-row items-center justify-center cursor-pointer hover:text-gray-700 highlights-none"
-      @click="collapseSideBar()"
-    >
-      <div
-        v-if="!is_mobile"
-        class="flex flex-row select-none"
-      >
-        <div
-          class="flex flex-row items-center text-base w-full"
-          :class="is_collapsed ? 'justify-center' : ''"
-        >
-          <span
-            class="ti-menu text-blue"
-            :class="is_collapsed ? 'rotate-0-cw' : 'rotate-180-cw'"
-          />
-        </div>
-      </div>
-      <div
-        v-else
-        class="flex flex-row select-none"
-      >
-        <div
-          class="flex flex-row items-center text-base w-full"
-          :class="is_collapsed ? 'justify-center' : ''"
-        >
-          <span
-            class
-            :class="is_collapsed ? 'ti-menu' : 'ti-close'"
-          />
-        </div>
-      </div>
-    </div>
-    -->
     <div class="block sm:hidden h-full flex flex-row items-center">
       <slot name="logo" />
     </div>
@@ -169,29 +134,29 @@ export default {
   },
   computed: {
     ...mapState('user', {
-      user: (state) => state.user
+      user: state => state.user
     }),
     ...mapState('page_info', {
-      updated_at: (state) => state.updated_at || state.last_updated,
-      post_num: (state) => state.post_num,
-      story_num: (state) => state.story_num
+      updated_at: state => state.updated_at || state.last_updated,
+      post_num: state => state.post_num,
+      story_num: state => state.story_num
     }),
     ...mapGetters('page_info', ['reference_period']),
     routeSectionTitle () {
       this.lastUpdate = null
 
       let labels = this.$route.matched
-        .map((route) => (route.meta ? route.meta.label : null))
+        .map(route => (route.meta ? route.meta.label : null))
         .reverse()
 
       // Return the first not null && not undefined label
-      return labels.find((label) => !!label)
+      return labels.find(label => !!label)
     },
     fullName () {
       return this.user.name + ' ' + this.user.surname
     },
     actions () {
-      return this.userActions.filter((action) => {
+      return this.userActions.filter(action => {
         if (action.roles.includes('*')) {
           return true
         }
