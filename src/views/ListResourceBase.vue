@@ -4,9 +4,8 @@
       v-if="!isLoading"
       class="w-full"
     >
-      <div
-        class="flex flex-row items-baseline sm:max-w-screen-sm md:max-w-screen-md xl:max-w-screen-xl px-4 mx-auto py-5"
-      >
+      <div class="flex flex-row items-baseline px-4 py-5">
+        <slot name="title" />
         <button
           v-if="config.canAdd"
           :class="addResourceClass"
@@ -20,13 +19,12 @@
         </button>
       </div>
       <transition>
-        <div
-          class="sm:max-w-screen-sm md:max-w-screen-md xl:max-w-screen-xl px-4 mx-auto py-5"
-        >
+        <div class="px-4 py-5">
           <awesome-table
             v-if="!resourceIsLoading"
             :header-class="headerClass"
             :add-resource-class="addResourceClass"
+            :table-class="tableClass"
             :row-class="rowClass"
             :striped="striped"
             :headers="headers"
@@ -62,6 +60,11 @@
 export default {
   name: 'ListResourceBase',
   props: {
+    tableClass: {
+      required: false,
+      type: String,
+      default: 'max-w-screen-xl'
+    },
     headerClass: {
       required: false,
       type: String,
@@ -118,13 +121,6 @@ export default {
   computed: {
     newResourceLabel () {
       return 'Nuova'
-
-      /*
-      let newResourceLabel = "Aggiungi ";
-      newResourceLabel += this.resourceInfo.singular ?? "Risorsa";
-
-      return newResourceLabel;
-      */
     },
     visibleActions () {
       return this.actions.filter((action) => {

@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="align-middle inline-block min-w-full"
-    :class="shadow ? 'box-shadow-light' : ''"
-  >
+  <div class="align-middle inline-block min-w-full">
     <div
       v-if="fields && !readonly"
       class="flex flex-row"
@@ -18,7 +15,7 @@
     </div>
     <table
       class="w-full table-auto border-collapse"
-      :class="shadow ? 'box-shadow-light' : ''"
+      :class="tableClass"
     >
       <thead>
         <tr
@@ -30,7 +27,7 @@
             v-for="(header, index) in headers"
             :key="index"
             :class="[getHeaderClass(header)]"
-            class="px-2 py-3 font-semibold text-md"
+            class="px-4 py-3 font-semibold text-md"
           >
             <div
               class="flex flex-row"
@@ -63,7 +60,7 @@
             <td
               v-for="(header, index) in headers"
               :key="index"
-              class="py-4 px-3"
+              class="py-4 px-4"
             >
               <div
                 class="flex flex-row items-center h-full text-gray-dark"
@@ -506,7 +503,8 @@ export default {
     striped: { required: false, default: true },
     shadow: { required: false, default: true },
     selectable: { required: false, default: false },
-    readonly: { required: false, default: false }
+    readonly: { required: false, default: false },
+    tableClass: { required: false, type: String, default: '' }
   },
   data () {
     return {
