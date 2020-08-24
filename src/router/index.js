@@ -2,8 +2,6 @@ import axios from 'axios'
 
 import {
   isLoggedIn,
-  isUserActive,
-  isUserEnabled,
   getProfile
 } from '@/utils/auth'
 

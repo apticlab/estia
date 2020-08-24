@@ -7,6 +7,8 @@ import Vuex from 'vuex'
 import { innerRoutes, outerRoutes, noAuthRouteList } from './router/routes.js';
 import baseComponents from './components';
 import './assets/css/app.css';
+import resources from './resources';
+import testResources from './resources/test.resources';
 
 Vue.use(VueRouter);
 const router = new VueRouter({
@@ -23,7 +25,15 @@ const store = new Vuex.Store({
 
 Vue.config.productionTip = false;
 
+console.log(testResources);
+console.log(resources);
+
 Vue.use(estia, {
+  test: {
+    apiTest: true,
+    resources: testResources
+  },
+  resources,
   router,
   store,
   innerRoutes,

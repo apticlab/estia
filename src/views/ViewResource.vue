@@ -1,17 +1,23 @@
 <template>
   <div class="flex flex-col flex-grow px-4 xl:px-0 max-w-screen-xl mx-auto">
-    <div class="w-full" v-if="!isLoading">
+    <div
+      v-if="!isLoading"
+      class="w-full"
+    >
       <div class="flex flex-row mb-8">
         <div class="flex flex-row items-baseline ml-auto py-4">
           <button
-            @click="act(action)"
+            v-for="action in visibleActions"
+            :key="action.label"
             :class="'bg-' + action.color"
             class="ml-3 px-4 outline-none rounded-none text-white ml-auto focus:outline-none"
-            :key="action.label"
-            v-for="action in visibleActions"
+            @click="act(action)"
           >
             <span class="flex flex-row justify-center">
-              <i :class="action.icon" class="mr-2 mt-1 text-md"></i>
+              <i
+                :class="action.icon"
+                class="mr-2 mt-1 text-md"
+              />
               <span>{{ action.label }}</span>
             </span>
           </button>
@@ -38,85 +44,34 @@
           >
             {{ header.label }}
           </label>
-          <field-view :data="resource" :field="header"></field-view>
+          <field-view
+            :data="resource"
+            :field="header"
+          />
         </div>
       </div>
     </div>
-    <loading v-if="isLoading" class="flex-grow w-full h-64"></loading>
+    <loading
+      v-if="isLoading"
+      class="flex-grow w-full h-64"
+    />
   </div>
 </template>
 <script>
-import { api } from "@/utils/api";
-
 export default {
-  name: "ViewResource",
+  name: 'ViewResource',
   props: {},
-  data() {
+  data () {
     return {
       isLoading: true,
       headers: null,
       actions: null,
       resource: null
-    };
-  },
-  async mounted() {
-    let resourceName = this.$route.meta.resource || this.$route.params.resource;
-    let resourceId = this.$route.params.id;
-
-    this.isLoading = true;
-
-    this.resource = (await api.get(resourceName, resourceId)) || {};
-
-    let headers = this.resources[resourceName].fields || [];
-    this.headers = headers.filter(field => {
-      if (!field.scopes) {
-        return true;
-      }
-
-      return field.scopes.includes("view");
-    });
-
-    this.actions = this.resources[resourceName].actions || [];
-    this.resourceInfo = this.resources[resourceName].info || {};
-
-    this.isLoading = false;
-  },
-  methods: {
-    labelClass(header) {
-      let cssClass = "";
-
-      switch (header.type) {
-        case "form":
-          cssClass = "text-gray-700 text-normal";
-          break;
-
-        case "fieldset":
-          cssClass = "text-gray-dark text-xl font-bold my-5";
-          break;
-
-        default:
-          cssClass = "text-gray-600 text-sm";
-          break;
-      }
-
-      return cssClass;
-    },
-    act(action) {
-      if (this[action.callback]) {
-        this[action.callback]();
-      }
-    },
-    edit() {
-      this.$router.push("../edit/" + this.resource.id);
-    },
-    delete() {},
-    goToList() {
-      this.$router.push("../list");
     }
   },
   computed: {
-    newResourceLabel() {
-      return "Nuova";
+    newResourceLabel () {
+      return 'Nuova'
 
       /*
       let newResourceLabel = "Aggiungi ";
@@ -125,18 +80,73 @@ export default {
       return newResourceLabel;
       */
     },
-    resourceName() {
+    resourceName () {
       let resourceNameField = this.resourceInfo
         ? this.resourceInfo.singular
-        : null;
+        : null
 
-      return resourceNameField ? resourceNameField : "Risorsa";
+      return resourceNameField || 'Risorsa'
     },
-    visibleActions() {
-      return this.actions.filter(action => {
-        return !action.scopes || action.scopes.includes("view");
-      });
+    visibleActions () {
+      return this.actions.filter((action) => {
+        return !action.scopes || action.scopes.includes('view')
+      })
+    }
+  },
+  async mounted () {
+    let resourceName = this.$route.meta.resource || this.$route.params.resource
+    let resourceId = this.$route.params.id
+
+    this.isLoading = true
+
+    this.resource = (await this.$api.get(resourceName, resourceId)) || {}
+
+    let headers = this.resources[resourceName].fields || []
+    this.headers = headers.filter((field) => {
+      if (!field.scopes) {
+        return true
+      }
+
+      return field.scopes.includes('view')
+    })
+
+    this.actions = this.resources[resourceName].actions || []
+    this.resourceInfo = this.resources[resourceName].info || {}
+
+    this.isLoading = false
+  },
+  methods: {
+    labelClass (header) {
+      let cssClass = ''
+
+      switch (header.type) {
+        case 'form':
+          cssClass = 'text-gray-700 text-normal'
+          break
+
+        case 'fieldset':
+          cssClass = 'text-gray-dark text-xl font-bold my-5'
+          break
+
+        default:
+          cssClass = 'text-gray-600 text-sm'
+          break
+      }
+
+      return cssClass
+    },
+    act (action) {
+      if (this[action.callback]) {
+        this[action.callback]()
+      }
+    },
+    edit () {
+      this.$router.push('../edit/' + this.resource.id)
+    },
+    delete () {},
+    goToList () {
+      this.$router.push('../list')
     }
   }
-};
+}
 </script>

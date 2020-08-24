@@ -1,4 +1,5 @@
 import AwesomeTest from '@/components/AwesomeTest.vue';
+import ListResource from '@/components/ListResource.vue';
 
 const innerRoutes = [
   {
@@ -8,6 +9,16 @@ const innerRoutes = [
     meta: {
       label: "Awesome Test",
     }
+  },
+  {
+    path: '/list-resource-test',
+    component: ListResource,
+    name: "listresourcetest",
+    meta: {
+      label: "Resource Test",
+      resource: "test"
+    }
+
   },
   {
     path: '',

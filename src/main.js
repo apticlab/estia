@@ -3,7 +3,7 @@ import VueSVGIcon from 'vue-svgicon'
 
 import { helpers } from './utils/helpers'
 import { EventBus } from './utils/event-bus.js'
-import { api } from './utils/api'
+import api from './utils/api'
 
 import components from './components'
 import mixins from './mixins'
@@ -24,7 +24,7 @@ export default {
 
     Object.keys(helpers).forEach(key => (Vue.prototype[key] = helpers[key]))
 
-    Vue.prototype.$api = api
+    Vue.prototype.$api = api(options)
     Vue.prototype.EventBus = EventBus
 
     Vue.use(VueFormulate, {

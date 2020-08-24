@@ -20,6 +20,7 @@ import TabView from '@/views/TabView.vue'
 import RecursivityPicker from '@/components/RecursivityPicker.vue'
 import RecursivityView from '@/components/RecursivityView.vue'
 import EditResource from '@/views/EditResource.vue'
+import ListResourceBase from '@/views/ListResourceBase.vue'
 import ResourceJson from '@/components/ResourceJson.vue'
 // import ResourceSurvey from "@/components/ResourceSurvey.vue";
 import FileUploader from '@/components/FileUploader.vue'
@@ -58,4 +59,5 @@ export default function (Vue) {
   Vue.component('side-nav', SideNav)
   Vue.component('top-bar', TopBar)
   Vue.component('popper', Popper)
+  Vue.component('list-resource-base', ListResourceBase)
 }
