@@ -12,7 +12,8 @@
         <span
           class="ml-3 hover:underline cursor-pointer"
           @click="collapseSideBar()"
-        >{{ is_collapsed ? 'Espandi' : 'Chiudi' }}</span>
+          >{{ is_collapsed ? 'Espandi' : 'Chiudi' }}</span
+        >
       </slot>
     </div>
     <div class="block sm:hidden h-full flex flex-row items-center">
@@ -32,9 +33,9 @@
 </template>
 
 <script>
-import { getProfile } from '@/utils/auth'
-import SideNavMixin from '@/mixins/sidenav.mixin.js'
-import { mapActions, mapGetters, mapState, mapMutations } from 'vuex'
+import { getProfile } from '@/utils/auth';
+import SideNavMixin from '@/mixins/sidenav.mixin.js';
+import { mapActions, mapGetters, mapState, mapMutations } from 'vuex';
 
 export default {
   name: 'TopBar',
@@ -46,74 +47,64 @@ export default {
         label: 'Logout',
         icon: 'hi-lock-open',
         callback: 'logout',
-        roles: ['*']
-      }
-    ]
+        roles: ['*'],
+      },
+    ],
   }),
-  beforeMount () {
-    this.reloadUser()
-    this.EventBus.$on('reload-user', this.reloadUser)
-    this.listenForSideNavCollapseEvent()
+  beforeMount() {
+    this.reloadUser();
+    this.EventBus.$on('reload-user', this.reloadUser);
+    this.listenForSideNavCollapseEvent();
   },
   methods: {
     ...mapActions('user', ['set_user', 'set_token']),
-    toggleUserMenu () {
-      this.showUserMenu = !this.showUserMenu
+    toggleUserMenu() {
+      this.showUserMenu = !this.showUserMenu;
     },
-    doUserAction (action) {
-      console.log(action)
-      this.showUserMenu = false
+    doUserAction(action) {
+      console.log(action);
+      this.showUserMenu = false;
 
       if (this[action.callback] != null) {
-        this[action.callback]()
+        this[action.callback]();
       }
     },
-    logout () {
-      this.$router.push('./logout')
+    logout() {
+      this.$router.push('./logout');
     },
-    logoutUser () {
-      this.remove_logged_account()
-      this.$router.push('/users')
+    logoutUser() {
+      this.remove_logged_account();
+      this.$router.push('/users');
     },
-    async reloadUser () {
-      let user = getProfile()
-      this.set_user(user)
-    }
+    async reloadUser() {
+      let user = getProfile();
+      this.set_user(user);
+    },
   },
   computed: {
     ...mapState('user', {
-      user: (state) => state.user
+      user: (state) => state.user,
     }),
     ...mapState('page_info', {
       updated_at: (state) => state.updated_at || state.last_updated,
       post_num: (state) => state.post_num,
-      story_num: (state) => state.story_num
+      story_num: (state) => state.story_num,
     }),
     ...mapGetters('page_info', ['reference_period']),
-    routeSectionTitle () {
-      this.lastUpdate = null
-
-      let labels = this.$route.matched
-        .map((route) => (route.meta ? route.meta.label : null))
-        .reverse()
-
-      // Return the first not null && not undefined label
-      return labels.find((label) => !!label)
+    fullName() {
+      return this.user.name + ' ' + this.user.surname;
     },
-    fullName () {
-      return this.user.name + ' ' + this.user.surname
-    },
-    actions () {
+    actions() {
       return this.userActions.filter((action) => {
         if (action.roles.includes('*')) {
-          return true
+          return true;
         }
 
-        return action.roles.includes(this.user.role.code)
-      })
-    }
-  }
-}
+        return action.roles.includes(this.user.role.code);
+      });
+    },
+  },
+};
 </script>
 
 <style>

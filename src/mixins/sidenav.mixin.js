@@ -55,5 +55,13 @@ export default {
         this.show_text = value;
       });
     },
+    routeSectionTitle () {
+      let labels = this.$route.matched
+        .map((route) => (route.meta ? route.meta.label : null))
+        .reverse()
+
+      // Return the first not null && not undefined label
+      return labels.find((label) => !!label)
+    },
   },
 };

@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col flex-grow px-3 sm:px-0">
+  <div class="flex flex-col flex-grow">
     <div
       v-if="!isLoading"
       class="w-full"
