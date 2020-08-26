@@ -13,6 +13,7 @@ import filters from './filters'
 import resources from './resources'
 import router from './router'
 import store from './store'
+import viewFields from './view-fields';
 
 export default {
   install (Vue, options) {
@@ -22,6 +23,7 @@ export default {
     filters(Vue)
     resources(Vue, options.resources || {})
     store(Vue, options.store)
+    viewFields(Vue, options.viewFields);
 
     Object.keys(helpers).forEach(key => (Vue.prototype[key] = helpers[key]))
 

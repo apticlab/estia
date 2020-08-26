@@ -122,6 +122,10 @@ function createRandomArray(min, max, number) {
 }
 
 function deepPick(object, nestedField) {
+  if (nestedField == ".") {
+    return object;
+  }
+
   return _.get(object, nestedField);
 }
 
