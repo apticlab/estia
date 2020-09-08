@@ -6,14 +6,20 @@ import { helpers } from './utils/helpers'
 import { EventBus } from './utils/event-bus.js'
 import api from './utils/api'
 
-import components from './components'
 import mixins from './mixins'
 import plugins from './plugins'
 import filters from './filters'
 import resources from './resources'
 import router from './router'
 import store from './store'
-import viewFields from './view-fields';
+import viewFields from './view-fields'
+import components, {
+  RouterView,
+  EditResource
+} from './components'
+import {
+  SideNav as SideNavMixin
+} from './mixins';
 
 export default {
   install (Vue, options) {
@@ -23,7 +29,7 @@ export default {
     filters(Vue)
     resources(Vue, options.resources || {})
     store(Vue, options.store)
-    viewFields(Vue, options.viewFields);
+    viewFields(Vue, options.viewFields)
 
     Object.keys(helpers).forEach(key => (Vue.prototype[key] = helpers[key]))
 
@@ -59,4 +65,10 @@ export default {
       Vue.prototype.$routes = options.innerRoutes || []
     }
   }
+}
+
+export {
+  RouterView,
+  EditResource,
+  SideNavMixin
 }

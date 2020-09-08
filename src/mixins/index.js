@@ -7,3 +7,7 @@ export default function(Vue) {
   Vue.mixin(Mobile);
   Vue.mixin(SideNav);
 }
+
+export {
+  SideNav
+}
