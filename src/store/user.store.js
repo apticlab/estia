@@ -1,4 +1,5 @@
 import { EventBus } from '@/utils/event-bus.js'
+import axios from 'axios';
 
 export default {
   namespaced: true,
@@ -35,7 +36,18 @@ export default {
       } catch (e) {
         return false
       }
-    }
+    },
+    async reload_user ({ commit }) {
+      console.log('reload_user')
+      try {
+        let response = await axios.get('/api/me')
+        commit('set_user', response.data)
+        return true
+      } catch (e) {
+        return false
+      }
+
+    },
   },
   getters: {
     accounts: state => {

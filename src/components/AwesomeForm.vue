@@ -14,158 +14,163 @@
       <div
         v-for="(header, index) in visible_headers"
         :key="index"
-        class="focus-within:text-blue relative"
-        :class="
-          header.type == 'form'
-            ? 'border border-rounded-sm border-dotted border-gray-light'
-            : 'mb-3 flex flex-col col-span-' +
-              (header.colSpan || 12) +
-              ' row-span-' +
-              (header.rowSpan || 1)
-        "
+        class="relative focus-within:text-blue grid grid-cols-3"
+        :class="{
+          'border border-rounded-sm border-dotted border-gray-light':
+            header.type == 'form',
+          ['mb-3 col-span-' +
+          (header.colSpan || 12) +
+          ' row-span-' +
+          (header.rowSpan || 1)]: header.type != 'form',
+          [fieldClass]: true
+        }"
       >
-        <template>
-          <label
-            class="font-semibold mb-2 text-gray-dark"
-            :class="labelClass(header)"
-            :for="header.code"
+        <label :class="getLabelClass(header)" :for="header.code">
+          {{ header.label }}
+          <span
+            v-if="
+              header.validator
+                ? header.validator.indexOf('required') != -1
+                : false
+            "
+            class="ml-1 font-bold text-orange-600"
+            >*</span
           >
-            {{ header.label }}
-            <span
-              v-if="
-                header.validator
-                  ? header.validator.indexOf('required') != -1
-                  : false
-              "
-              class="ml-1 font-bold text-orange-600"
-            >*</span>
-          </label>
-        </template>
-        <template v-if="header.type == 'form'">
-          <awesome-form
-            class="w-12/12 px-10"
-            :form="dataForm[header.field]"
-            :headers="header.headers"
-            :validate="header.validate"
-            @change="(value) => (dataForm[header.field] = value)"
+        </label>
+        <template v-if="header.field && header.field.includes('.')">
+          <input
+            type="text"
+            :value="deepPick(dataForm, header.field)"
+            @input="$event => updateNested(header.field, $event.target.value)"
           />
         </template>
-        <template v-if="header.type == 'select'">
-          <FormulateInput
-            type="resource-select"
-            class="flex-grow"
-            :disabled="fieldIsReadonly(header)"
-            :name="header.field"
-            :resources="filterOptions(header)"
-            :option-field="header.select.option"
-            :placeholder="header.placeholder"
-            :select="header.select"
-          />
-        </template>
-        <template
-          v-else-if="header.type == 'dynamic-select' || header.type == 'user'"
-        >
-          <FormulateInput
-            :key="header.field"
-            type="dynamic-select"
-            :name="header.field"
-            :header="header"
-            :readonly="fieldIsReadonly(header)"
-          />
-        </template>
-        <template v-else-if="header.type == 'balance'">
-          <div class="flex">
+        <div v-else="">
+          <template v-if="header.type == 'form'">
+            <awesome-form
+              class="px-10 w-12/12"
+              :form="dataForm[header.field]"
+              :headers="header.headers"
+              :validate="header.validate"
+              @change="value => (dataForm[header.field] = value)"
+            />
+          </template>
+          <template v-if="header.type == 'select'">
+            <FormulateInput
+              type="resource-select"
+              class="flex-grow"
+              :disabled="fieldIsReadonly(header)"
+              :name="header.field"
+              :resources="filterOptions(header)"
+              :option-field="header.select.option"
+              :placeholder="header.placeholder"
+              :select="header.select"
+            />
+          </template>
+          <template
+            v-else-if="header.type == 'dynamic-select' || header.type == 'user'"
+          >
+            <FormulateInput
+              :key="header.field"
+              type="dynamic-select"
+              :name="header.field"
+              :header="header"
+              :readonly="fieldIsReadonly(header)"
+            />
+          </template>
+          <template v-else-if="header.type == 'balance'">
+            <div class="flex">
+              <FormulateInput
+                :id="header.code"
+                :key="header.field"
+                type="custom-number"
+                :readonly="fieldIsReadonly(header)"
+                :placeholder="header.placeholder"
+                :name="header.field"
+                class="flex-grow rounded-r-none"
+              />
+              <div
+                class="flex items-center bg-gray-200 border border-l-0 border-gray-300 rounded rounded-l-none border-l-none"
+              >
+                <span class="px-3 text-gray-600">{{ header.udm }}</span>
+              </div>
+            </div>
+          </template>
+          <template v-else-if="header.type == 'boolean'">
+            <label class="flex custom-label">
+              <div
+                class="flex items-center justify-center w-6 h-6 p-1 mr-2 bg-white shadow"
+              >
+                <FormulateInput
+                  :id="header.code"
+                  :readonly="fieldIsReadonly(header)"
+                  type="checkbox"
+                  class="hidden"
+                  :name="header.field"
+                />
+                <svg
+                  :class="!!deepFind(dataForm, header.field) ? '' : 'hidden'"
+                  class="w-4 h-4 text-green-600 pointer-events-none"
+                  viewBox="0 0 172 172"
+                >
+                  <g
+                    fill="none"
+                    stroke-width="none"
+                    stroke-miterlimit="10"
+                    font-family="none"
+                    font-weight="none"
+                    font-size="none"
+                    text-anchor="none"
+                    style="mix-blend-mode:normal"
+                  >
+                    <path d="M0 172V0h172v172z" />
+                    <path
+                      d="M145.433 37.933L64.5 118.8658 33.7337 88.0996l-10.134 10.1341L64.5 139.1341l91.067-91.067z"
+                      fill="currentColor"
+                      stroke-width="1"
+                    />
+                  </g>
+                </svg>
+              </div>
+            </label>
+          </template>
+          <template v-else-if="header.type == 'date'">
+            <div class="flex">
+              <v-date-picker
+                class="w-full"
+                :value="parseDate(header)"
+                :input-props="{
+                  class: 'form-control w-full'
+                }"
+                :masks="{
+                  input: 'DD/MM/YYYY'
+                }"
+                locale="it"
+                @input="formatDate($event, header)"
+              />
+            </div>
+          </template>
+          <template v-else-if="header.type == 'image_upload'">
             <FormulateInput
               :id="header.code"
               :key="header.field"
-              type="custom-number"
+              type="image-uploader"
               :readonly="fieldIsReadonly(header)"
               :placeholder="header.placeholder"
               :name="header.field"
-              class="rounded-r-none flex-grow"
             />
-            <div
-              class="bg-gray-200 rounded rounded-l-none border border-l-none border-gray-300 flex items-center border-l-0"
-            >
-              <span class="text-gray-600 px-3">{{ header.udm }}</span>
-            </div>
-          </div>
-        </template>
-        <template v-else-if="header.type == 'boolean'">
-          <label class="custom-label flex">
-            <div
-              class="bg-white shadow w-6 h-6 p-1 flex justify-center items-center mr-2"
-            >
-              <FormulateInput
-                :id="header.code"
-                :readonly="fieldIsReadonly(header)"
-                type="checkbox"
-                class="hidden"
-                :name="header.field"
-              />
-              <svg
-                :class="!!deepFind(dataForm, header.field) ? '' : 'hidden'"
-                class="w-4 h-4 text-green-600 pointer-events-none"
-                viewBox="0 0 172 172"
-              >
-                <g
-                  fill="none"
-                  stroke-width="none"
-                  stroke-miterlimit="10"
-                  font-family="none"
-                  font-weight="none"
-                  font-size="none"
-                  text-anchor="none"
-                  style="mix-blend-mode:normal"
-                >
-                  <path d="M0 172V0h172v172z" />
-                  <path
-                    d="M145.433 37.933L64.5 118.8658 33.7337 88.0996l-10.134 10.1341L64.5 139.1341l91.067-91.067z"
-                    fill="currentColor"
-                    stroke-width="1"
-                  />
-                </g>
-              </svg>
-            </div>
-          </label>
-        </template>
-        <template v-else-if="header.type == 'date'">
-          <div class="flex">
-            <v-date-picker
-              class="w-full"
-              :value="parseDate(header)"
-              :input-props="{
-                class: 'form-control w-full',
-              }"
-              :masks="{
-                input: 'DD/MM/YYYY',
-              }"
-              locale="it"
-              @input="formatDate($event, header)"
-            />
-          </div>
-        </template>
-        <template v-else-if="header.type == 'image_upload'">
+          </template>
           <FormulateInput
+            v-else
             :id="header.code"
             :key="header.field"
-            type="image-uploader"
             :readonly="fieldIsReadonly(header)"
+            :type="header.type"
             :placeholder="header.placeholder"
             :name="header.field"
+            :resource="header.resource"
           />
-        </template>
-        <FormulateInput
-          v-else
-          :id="header.code"
-          :key="header.field"
-          :readonly="fieldIsReadonly(header)"
-          :type="header.type"
-          :placeholder="header.placeholder"
-          :name="header.field"
-          :resource="header.resource"
-        />
-        <div class="mt-2 error-container mr-auto">
+        </div>
+        <div class="mt-2 mr-auto error-container">
           <div
             v-if="form_validation_status[header.code]"
             class="flex flex-col items-center"
@@ -174,8 +179,9 @@
               v-for="(error, index) in form_validation_status[header.code]
                 .errors"
               :key="index"
-              class="text-red-600 mb-2"
-            >{{ error }}</span>
+              class="mb-2 text-red-600"
+              >{{ error }}</span
+            >
           </div>
         </div>
       </div>
@@ -200,20 +206,48 @@
 </template>
 
 <script>
-import _ from 'lodash'
-import { mapState } from 'vuex'
+import _ from "lodash";
+import { mapState } from "vuex";
 
 export default {
-  name: 'AwesomeForm',
+  name: "AwesomeForm",
   props: {
     debug: { required: false, default: false },
     isEdit: { required: false, default: false },
     form: { required: true, default: () => ({}) },
     readonly: { required: false, default: false },
     validate: { required: false, default: false },
-    headers: { required: true, default: {} }
+    headers: { required: true, default: {} },
+    separatorClass: {
+      required: false,
+      type: String,
+      default() {
+        return this.$theme.separatorClass;
+      }
+    },
+    labelClass: {
+      required: false,
+      type: String,
+      default() {
+        return this.$theme.labelClass;
+      }
+    },
+    inputClass: {
+      required: false,
+      type: String,
+      default() {
+        return this.$theme.inputClass;
+      }
+    },
+    fieldClass: {
+      required: false,
+      type: String,
+      default() {
+        return this.$theme.fieldClass;
+      }
+    }
   },
-  data () {
+  data() {
     return {
       loading: true,
       dataForm: {},
@@ -224,328 +258,331 @@ export default {
       form_validation_status: {},
       form_is_valid: {},
       form_errors: {}
-    }
+    };
   },
-  async mounted () {
-    this.loading = true
+  async mounted() {
+    this.loading = true;
 
     // Use a private clone so that we can
     // change it entirely to trigger some refresh
-    this.dataForm = JSON.parse(JSON.stringify(this.form))
+    this.dataForm = JSON.parse(JSON.stringify(this.form));
 
-    await this.fetchOptions()
-    this.validatedataForm()
+    await this.fetchOptions();
+    this.validatedataForm();
 
-    this.updateOldForm(this.dataForm)
+    this.updateOldForm(this.dataForm);
 
-    this.loading = false
+    this.loading = false;
   },
-  beforeDestroy () {
+  beforeDestroy() {
     // this.event_bus.$off('aw:form:update', this.forceUpdate);
   },
   methods: {
-    listenForAwEvents () {
-      this.event_bus.$on('aw:form:update', this.forceUpdate())
+    updateNested(field, value) {
+      _.set(this.dataForm, field, value);
+
+      this.updateOldForm(this.dataForm);
     },
-    parseDate (header) {
+    listenForAwEvents() {
+      this.event_bus.$on("aw:form:update", this.forceUpdate());
+    },
+    parseDate(header) {
       let parsedDate = this.moment(
         this.dataForm[header.field],
-        'YYYY-MM-DD'
-      ).toDate()
+        "YYYY-MM-DD"
+      ).toDate();
 
-      return parsedDate
+      return parsedDate;
     },
-    formatDate (newDate, header) {
-      this.dataForm[header.field] = this.moment(newDate).format('YYYY-MM-DD')
-      this.validatedataForm()
-      this.forceUpdate()
+    formatDate(newDate, header) {
+      this.dataForm[header.field] = this.moment(newDate).format("YYYY-MM-DD");
+      this.validatedataForm();
+      this.forceUpdate();
     },
-    forceUpdate () {
-      this.$forceUpdate()
+    forceUpdate() {
+      this.$forceUpdate();
     },
-    async fetchOptions () {
-      let promises = []
-      let selectCodes = []
+    async fetchOptions() {
+      let promises = [];
+      let selectCodes = [];
 
-      this.headers.forEach((header) => {
-        if (header.type == 'select') {
+      this.headers.forEach(header => {
+        if (header.type == "select") {
           if (header.select && header.select.choices) {
-            this.form_options[header.select.code] = header.select.choices
+            this.form_options[header.select.code] = header.select.choices;
           } else {
-            selectCodes.push(header.select.code)
+            selectCodes.push(header.select.code);
 
-            let url = header.select.url
+            let url = header.select.url;
             if (header.select.of) {
-              url = url.concat(`/${this.deepFind(this, header.select.of)}`)
+              url = url.concat(`/${this.deepFind(this, header.select.of)}`);
             }
 
-            if (header.select.type && header.select.type == 'param') {
-              promises.push(this.$api.params(url))
+            if (header.select.type && header.select.type == "param") {
+              promises.push(this.$api.params(url));
             } else {
-              promises.push(this.$api.list(url))
+              promises.push(this.$api.list(url));
             }
           }
         }
 
-        if (header.type == 'boolean') {
-          this.dataForm[header.field] = header.default ? header.default : false
+        if (header.type == "boolean") {
+          this.dataForm[header.field] = header.default ? header.default : false;
         }
-      })
+      });
 
-      let selectValues = await Promise.all(promises)
+      let selectValues = await Promise.all(promises);
 
       selectValues.forEach((values, index) => {
-        this.form_options[selectCodes[index]] = values
-      })
+        this.form_options[selectCodes[index]] = values;
+      });
 
-      this.$forceUpdate()
+      this.$forceUpdate();
     },
-    validatedataForm () {
-      if (!this.validate) return 0
-      if (!this.headers) return 0
-      if (!this.dataForm) return 0
+    validatedataForm() {
+      if (!this.validate) return 0;
+      if (!this.headers) return 0;
+      if (!this.dataForm) return 0;
 
-      this.form_is_valid = true
+      this.form_is_valid = true;
 
-      this.headers.forEach((header) => {
-        if (header.type == 'form') {
-          return
+      this.headers.forEach(header => {
+        if (header.type == "form") {
+          return;
         }
 
         if (!this.fieldIsVisible(header)) {
-          return
+          return;
         }
 
-        const validation_rules = header.validator || []
-        this.form_validation_status[header.code] = {}
+        const validation_rules = header.validator || [];
+        this.form_validation_status[header.code] = {};
 
-        this.form_validation_status[header.code].valid = true
-        this.form_validation_status[header.code].errors = []
-        this.form_validation_status[header.code].status = 'validating'
+        this.form_validation_status[header.code].valid = true;
+        this.form_validation_status[header.code].errors = [];
+        this.form_validation_status[header.code].status = "validating";
 
-        validation_rules.forEach((rule) => {
-          let ruleTokens = rule.split(':')
+        validation_rules.forEach(rule => {
+          let ruleTokens = rule.split(":");
 
-          let ruleCode = ruleTokens[0]
-          let ruleParams = ruleTokens[1] ? ruleTokens[1].split(',') : []
+          let ruleCode = ruleTokens[0];
+          let ruleParams = ruleTokens[1] ? ruleTokens[1].split(",") : [];
 
           switch (ruleCode) {
-            case 'required':
-              let fieldValue = this.dataForm[header.field]
-              let fieldValueIsEmpty = false
+            case "required":
+              let fieldValue = this.dataForm[header.field];
+              let fieldValueIsEmpty = false;
 
               switch (typeof fieldValue) {
-                case 'object':
-                  fieldValueIsEmpty = _.isEmpty(fieldValue)
-                  break
+                case "object":
+                  fieldValueIsEmpty = _.isEmpty(fieldValue);
+                  break;
                 default:
-                  fieldValueIsEmpty = ['', undefined, null, NaN].includes(
+                  fieldValueIsEmpty = ["", undefined, null, NaN].includes(
                     fieldValue
-                  )
-                  break
+                  );
+                  break;
               }
 
               if (fieldValueIsEmpty) {
-                this.form_is_valid = false
-                this.form_validation_status[header.code].valid = false
+                this.form_is_valid = false;
+                this.form_validation_status[header.code].valid = false;
                 this.form_validation_status[header.code].errors.push(
-                  'Campo obbligatorio'
-                )
+                  "Campo obbligatorio"
+                );
               }
-              break
+              break;
 
-            case 'equal':
-              let currentValue = this.dataForm[header.field]
-              let otherValue = this.dataForm[ruleParams[0]]
+            case "equal":
+              let currentValue = this.dataForm[header.field];
+              let otherValue = this.dataForm[ruleParams[0]];
 
               if (
                 (!!currentValue || !!otherValue) &&
                 currentValue != otherValue
               ) {
-                this.form_is_valid = false
-                this.form_validation_status[header.code].valid = false
+                this.form_is_valid = false;
+                this.form_validation_status[header.code].valid = false;
                 this.form_validation_status[header.code].errors.push(
-                  'I due valori non corrispondono'
-                )
+                  "I due valori non corrispondono"
+                );
               }
-              break
+              break;
 
-            case 'file_with_owner':
-              let fileObject = this.dataForm[header.field]
+            case "file_with_owner":
+              let fileObject = this.dataForm[header.field];
 
               if (
                 !_.isEmpty(fileObject) &&
                 (_.isEmpty(fileObject.status) || _.isEmpty(fileObject.doc))
               ) {
-                this.form_is_valid = false
-                this.form_validation_status[header.code].valid = false
+                this.form_is_valid = false;
+                this.form_validation_status[header.code].valid = false;
                 this.form_validation_status[header.code].errors.push(
-                  'Inserire documento e relativo stato'
-                )
+                  "Inserire documento e relativo stato"
+                );
               }
-              break
+              break;
 
             default:
-              break
+              break;
           }
-        })
+        });
 
-        this.form_validation_status[header.code].status = 'validate'
-      })
+        this.form_validation_status[header.code].status = "validate";
+      });
 
-      this.$emit('valid', this.form_is_valid)
+      this.$emit("valid", this.form_is_valid);
     },
-    fieldIsVisible (header) {
+    fieldIsVisible(header) {
       if (header.roles) {
-        return header.roles.includes(this.user.role.code)
+        return header.roles.includes(this.user.role.code);
       }
 
       if (header.visible == undefined) {
-        return true
+        return true;
       }
 
-      let isVisible = true
+      let isVisible = true;
 
-      header.visible.forEach((condition) => {
+      header.visible.forEach(condition => {
         isVisible =
-          isVisible && this.evaluateCondition(condition, this.dataForm)
-      })
+          isVisible && this.evaluateCondition(condition, this.dataForm);
+      });
 
-      return isVisible
+      return isVisible;
     },
-    fieldIsReadonly (header) {
+    fieldIsReadonly(header) {
       if (this.readonly) {
-        return true
+        return true;
       }
 
       if (header.readonly == undefined) {
-        return false
+        return false;
       }
 
-      if (typeof header.readonly === 'boolean') {
-        return header.readonly
+      if (typeof header.readonly === "boolean") {
+        return header.readonly;
       }
 
-      let mode = this.is_edit ? 'edit' : 'create'
+      let mode = this.is_edit ? "edit" : "create";
 
       // If it's false or not set I return false
       // otherwise I simply return the value
-      return header.readonly[mode] != undefined ? header.readonly[mode] : false
+      return header.readonly[mode] != undefined ? header.readonly[mode] : false;
     },
-    toObject (arr, header) {
+    toObject(arr, header) {
       if (!arr) {
-        return
+        return;
       }
 
-      var rv = {}
+      var rv = {};
 
       for (var i = 0; i < arr.length; ++i) {
-        rv[arr[i].id] = this.deepPick(arr[i], header.select.option)
+        rv[arr[i].id] = this.deepPick(arr[i], header.select.option);
       }
 
-      return rv
+      return rv;
     },
-    filterOptions (header) {
+    filterOptions(header) {
       if (header.options) {
-        return header.options
+        return header.options;
       }
 
       if (header.select && header.select.filter == undefined) {
-        return this.form_options[header.select.code]
+        return this.form_options[header.select.code];
       }
 
       if (!this.form_options[header.select.code]) {
-        return []
+        return [];
       }
 
-      let filteredOptions = []
+      let filteredOptions = [];
 
-      filteredOptions = this.form_options[header.select.code].filter(
-        (option) => {
-          let isInFilter = this.evaluateCondition(
-            header.select.filter,
-            option,
-            this.dataForm
-          )
+      filteredOptions = this.form_options[header.select.code].filter(option => {
+        let isInFilter = this.evaluateCondition(
+          header.select.filter,
+          option,
+          this.dataForm
+        );
 
-          return isInFilter
-        }
-      )
+        return isInFilter;
+      });
 
       if (this.changedFields[header.select.filter[0]]) {
-        this.dataForm[header.field] = undefined
-        this.changedFields[header.select.filter[0]] = false
-        this.$forceUpdate()
+        this.dataForm[header.field] = undefined;
+        this.changedFields[header.select.filter[0]] = false;
+        this.$forceUpdate();
       }
 
-      return filteredOptions
+      return filteredOptions;
     },
-    updateOldForm (newForm) {
-      this.oldForm = JSON.parse(JSON.stringify(newForm))
+    updateOldForm(newForm) {
+      this.oldForm = JSON.parse(JSON.stringify(newForm));
       // Update form for parent component
-      this.$emit('change', this.dataForm)
+      this.$emit("change", this.dataForm);
     },
-    labelClass (header) {
-      let cssClass = ''
+    getLabelClass(header) {
+      let cssClass = "";
 
       switch (header.type) {
-        case 'form':
-          cssClass = 'text-gray-700 text-normal'
-          break
+        case "form":
+          cssClass = "text-gray-700 text-normal";
+          break;
 
-        case 'fieldset':
-          cssClass = 'text-gray-dark text-xl font-bold my-5'
-          break
+        case "fieldset":
+          cssClass = this.separatorClass;
+          break;
 
         default:
-          cssClass = 'text-gray-600 text-sm'
-          break
+          cssClass = this.labelClass;
+          break;
       }
 
       if (header.select) {
         if (header.select.can_add) {
-          cssClass += ''
+          cssClass += "";
         }
       }
 
-      return cssClass
+      return cssClass;
     }
   },
   computed: {
-    ...mapState('user', {
-      user: (state) => state.user
+    ...mapState("user", {
+      user: state => state.user
     }),
-    visible_headers () {
-      return this.headers.filter((header) => {
-        return this.fieldIsVisible(header)
-      })
+    visible_headers() {
+      return this.headers.filter(header => {
+        return this.fieldIsVisible(header);
+      });
     }
   },
   watch: {
     dataForm: {
       deep: true,
-      handler (newForm) {
+      handler(newForm) {
         this.headers.forEach((header, index) => {
           if (
             this.deepPick(newForm, header.field) !=
             this.deepPick(this.oldForm, header.field)
           ) {
-            this.changedFields[header.field] = true
+            this.changedFields[header.field] = true;
             // this.form = newForm;
 
-            this.$emit('single-change', {
+            this.$emit("single-change", {
               header,
               header_index: index,
               value: this.deepPick(newForm, header.field)
-            })
+            });
           }
-        })
+        });
 
-        this.updateOldForm(newForm)
+        this.updateOldForm(newForm);
       }
     }
   }
-}
+};
 </script>
 
 <style></style>

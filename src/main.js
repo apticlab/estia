@@ -5,7 +5,9 @@ import VueTailwind from 'vue-tailwind'
 import { helpers } from './utils/helpers'
 import { EventBus } from './utils/event-bus.js'
 import api from './utils/api'
+import { getProfile } from './utils/auth';
 
+import theme from './theme';
 import mixins from './mixins'
 import plugins from './plugins'
 import filters from './filters'
@@ -23,6 +25,10 @@ import {
 
 export default {
   install (Vue, options) {
+    Vue.prototype.$api = api(options)
+    Vue.prototype.EventBus = EventBus
+    Vue.prototype.$theme = theme(options)
+
     components(Vue)
     mixins(Vue)
     plugins(Vue)
@@ -32,9 +38,6 @@ export default {
     viewFields(Vue, options.viewFields)
 
     Object.keys(helpers).forEach(key => (Vue.prototype[key] = helpers[key]))
-
-    Vue.prototype.$api = api(options)
-    Vue.prototype.EventBus = EventBus
 
     Vue.use(VueFormulate, {
       library: {
@@ -70,5 +73,6 @@ export default {
 export {
   RouterView,
   EditResource,
-  SideNavMixin
+  SideNavMixin,
+  getProfile
 }
