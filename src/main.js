@@ -20,7 +20,8 @@ import components, {
   EditResource
 } from './components'
 import {
-  SideNav as SideNavMixin
+  SideNav as SideNavMixin,
+  Actions as ActionsMixin
 } from './mixins';
 
 export default {
@@ -28,6 +29,7 @@ export default {
     Vue.prototype.$api = api(options)
     Vue.prototype.EventBus = EventBus
     Vue.prototype.$theme = theme(options)
+    Vue.prototype.$actions = options.actions ? options.actions : {};
 
     components(Vue)
     mixins(Vue)
@@ -74,5 +76,6 @@ export {
   RouterView,
   EditResource,
   SideNavMixin,
+  ActionsMixin,
   getProfile
 }

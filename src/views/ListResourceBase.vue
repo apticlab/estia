@@ -6,11 +6,11 @@
         <button
           v-if="config.canAdd"
           :class="addResourceClass"
-          class="outline-none ml-auto focus:outline-none"
+          class="ml-auto outline-none focus:outline-none"
           @click="addResource()"
         >
           <span class="flex flex-row justify-center">
-            <i class="ti-plus mr-2 mt-1 text-md" />
+            <i class="mt-1 mr-2 ti-plus text-md" />
             <span>{{ newResourceLabel }}</span>
           </span>
         </button>
@@ -48,8 +48,11 @@
   </div>
 </template>
 <script>
+import ActionsMixin from "@/mixins/actions.mixin.js";
+
 export default {
   name: "ListResourceBase",
+  mixins: [ActionsMixin],
   props: {
     tableClass: {
       required: false,
@@ -164,15 +167,6 @@ export default {
       }
 
       this.isLoading = false;
-    },
-    actOnRow(event) {
-      let action = event.action;
-      let index = event.index;
-
-      if (this[action.callback]) {
-        let row = this.rows[index];
-        this[action.callback](row);
-      }
     },
     addResource() {
       this.$router.push(`${this.resourceName}/create`);
