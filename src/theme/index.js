@@ -5,6 +5,7 @@ const defaultTheme = {
   "fieldClass": "text-gray-700 font-bold flex flex-col",
   "backButtonClass": "bg-gray-300 text-gray-700",
   "saveButtonClass": "bg-green-700 text-white",
+  "backdropBgColor": "bg-gray-700",
 };
 
 export default function(options) {

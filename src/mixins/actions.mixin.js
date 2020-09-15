@@ -18,6 +18,15 @@ export default {
         this.$actions[action.callback](this, row);
       }
     },
+    act(action) {
+      if (this[action.callback]) {
+        this[action.callback]();
+      }
+
+      if (this.$actions[action.callback]) {
+        this.$actions[action.callback](this);
+      }
+    },
   },
   computed: {
     visibleActions() {

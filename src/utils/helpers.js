@@ -16,7 +16,6 @@ const helpers = {
   getDayWeekNumber,
   getVisibleItemsByRole,
   itemIsVisible,
-  actOnRow
 };
 
 export { helpers };
@@ -209,16 +208,6 @@ function getVisibleItemsByRole(items, user) {
   return items.filter(item => {
     return !item.roles || item.roles.includes(user.role.code);
   });
-}
-
-function actOnRow(event) {
-  let action = event.action;
-  let index = event.index;
-
-  if (this[action.callback]) {
-    let row = this.rows[index];
-    this[action.callback](row);
-  }
 }
 
 function itemIsVisible(item, reference) {
