@@ -15,7 +15,7 @@ const helpers = {
   moment,
   getDayWeekNumber,
   getVisibleItemsByRole,
-  actionIsVisible,
+  itemIsVisible,
   actOnRow
 };
 
@@ -221,15 +221,15 @@ function actOnRow(event) {
   }
 }
 
-function actionIsVisible(action) {
-  if (action.visible == undefined) {
+function itemIsVisible(item, reference) {
+  if (item.visible == undefined) {
     return true;
   }
 
   let isVisible = true;
 
-  action.visible.forEach(condition => {
-    isVisible = isVisible && this.evaluateCondition(condition, this.mission);
+  item.visible.forEach(condition => {
+    isVisible = isVisible && this.evaluateCondition(condition, reference);
   });
 
   return isVisible;
