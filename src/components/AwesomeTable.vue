@@ -23,7 +23,7 @@
 							{{ header.label | translate }}
 						</div>
 					</th>
-					<th v-if="actions.length || selectable" class="py-5 px-3">
+					<th v-if="actions.length || selectable" class="px-4 py-3 font-semibold text-md">
 						<div class="flex flex-row justify-center" :class="headerClass">
 							Azioni
 						</div>
@@ -230,14 +230,15 @@
 									<div class="popper shadow-md bg-white text-gray-700 rounded py-1 px-2">
 										{{ action.label }}
 									</div>
-									<button
+									<icon
 										slot="reference"
+										:name="action.icon"
 										:class="action.class"
-										class="mr-1 text-gray-500 focus:outline-none p-1"
+										size="l"
+										color="text-gray-500"
+										class="mr-1 focus:outline-none p-1"
 										@click="actOnRow(action, index)"
-									>
-										<i class="fa text-xl" :class="action.icon" />
-									</button>
+									/>
 								</popper>
 							</div>
 							<div v-else class="flex flex-row items-center justify-center">
