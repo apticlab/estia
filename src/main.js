@@ -21,7 +21,6 @@ import components, {
 } from './components'
 import {
   SideNav as SideNavMixin,
-  Actions as ActionsMixin
 } from './mixins';
 
 export default {
@@ -76,6 +75,5 @@ export {
   RouterView,
   EditResource,
   SideNavMixin,
-  ActionsMixin,
   getProfile
 }

@@ -3,10 +3,10 @@ import moment from "moment";
 moment.locale("it");
 
 const helpers = {
-  getNestedField: getNestedField,
-  getInfoFromOptions: getInfoFromOptions,
-  clone: clone,
-  sleep: sleep,
+  getNestedField,
+  getInfoFromOptions,
+  clone,
+  sleep,
   deepFind,
   getColor,
   createRandomArray,
@@ -14,7 +14,7 @@ const helpers = {
   deepPick,
   moment,
   getDayWeekNumber,
-  getVisibleActionsByRole,
+  getVisibleItemsByRole,
   actionIsVisible,
   actOnRow
 };
@@ -205,9 +205,9 @@ function evaluateCondition(condition, object, reference = null) {
   return conditionIsMet;
 }
 
-function getVisibleActionsByRole(actions, user) {
-  return actions.filter(action => {
-    return !action.roles || action.roles.includes(user.role.code);
+function getVisibleItemsByRole(items, user) {
+  return items.filter(item => {
+    return !item.roles || item.roles.includes(user.role.code);
   });
 }
 
