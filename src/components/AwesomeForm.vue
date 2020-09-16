@@ -526,6 +526,12 @@ export default {
         return isInFilter;
       });
 
+      if (this.debug) {
+        this.log(this.form_options);
+        this.log(header.select.code);
+        this.log(filteredOptions);
+      }
+
       if (this.changedFields[header.select.filter[0]]) {
         this.dataForm[header.field] = undefined;
         this.changedFields[header.select.filter[0]] = false;

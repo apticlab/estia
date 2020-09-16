@@ -1,6 +1,7 @@
 import VueFormulate from '@braid/vue-formulate'
 import VueSVGIcon from 'vue-svgicon'
 import VueTailwind from 'vue-tailwind'
+import moment from 'moment';
 
 import { helpers } from './utils/helpers'
 import { EventBus } from './utils/event-bus.js'
@@ -30,6 +31,7 @@ export default {
     Vue.prototype.EventBus = EventBus
     Vue.prototype.$theme = theme(options)
     Vue.prototype.$actions = options.actions ? options.actions : {};
+    Vue.prototype.$moment = moment;
 
     components(Vue)
     mixins(Vue)

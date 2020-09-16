@@ -61,12 +61,7 @@ export default {
       optionsArray: null
     };
   },
-  beforeMount() {
-    console.log(this.value);
-    console.log(this.header);
-    console.log(this.resources);
-    console.log(this.attributes);
-  },
+  beforeMount() {},
   methods: {
     onChange($event) {
       let newValue = this.options.find(o => o.id == $event.target.value);
