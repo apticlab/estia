@@ -131,8 +131,10 @@ export default {
 
     this.actions = this.resources[this.resource_name].actions || [];
 
-    console.log(this.resource_name);
-    console.log(this.resource_id);
+    if (this.debug) {
+      this.log("ResourceName: " + this.resource_name);
+      this.log("ResourceId: " + this.resource_id);
+    }
 
     if (this.resource_id) {
       this.is_edit = true;
@@ -204,6 +206,11 @@ export default {
       this.$router.back();
     },
     updateResource(newResource) {
+      if (this.debug) {
+        this.log("NewResource");
+        this.log(newResource);
+      }
+
       this.changedResource = newResource;
     },
     act(action) {
