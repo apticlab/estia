@@ -72,31 +72,11 @@ export default {
   components: {},
   data() {
     return {
-      value: null,
       example:
         '{"status":200,"error":"","data":[{"news_id":51184,"title":"iPhone X Review: Innovative future with real black technology","source":"Netease phone"},{"news_id":51183,"title":"Traffic paradise: How to design streets for people and unmanned vehicles in the future?","source":"Netease smart","link":"http://netease.smart/traffic-paradise/1235"},{"news_id":51182,"title":"Teslamasks American Business Relations: The government does not pay billions to build factories","source":"AI Finance","members":["Daniel","Mike","John"]}]}'
     };
   },
-  mounted() {
-    let fieldName = this.getFieldNameFromType(this.field) || this.field.field;
-
-    switch (this.field.type) {
-      case "fieldset":
-        this.value = this.field.label;
-        break;
-      case "image_upload":
-        this.value = {
-          "background-image": "url(" + this.deepPick(this.data, fieldName) + ")"
-        };
-        break;
-      case "json":
-        this.value =
-          JSON.parse(JSON.stringify(this.deepPick(this.data, fieldName))) || "";
-        break;
-      default:
-        this.value = this.deepPick(this.data, fieldName);
-    }
-  },
+  mounted() {},
   methods: {
     getFieldNameFromType(field) {
       switch (field.type) {
@@ -113,6 +93,28 @@ export default {
       }
     }
   },
-  computed: {}
+  computed: {
+    value() {
+      let fieldName = this.getFieldNameFromType(this.field) || this.field.field;
+
+      switch (this.field.type) {
+        case "fieldset":
+          return this.field.label;
+
+        case "image_upload":
+          return {
+            "background-image":
+              "url(" + this.deepPick(this.data, fieldName) + ")"
+          };
+
+        case "json":
+          return;
+          JSON.parse(JSON.stringify(this.deepPick(this.data, fieldName))) || "";
+
+        default:
+          return this.deepPick(this.data, fieldName);
+      }
+    }
+  }
 };
 </script>
