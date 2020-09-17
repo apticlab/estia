@@ -169,13 +169,25 @@ export default {
       this.isLoading = false;
     },
     addResource() {
-      this.$router.push(`${this.resourceName}/create`);
+      this.$router.push({
+        name: `create_${this.resourceName}`
+      });
     },
     view(resource) {
-      this.$router.push(`${this.resourceName}/view/${resource.id}`);
+      this.$router.push({
+        name: `view_${this.resourceName}`,
+        params: {
+          id: resource.id
+        }
+      });
     },
     edit(resource) {
-      this.$router.push(`${this.resourceName}/edit/${resource.id}`);
+      this.$router.push({
+        name: `edit_${this.resourceName}`,
+        params: {
+          id: resource.id
+        }
+      });
     },
     async delete(resource) {
       if (confirm("Vuoi davvero eliminare questa risorsa?")) {
