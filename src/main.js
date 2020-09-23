@@ -16,6 +16,7 @@ import resources from './resources'
 import router from './router'
 import store from './store'
 import viewFields from './view-fields';
+import editFields from './edit-fields';
 import modalWidgets from './modal-widgets';
 import components, {
   RouterView,
@@ -40,6 +41,7 @@ export default {
     resources(Vue, options.resources || {})
     store(Vue, options.store)
     viewFields(Vue, options)
+    editFields(Vue, options)
     modalWidgets(Vue, options)
 
     Object.keys(helpers).forEach(key => (Vue.prototype[key] = helpers[key]))

@@ -26,8 +26,8 @@
         :value="option.id"
       >
         {{
-          attributes.optionField
-            ? deepPick(option, attributes.optionField)
+          attributes.select.option
+            ? deepPick(option, attributes.select.option)
             : option.description
         }}
       </option>

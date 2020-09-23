@@ -57,7 +57,10 @@ export default {
     tableClass: {
       required: false,
       type: String,
-      default: "max-w-screen-xl"
+      default() {
+        console.log(this.$theme);
+        return this.$theme.tableClass;
+      }
     },
     headerClass: {
       required: false,

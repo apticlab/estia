@@ -37,7 +37,17 @@
             >*</span
           >
         </label>
-        <template v-if="header.field && header.field.includes('.')">
+        <div v-if="$editFields[header.type]">
+          <component
+            :is="$editFields[header.type]"
+            :disabled="fieldIsReadonly(header)"
+            :resources="filterOptions(header)"
+            :header="header"
+            :value="deepPick(dataForm, header.field)"
+            @change="$event => updateNested(header.field, $event)"
+          ></component>
+        </div>
+        <template v-else-if="header.field && header.field.includes('.')">
           <resource-select
             v-if="header.type == 'select'"
             :disabled="fieldIsReadonly(header)"
@@ -55,7 +65,7 @@
               :select="header.select"
             /> -->
           <input
-            v-else
+            v-if="header.type == 'text'"
             type="text"
             :value="deepPick(dataForm, header.field)"
             @input="$event => updateNested(header.field, $event.target.value)"
@@ -324,7 +334,7 @@ export default {
       let selectCodes = [];
 
       this.headers.forEach(header => {
-        if (header.type == "select") {
+        if (header.type == "select" || header.isFetchable) {
           if (header.select && header.select.choices) {
             this.form_options[header.select.code] = header.select.choices;
           } else {
@@ -502,6 +512,10 @@ export default {
       return rv;
     },
     filterOptions(header) {
+      if (!header.select) {
+        return [];
+      }
+
       if (header.options) {
         return header.options;
       }
