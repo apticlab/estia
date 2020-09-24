@@ -20,6 +20,7 @@ import editFields from './edit-fields';
 import modalWidgets from './modal-widgets';
 import components, {
   RouterView,
+  ViewResource,
   EditResource
 } from './components'
 import {
@@ -80,6 +81,7 @@ export default {
 export {
   RouterView,
   EditResource,
+  ViewResource,
   SideNavMixin,
   getProfile
 }
