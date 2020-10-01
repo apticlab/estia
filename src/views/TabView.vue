@@ -1,19 +1,17 @@
 <template>
   <div>
-    <div class="bg-white px-4">
-      <div
-        v-if="current_tab"
-        class="flex flex-row justify-between sm:justify-start mx-auto px-0 sm:px-4 sm:max-w-screen-sm md:max-w-screen-md xl:max-w-screen-xl"
-      >
+    <div :class="$theme.tab_view.container">
+      <div v-if="current_tab" :class="$theme.tab_view.tab_container">
         <div
           v-for="tab in visibleTabs"
           :class="{
-            'text-blue-dark border-b-2 border-blue':
-              current_tab.code == tab.code
+            [$theme.tab_view.active]: current_tab.code == tab.code,
+            [$theme.tab_view.inactive]: current_tab.code !== tab.code,
+            [$theme.tab_view.normal]: true,
           }"
           :key="tab.label"
           @click="goToTab(tab, true)"
-          class="mr-8 py-3 text-lg font-bold text-gray-light section-link cursor-pointer"
+          class=""
         >
           <i v-if="tab.icon" class="fas mr-1 text-xs" :class="tab.icon"></i>
           {{ tab.label }}
@@ -31,7 +29,7 @@ export default {
   name: "tab-view",
   props: {
     initial_tab: { required: false, default: null },
-    external_tabs: { required: false }
+    external_tabs: { required: false },
   },
   data() {
     return {
@@ -40,7 +38,7 @@ export default {
       current_resource: null,
       tabs: null,
       tabsFromRouter: false,
-      current_tab: null
+      current_tab: null,
     };
   },
   beforeMount() {
@@ -49,7 +47,7 @@ export default {
   mounted() {
     if (this.tabsFromRouter && this.$route.params.resource) {
       this.current_resource = this.$route.params.resource;
-      this.goToTab(this.tabs.find(tab => tab.code == this.current_resource));
+      this.goToTab(this.tabs.find((tab) => tab.code == this.current_resource));
       return;
     }
 
@@ -69,7 +67,7 @@ export default {
 
       this.tabsFromRouter = true;
 
-      let routeWithTabDefinition = this.$route.matched.find(route =>
+      let routeWithTabDefinition = this.$route.matched.find((route) =>
         route.meta ? route.meta.tabs : null
       );
 
@@ -90,30 +88,30 @@ export default {
 
       if (this.tabsFromRouter) {
         this.$router.push({
-          path: `${this.basePath}/${tab.code}/list`
+          path: `${this.basePath}/${tab.code}/list`,
         });
       }
 
       if (fromTapAction) {
         this.$emit("tab-change", tab);
       }
-    }
+    },
   },
   computed: {
     ...mapState("user", {
-      user: state => state.user
+      user: (state) => state.user,
     }),
     visibleTabs() {
-      return this.tabs.filter(tab => {
+      return this.tabs.filter((tab) => {
         if (!tab.roles) {
           return true;
         }
 
         return tab.roles.includes(this.user.role.code);
       });
-    }
+    },
   },
-  watch: {}
+  watch: {},
 };
 </script>
 
