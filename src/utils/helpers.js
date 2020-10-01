@@ -3,10 +3,10 @@ import moment from "moment";
 moment.locale("it");
 
 const helpers = {
-  getNestedField: getNestedField,
-  getInfoFromOptions: getInfoFromOptions,
-  clone: clone,
-  sleep: sleep,
+  getNestedField,
+  getInfoFromOptions,
+  clone,
+  sleep,
   deepFind,
   getColor,
   createRandomArray,
@@ -14,9 +14,8 @@ const helpers = {
   deepPick,
   moment,
   getDayWeekNumber,
-  getVisibleActionsByRole,
-  actionIsVisible,
-  actOnRow
+  getVisibleItemsByRole,
+  itemIsVisible,
 };
 
 export { helpers };
@@ -205,31 +204,21 @@ function evaluateCondition(condition, object, reference = null) {
   return conditionIsMet;
 }
 
-function getVisibleActionsByRole(actions, user) {
-  return actions.filter(action => {
-    return !action.roles || action.roles.includes(user.role.code);
+function getVisibleItemsByRole(items, user) {
+  return items.filter(item => {
+    return !item.roles || item.roles.includes(user.role.code);
   });
 }
 
-function actOnRow(event) {
-  let action = event.action;
-  let index = event.index;
-
-  if (this[action.callback]) {
-    let row = this.rows[index];
-    this[action.callback](row);
-  }
-}
-
-function actionIsVisible(action) {
-  if (action.visible == undefined) {
+function itemIsVisible(item, reference) {
+  if (item.visible == undefined) {
     return true;
   }
 
   let isVisible = true;
 
-  action.visible.forEach(condition => {
-    isVisible = isVisible && this.evaluateCondition(condition, this.mission);
+  item.visible.forEach(condition => {
+    isVisible = isVisible && this.evaluateCondition(condition, reference);
   });
 
   return isVisible;

@@ -1,33 +1,33 @@
 <template>
-  <div :data-type="context.type">
+  <div :data-type="context ? context.type : ''">
     <div
       v-if="select.can_add"
-      class="flex flex-row items-baseline max-w-screen-xl absolute right-0 top-0"
+      class="absolute top-0 right-0 flex flex-row items-baseline max-w-screen-xl"
     >
       <div
         @click="addResource()"
-        class="text-blue ml-auto flex flex-row items-center cursor-pointer hover:text-blue-dark font-bold"
+        class="flex flex-row items-center ml-auto font-bold cursor-pointer text-blue hover:text-blue-dark"
       >
-        <i class="ti-plus mr-2"></i>
+        <i class="mr-2 ti-plus"></i>
         <span>Aggiungi</span>
       </div>
     </div>
     <select
       v-if="options"
       @change="onChange"
-      :name="context.name"
-      class="form-control flex-grow w-full"
+      :name="context ? context.name : ''"
+      class="flex-grow w-full form-control"
     >
       <option value="undefined">{{ attributes.placeholder }}</option>
       <option
         :key="option.id"
         v-for="option in options"
-        :selected="option.id == context.model.id || option.id == context.model"
+        :selected="option.id == model.id || option.id == model"
         :value="option.id"
       >
         {{
-          attributes.optionField
-            ? deepPick(option, attributes.optionField)
+          attributes.select.option
+            ? deepPick(option, attributes.select.option)
             : option.description
         }}
       </option>
@@ -44,7 +44,16 @@ export default {
   props: {
     context: {
       type: Object,
-      required: true
+      required: false
+    },
+    value: {
+      required: false
+    },
+    resources: {
+      required: false
+    },
+    header: {
+      required: false
     }
   },
   data() {
@@ -55,7 +64,12 @@ export default {
   beforeMount() {},
   methods: {
     onChange($event) {
-      this.context.model = this.options.find(o => o.id == $event.target.value);
+      let newValue = this.options.find(o => o.id == $event.target.value);
+      if (this.context) {
+        this.context.model = newValue;
+      } else {
+        this.$emit("change", newValue);
+      }
     },
     onSearch(search, loading, param) {
       this.onSearchDebounced(search, loading, param, this);
@@ -97,7 +111,7 @@ export default {
   computed: {
     options() {
       if (this.optionsArray == null) {
-        return this.context.attributes.resources;
+        return this.attributes.resources;
       }
 
       return this.optionsArray;
@@ -106,13 +120,24 @@ export default {
       return this.attributes.select;
     },
     model() {
-      return this.context.model;
-    },
-    header() {
-      return this.attributes.header;
+      if (this.context) {
+        return this.context.model;
+      }
+
+      return this.value || {};
     },
     attributes() {
-      return this.context.attributes;
+      if (this.context) {
+        return this.context.attributes;
+      }
+
+      return {
+        header: this.header,
+        select: this.header.select,
+        resources: this.resources,
+        optionField: this.header.select.option,
+        placeholder: this.header.placeholder
+      };
     },
     formattedOptions() {
       return this.options.map(opt => {

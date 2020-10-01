@@ -1,7 +1,8 @@
 <template>
   <transition name="fade">
-    <div v-if="visible" class="z-50 fixed inset-0">
+    <div v-if="visible" class="fixed inset-0 z-50">
       <div
+        :class="$theme.backdropBgColor"
         class="absolute inset-0 opacity-50 bg-gray-dark"
         @click="hide()"
       ></div>
@@ -36,12 +37,19 @@
             :params="params"
           ></import-csv-modal>
         </template>
+        <template v-else-if="$modalWidgets[type]">
+          <component
+            :is="$modalWidgets[type]"
+            @done="confirm"
+            :params="params"
+          ></component>
+        </template>
         <template v-else>
           <div
             :class="is_mobile ? 'h-full w-full' : ''"
-            class="bg-white shadow-2xl flex flex-col p-5 rounded-none sm:rounded-lg"
+            class="flex flex-col p-5 bg-white rounded-none shadow-2xl sm:rounded-lg"
           >
-            <div class="p-4 flex-grow">
+            <div class="flex-grow p-4">
               <div class="flex flex-col items-baseline mb-4">
                 <div class="flex-cont-col">
                   <h2 class="m-0 mb-8 text-2xl text-black">
@@ -60,16 +68,16 @@
             </div>
             <div
               v-if="!type"
-              class="py-3 px-4 bg-gray-100 flex flex-row items-center justify-between sm:justify-end"
+              class="flex flex-row items-center justify-between px-4 py-3 bg-gray-100 sm:justify-end"
             >
               <button
-                class="text-blue px-3 py-2 mr-3 ml-0 sm:ml-auto no-outline"
+                class="px-3 py-2 ml-0 mr-3 text-blue sm:ml-auto no-outline"
                 @click="confirm(false)"
               >
                 {{ params.cancelText || defaultCancelText }}
               </button>
               <button
-                class="rounded-none bg-blue text-white tx-bold px-3 py-2 focus:outline-none"
+                class="px-3 py-2 text-white rounded-none bg-blue tx-bold focus:outline-none"
                 @click="confirm(true)"
               >
                 {{ params.confirmText || defaultConfirmText }}
@@ -115,6 +123,8 @@ export default {
       this.params = params;
       this.type = params.type;
       this.onConfirm = params.onConfirm;
+
+      console.log(this.$modalWidgets);
 
       // making modal visible
       this.visible = true;

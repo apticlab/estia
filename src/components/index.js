@@ -29,6 +29,7 @@ import Popper from '@/components/Popper.vue'
 import SideNav from '@/components/SideNav.vue'
 import TopBar from '@/components/TopBar.vue'
 import RouterView from '@/views/RouterView.vue'
+import ViewResource from '@/views/ViewResource.vue'
 
 export default function (Vue) {
   Vue.component('login', Login)
@@ -61,9 +62,11 @@ export default function (Vue) {
   Vue.component('top-bar', TopBar)
   Vue.component('popper', Popper)
   Vue.component('list-resource-base', ListResourceBase)
+  Vue.component('view-resource', ViewResource)
 }
 
 export {
   RouterView,
-  EditResource
+  EditResource,
+  ViewResource,
 }
