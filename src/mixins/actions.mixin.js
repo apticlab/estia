@@ -40,7 +40,7 @@ export default {
         let roleBasedFilter = !action.roles || action.roles.includes(this.user.role.code);
         let scopeBasedFilter = !action.scopes || action.scopes.includes(actionScope);
 
-        return roleBasedFilter && scopeBasedFilter && this.actionIsVisible(action);
+        return roleBasedFilter && scopeBasedFilter && this.itemIsVisible(action);
       });
 
       return actions;
