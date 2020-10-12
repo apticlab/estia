@@ -22,7 +22,7 @@
           (header.colSpan || 12) +
           ' row-span-' +
           (header.rowSpan || 1)]: header.type != 'form',
-          [fieldClass]: true
+          [fieldClass]: true,
         }"
       >
         <label :class="getLabelClass(header)" :for="header.code">
@@ -44,7 +44,7 @@
             :resources="filterOptions(header)"
             :header="header"
             :value="deepPick(dataForm, header.field)"
-            @change="$event => updateNested(header.field, $event)"
+            @change="($event) => updateNested(header.field, $event)"
           ></component>
         </div>
         <template v-else-if="header.field && header.field.includes('.')">
@@ -55,7 +55,7 @@
             :header="header"
             :placeholder="header.placeholder"
             :value="deepPick(dataForm, header.field)"
-            @change="$event => updateNested(header.field, $event)"
+            @change="($event) => updateNested(header.field, $event)"
           >
           </resource-select>
           <!-- <FormulateInput
@@ -68,7 +68,7 @@
             v-if="header.type == 'text'"
             type="text"
             :value="deepPick(dataForm, header.field)"
-            @input="$event => updateNested(header.field, $event.target.value)"
+            @input="($event) => updateNested(header.field, $event.target.value)"
           />
         </template>
         <div v-else="">
@@ -78,7 +78,7 @@
               :form="dataForm[header.field]"
               :headers="header.headers"
               :validate="header.validate"
-              @change="value => (dataForm[header.field] = value)"
+              @change="(value) => (dataForm[header.field] = value)"
             />
           </template>
           <template v-if="header.type == 'select'">
@@ -147,7 +147,7 @@
                     font-weight="none"
                     font-size="none"
                     text-anchor="none"
-                    style="mix-blend-mode:normal"
+                    style="mix-blend-mode: normal"
                   >
                     <path d="M0 172V0h172v172z" />
                     <path
@@ -166,10 +166,10 @@
                 class="w-full"
                 :value="parseDate(header)"
                 :input-props="{
-                  class: 'form-control w-full'
+                  class: 'form-control w-full',
                 }"
                 :masks="{
-                  input: 'DD/MM/YYYY'
+                  input: 'DD/MM/YYYY',
                 }"
                 locale="it"
                 @input="formatDate($event, header)"
@@ -250,29 +250,29 @@ export default {
       type: String,
       default() {
         return this.$theme.separatorClass;
-      }
+      },
     },
     labelClass: {
       required: false,
       type: String,
       default() {
         return this.$theme.labelClass;
-      }
+      },
     },
     inputClass: {
       required: false,
       type: String,
       default() {
         return this.$theme.inputClass;
-      }
+      },
     },
     fieldClass: {
       required: false,
       type: String,
       default() {
         return this.$theme.fieldClass;
-      }
-    }
+      },
+    },
   },
   data() {
     return {
@@ -284,7 +284,7 @@ export default {
       form_options: {},
       form_validation_status: {},
       form_is_valid: {},
-      form_errors: {}
+      form_errors: {},
     };
   },
   async mounted() {
@@ -333,7 +333,7 @@ export default {
       let promises = [];
       let selectCodes = [];
 
-      this.headers.forEach(header => {
+      this.headers.forEach((header) => {
         if (header.type == "select" || header.isFetchable) {
           if (header.select && header.select.choices) {
             this.form_options[header.select.code] = header.select.choices;
@@ -373,7 +373,7 @@ export default {
 
       this.form_is_valid = true;
 
-      this.headers.forEach(header => {
+      this.headers.forEach((header) => {
         if (header.type == "form") {
           return;
         }
@@ -389,7 +389,7 @@ export default {
         this.form_validation_status[header.code].errors = [];
         this.form_validation_status[header.code].status = "validating";
 
-        validation_rules.forEach(rule => {
+        validation_rules.forEach((rule) => {
           let ruleTokens = rule.split(":");
 
           let ruleCode = ruleTokens[0];
@@ -472,7 +472,7 @@ export default {
 
       let isVisible = true;
 
-      header.visible.forEach(condition => {
+      header.visible.forEach((condition) => {
         isVisible =
           isVisible && this.evaluateCondition(condition, this.dataForm);
       });
@@ -530,15 +530,17 @@ export default {
 
       let filteredOptions = [];
 
-      filteredOptions = this.form_options[header.select.code].filter(option => {
-        let isInFilter = this.evaluateCondition(
-          header.select.filter,
-          option,
-          this.dataForm
-        );
+      filteredOptions = this.form_options[header.select.code].filter(
+        (option) => {
+          let isInFilter = this.evaluateCondition(
+            header.select.filter,
+            option,
+            this.dataForm
+          );
 
-        return isInFilter;
-      });
+          return isInFilter;
+        }
+      );
 
       if (this.debug) {
         this.log(this.form_options);
@@ -558,6 +560,7 @@ export default {
       this.oldForm = JSON.parse(JSON.stringify(newForm));
       // Update form for parent component
       this.$emit("change", this.dataForm);
+      this.$emit("input", this.dataForm);
     },
     getLabelClass(header) {
       let cssClass = "";
@@ -583,17 +586,17 @@ export default {
       }
 
       return cssClass;
-    }
+    },
   },
   computed: {
     ...mapState("user", {
-      user: state => state.user
+      user: (state) => state.user,
     }),
     visible_headers() {
-      return this.headers.filter(header => {
+      return this.headers.filter((header) => {
         return this.fieldIsVisible(header);
       });
-    }
+    },
   },
   watch: {
     dataForm: {
@@ -610,15 +613,15 @@ export default {
             this.$emit("single-change", {
               header,
               header_index: index,
-              value: this.deepPick(newForm, header.field)
+              value: this.deepPick(newForm, header.field),
             });
           }
         });
 
         this.updateOldForm(newForm);
-      }
-    }
-  }
+      },
+    },
+  },
 };
 </script>
 
