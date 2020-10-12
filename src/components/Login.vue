@@ -17,7 +17,7 @@
       <div class="mt-12">
         <div class="py-3 px-1 sm:px-4">
           <slot name="title">
-            <h1 class="text-gray-600 ext-3xl font-semibold">
+            <h1 class="text-gray-600 text-3xl font-semibold">
               Accedi
             </h1>
           </slot>
