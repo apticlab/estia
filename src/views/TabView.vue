@@ -7,7 +7,7 @@
           :class="{
             [$theme.tab_view.active]: current_tab.code == tab.code,
             [$theme.tab_view.inactive]: current_tab.code !== tab.code,
-            [$theme.tab_view.normal]: true
+            [$theme.tab_view.normal]: true,
           }"
           :key="tab.label"
           @click="goToTab(tab, true)"
@@ -29,7 +29,7 @@ export default {
   name: "tab-view",
   props: {
     initialTab: { required: false, default: null },
-    externalTabs: { required: false }
+    externalTabs: { required: false },
   },
   data() {
     return {
@@ -38,7 +38,7 @@ export default {
       current_resource: null,
       tabs: null,
       tabsFromRouter: false,
-      current_tab: null
+      current_tab: null,
     };
   },
   beforeMount() {
@@ -47,16 +47,16 @@ export default {
   mounted() {
     if (this.tabsFromRouter && this.$route.params.resource) {
       this.current_resource = this.$route.params.resource;
-      this.goToTab(this.tabs.find(tab => tab.code == this.current_resource));
+      this.goToTab(this.tabs.find((tab) => tab.code == this.current_resource));
       return;
     }
 
-    if (!this.initial_tab) {
+    if (!this.initialTab) {
       this.goToTab(this.visibleTabs[0]);
       return;
     }
 
-    this.goToTab(this.visibleTabs[this.initial_tab]);
+    this.goToTab(this.visibleTabs[this.initialTab]);
   },
   methods: {
     fetchTabs() {
@@ -67,7 +67,7 @@ export default {
 
       this.tabsFromRouter = true;
 
-      let routeWithTabDefinition = this.$route.matched.find(route =>
+      let routeWithTabDefinition = this.$route.matched.find((route) =>
         route.meta ? route.meta.tabs : null
       );
 
@@ -88,30 +88,30 @@ export default {
 
       if (this.tabsFromRouter) {
         this.$router.push({
-          path: `${this.basePath}/${tab.code}/list`
+          path: `${this.basePath}/${tab.code}/list`,
         });
       }
 
       if (fromTapAction) {
         this.$emit("tab-change", tab);
       }
-    }
+    },
   },
   computed: {
     ...mapState("user", {
-      user: state => state.user
+      user: (state) => state.user,
     }),
     visibleTabs() {
-      return this.tabs.filter(tab => {
+      return this.tabs.filter((tab) => {
         if (!tab.roles) {
           return true;
         }
 
         return tab.roles.includes(this.user.role.code);
       });
-    }
+    },
   },
-  watch: {}
+  watch: {},
 };
 </script>
 
