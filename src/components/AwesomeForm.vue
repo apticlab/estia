@@ -560,7 +560,6 @@ export default {
       this.oldForm = JSON.parse(JSON.stringify(newForm));
       // Update form for parent component
       this.$emit("change", this.dataForm);
-      this.$emit("input", this.dataForm);
     },
     getLabelClass(header) {
       let cssClass = "";
@@ -615,6 +614,8 @@ export default {
               header_index: index,
               value: this.deepPick(newForm, header.field),
             });
+
+            this.$emit("input", newForm);
           }
         });
 
