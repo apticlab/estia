@@ -43,6 +43,7 @@
             :disabled="fieldIsReadonly(header)"
             :resources="filterOptions(header)"
             :header="header"
+            :form-data="dataForm"
             :value="deepPick(dataForm, header.field)"
             @change="($event) => updateNested(header.field, $event)"
           ></component>
