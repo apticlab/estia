@@ -14,6 +14,17 @@ const defaultTheme = {
     inactive: "",
     normal: "mr-8 py-3 text-lg font-bold text-gray-light cursor-pointer",
   },
+  paginationClasses: {
+    wrapper: "flex",
+    element: "w-8 h-8 mx-1",
+    disabledElement: "w-8 h-8 mx-1",
+    ellipsisElement: "w-8 h-8 mx-1",
+    activeButton: "bg-blue-500 w-full h-full text-white rounded-full ",
+    disabledButton:
+    "opacity-25 w-full h-full cursor-not-allowed rounded-full",
+    button: "hover:bg-blue-100 w-full h-full text-blue-500 rounded-full ",
+    ellipsis: "text-gray-500"
+  }
 };
 
 export default function (options) {
