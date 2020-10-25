@@ -56,6 +56,13 @@
           :readonly="field.readonly"
         ></resource-survey>
       </span>
+      <div v-if="$viewFields[field.type]">
+        <component
+          :is="$viewFields[field.type]"
+          :context="field.context"
+          :field="deepPick(data, field.field)"
+        ></component>
+      </div>
     </div>
     <div v-else>
       <span class="text-gray-400">Valore non impostato</span>
