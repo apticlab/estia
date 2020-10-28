@@ -160,8 +160,7 @@ function evaluateCondition(condition, object, reference = null) {
       break;
     case "!=":
       // !!conditionFieldValue is for ensuring conditionFieldValue is not null or undefined
-      conditionIsMet =
-        !!conditionFieldValue && conditionFieldValue != conditionValue;
+      conditionIsMet = conditionFieldValue != conditionValue;
       break;
     case "IN":
       var conditionValueTokens = [];
