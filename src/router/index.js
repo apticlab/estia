@@ -74,11 +74,6 @@ export default function (options) {
 
       if (roleHolder != null && user != null) {
         let userRole = user.role.code.toLowerCase()
-
-        if (user.role.code == 'superadmin' && user.account) {
-          userRole = 'user'
-        }
-
         let userHasRole = roleHolder.indexOf(userRole) != -1
 
         if (userHasRole) {

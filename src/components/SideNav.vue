@@ -1,34 +1,31 @@
 <template>
   <div
-    class="h-full fixed left-0 top-14 sm:top-0 z-20 shadow-xs transition-all duration-200 ease-in flex flex-col"
+    class="fixed left-0 z-20 flex flex-col h-full top-14 sm:top-0 shadow-xs transition-all duration-200 ease-in"
     :class="{
       [bgColor]: true,
       'hidden sm:w-16 sm:block': is_collapsed,
       'w-full sm:w-64': !is_collapsed,
-      'right-0': is_mobile,
+      'right-0': is_mobile
     }"
   >
     <div
       v-if="!is_mobile"
-      class="h-12 text-center flex flex-col justify-center font-medium text-xl pt-3"
+      class="flex flex-col justify-center h-12 pt-3 text-xl font-medium text-center"
     >
       <div class="px-3 py-4">
         <template>
-          <slot
-            name="logo"
-            :is_collapsed="!show_text"
-          />
+          <slot name="logo" :is_collapsed="!show_text" />
         </template>
       </div>
     </div>
     <div class="flex flex-col flex-grow mt-8">
-      <div class="flex flex-col pt-0 sm:pt-6 flex-grow-0">
+      <div class="flex flex-col flex-grow-0 pt-0 sm:pt-6">
         <div
           v-for="item in items"
           :key="item.meta.label"
           class="nav-link"
           :class="{
-            selected: linkIsCurrentLink(item),
+            selected: linkIsCurrentLink(item)
           }"
           @click="navigateTo(item)"
         >
@@ -45,7 +42,7 @@
     </div>
     <div
       v-if="!is_collapsed && version"
-      class="text-center py-2 mt-auto text-blue"
+      class="py-2 mt-auto text-center text-blue"
     >
       <span>versione</span>
       <span>{{ version }}</span>
@@ -54,14 +51,14 @@
 </template>
 
 <script>
-import SideNavMixin from '@/mixins/sidenav.mixin.js'
-import { mapState } from 'vuex'
+import SideNavMixin from "@/mixins/sidenav.mixin.js";
+import { mapState } from "vuex";
 
 export default {
-  name: 'SideNav',
+  name: "SideNav",
   mixins: [SideNavMixin],
   props: {
-    bgColor: { required: false, default: 'bg-white', type: String }
+    bgColor: { required: false, default: "bg-white", type: String }
   },
   data: () => ({
     value: 0,
@@ -70,70 +67,65 @@ export default {
     selected_action: {}
   }),
   computed: {
-    ...mapState('user', {
-      user: (state) => state.user
+    ...mapState("user", {
+      user: state => state.user
     }),
-    currentPath () {
-      return this.$router.name
+    currentPath() {
+      return this.$router.name;
     },
-    items () {
+    items() {
       if (!this.$routes.length) {
-        return []
+        return [];
       }
 
       return this.$routes
-        .filter((route) => {
+        .filter(route => {
           // Only routes with the meta.label have to be present
           // in the SideNav
-          return route.meta && route.meta.label !== undefined
+          return route.meta && route.meta.label !== undefined;
         })
-        .filter((route) => {
+        .filter(route => {
           if (route.meta.roles) {
             if (!this.user) {
-              return -1
+              return false;
             }
 
-            let userRole = this.user.role.code.toLowerCase()
-
-            if (this.user.role.code === 'superadmin' && this.user.account) {
-              userRole = 'user'
-            }
-
-            return route.meta.roles.includes(userRole)
+            let userRole = this.user.role.code.toLowerCase();
+            return route.meta.roles.includes(userRole);
           }
 
-          return true
-        })
+          return true;
+        });
     },
-    version () {
-      return this.APPLICATION_VERSION
+    version() {
+      return this.APPLICATION_VERSION;
     }
   },
-  beforeMount () {
-    this.listenForSideNavCollapseEvent()
+  beforeMount() {
+    this.listenForSideNavCollapseEvent();
   },
-  mounted () {},
+  mounted() {},
   methods: {
-    doUserAction (action) {
-      this.$router.push(action.path)
+    doUserAction(action) {
+      this.$router.push(action.path);
     },
-    navigateTo (link) {
+    navigateTo(link) {
       // Don't navigate to same route or root route
       if (
         link.path != this.$route.name &&
         link.path != this.$route.redirectedFrom
       ) {
         if (this.is_mobile) {
-          this.collapseSideBar()
+          this.collapseSideBar();
         }
-        this.$router.push(link.path)
+        this.$router.push(link.path);
       }
     },
-    linkIsCurrentLink (link) {
-      return this.$route.matched.map((l) => l.name).indexOf(link.name) != -1
+    linkIsCurrentLink(link) {
+      return this.$route.matched.map(l => l.name).indexOf(link.name) != -1;
     }
   }
-}
+};
 </script>
 
 <style>
