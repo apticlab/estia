@@ -18,7 +18,7 @@
           }"
         >
           <th
-            v-for="(header, index) in headers"
+            v-for="(header, index) in visibleHeaders"
             :key="index"
             :class="[getHeaderClass(header)]"
             class="px-4 py-3 font-semibold text-md"
@@ -46,7 +46,7 @@
             @click="selectable ? selectRow(row) : null"
           >
             <td
-              v-for="(header, index) in headers"
+              v-for="(header, index) in visibleHeaders"
               :key="index"
               class="px-4 py-4"
             >
@@ -497,7 +497,17 @@ export default {
       ig_usr_url: "https://instagram.com"
     };
   },
-  computed: {},
+  computed: {
+    visibleHeaders() {
+      return this.headers.filter(header => {
+        if (!header.roles) {
+          return true;
+        }
+
+        return header.roles.includes(this.user.role.code);
+      });
+    }
+  },
   methods: {
     getImage(obj, header) {
       if (header.type === "image") {

@@ -11,7 +11,7 @@
             @click="act(action)"
           >
             <span class="flex flex-row justify-center">
-              <icon name="action.icon" class="mr-1"></icon>
+              <icon name="action.icon" size="m" class="mr-1 text-white"></icon>
               <span>{{ action.label }}</span>
             </span>
           </button>
