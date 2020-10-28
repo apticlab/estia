@@ -1,31 +1,31 @@
 <template>
   <div
     :style="{ 'background-image': bgImage }"
-    class="flex flex-col items-center justify-center h-screen px-4 sm:px-0 bg-no-repeat bg-cover bg-center"
+    class="flex flex-col items-center justify-center h-screen px-4 bg-center bg-no-repeat bg-cover sm:px-0"
   >
     <div
       :class="{
-        [cardClass]: true,
+        [cardClass]: true
       }"
     >
-      <div class="w-full bg-white flex flex-row items-center justify-center">
+      <div class="flex flex-row items-center justify-center w-full bg-white">
         <slot name="logo">
           Logo
         </slot>
       </div>
 
-      <div class="mt-12">
-        <div class="py-3 px-1 sm:px-4">
+      <form class="mt-12" @submit.prevent="login">
+        <div class="px-1 py-3 sm:px-4">
           <slot name="title">
-            <h1 class="text-gray-600 text-3xl font-semibold">
+            <h1 class="text-3xl font-semibold text-gray-600">
               Accedi
             </h1>
           </slot>
-          <div class="flex flex-col mb-4 mt-4">
+          <div class="flex flex-col mt-4 mb-4">
             <slot name="username" :credentials="credentials">
               <label
                 for="username"
-                class="text-gray-600 text-xs mb-1 ml-2 text-blue-dark"
+                class="mb-1 ml-2 text-xs text-gray-600 text-blue-dark"
                 >Username</label
               >
               <input
@@ -42,7 +42,7 @@
             <slot name="password" :credentials="credentials">
               <label
                 for="password"
-                class="text-gray-600 text-xs mb-1 ml-2 text-blue-dark"
+                class="mb-1 ml-2 text-xs text-gray-600 text-blue-dark"
                 >Password</label
               >
               <input
@@ -55,14 +55,14 @@
             </slot>
             <slot name="forgot-password">
               <span
-                class="text-blue ml-auto mr-auto underline italic mt-5 text-xs cursor-pointer"
+                class="mt-5 ml-auto mr-auto text-xs italic underline cursor-pointer text-blue"
               >
                 Password dimenticata?
               </span>
             </slot>
           </div>
         </div>
-        <div class="px-4 flex flex-col justify-center items-center">
+        <div class="flex flex-col items-center justify-center px-4">
           <slot
             name="submit"
             :submitText="submitText"
@@ -72,10 +72,10 @@
             <button
               :disabled="submitDisabled"
               type="submit"
-              class="text-white w-full sm:w-32 ml-0 sm:ml-auto p-3 text-normal outline-none rounded-none"
+              class="w-full p-3 ml-0 text-white rounded-none outline-none sm:w-32 sm:ml-auto text-normal"
               :class="{
                 'bg-blue-light cursor-not-allowed': submitDisabled,
-                'bg-blue cursor-pointer': !submitDisabled,
+                'bg-blue cursor-pointer': !submitDisabled
               }"
               @click="login"
             >
@@ -86,57 +86,58 @@
             <div
               :class="{
                 'opacity-0': errorText == '',
-                'opacity-100': errorText != '',
+                'opacity-100': errorText != ''
               }"
-              class="flex flex-col items-center justify-center my-5 text-center h-6 text-lg text-red-700"
+              class="flex flex-col items-center justify-center h-6 my-5 text-lg text-center text-red-700"
             >
               {{ errorText }}
             </div>
           </slot>
         </div>
-      </div>
+      </form>
     </div>
   </div>
 </template>
 <script>
-import { login, resetPassword } from '../utils/auth';
+import { login, resetPassword } from "../utils/auth";
 
 export default {
-  name: 'Login',
+  name: "Login",
   props: {
     cardClass: {
       required: false,
       type: String,
-      default:
-        'px-10 py-10 rounded-md flex flex-col flex-grow-0 bg-white overflow-hidden mt-2 max-w-screen-sm border border-gray-200',
+      default() {
+        return this.$theme.loginCardClass;
+      }
     },
     bgImage: {
       required: false,
       type: String,
-      default: '',
-    },
+      default: ""
+    }
   },
   data() {
     return {
-      email: '',
-      loginStep: 'login',
+      email: "",
+      loginStep: "login",
       credentials: {
-        username: '',
-        password: '',
+        username: "",
+        password: ""
       },
       isLoading: false,
-      errorText: '',
+      errorText: "",
       errorCodeDict: {
-        user_not_found: 'Matricola non appartenente a nessun utente',
-        username_not_sent: 'Inserisci una matricola nel campo di testo',
-        password_not_insert: 'Inserire la password',
-      },
+        user_not_found: "Matricola non appartenente a nessun utente",
+        username_not_sent: "Inserisci una matricola nel campo di testo",
+        password_not_insert: "Inserire la password"
+      }
     };
   },
   computed: {
     canLogin: function() {
       return (
-        this.credentials.username !== '' && this.credentials.password !== ''
+        this.credentials.username !== "" && this.credentials.password !== ""
       );
     },
     submitDisabled: function() {
@@ -144,11 +145,11 @@ export default {
     },
     submitText: function() {
       if (this.isLoading) {
-        return 'Caricamento';
+        return "Caricamento";
       }
 
-      return this.errorText === '' ? 'Login' : 'Errore';
-    },
+      return this.errorText === "" ? "Login" : "Errore";
+    }
   },
   mounted() {
     if (this.$refs.username) {
@@ -160,55 +161,55 @@ export default {
       var $route = this.$route;
       var $router = this.$router;
 
-      this.errorText = '';
+      this.errorText = "";
 
       this.isLoading = true;
 
       let loginData = await login(
         this.credentials.username,
-        this.credentials.password,
+        this.credentials.password
       );
 
       if (loginData.error) {
         this.isLoading = false;
-        this.errorText = 'Credenziali non valide';
+        this.errorText = "Credenziali non valide";
         return;
       }
 
-      var redirect = $route.query.redirect || '';
+      var redirect = $route.query.redirect || "";
 
       this.isLoading = false;
-      $router.push('/' + redirect);
+      $router.push("/" + redirect);
     },
     sendPasswordReset: function() {
       this.isLoading = true;
-      this.errorText = '';
+      this.errorText = "";
 
       resetPassword(this.email).then(
-        (data) => {
+        data => {
           this.isLoading = false;
-          this.email = '';
-          this.loginStep = 'success';
+          this.email = "";
+          this.loginStep = "success";
         },
-        (err) => {
-          this.email = '';
+        err => {
+          this.email = "";
           this.errorText = this.errorCodeDict[err.code];
           this.isLoading = false;
-        },
+        }
       );
     },
     resetPassword: function($event) {
       $event.stopPropagation();
       $event.preventDefault();
 
-      this.errorText = '';
-      this.loginStep = 'passwordreset';
+      this.errorText = "";
+      this.loginStep = "passwordreset";
     },
     goBack: function() {
-      this.loginStep = 'login';
-      this.errorText = '';
-    },
-  },
+      this.loginStep = "login";
+      this.errorText = "";
+    }
+  }
 };
 </script>
 <style>

@@ -6,6 +6,7 @@ const defaultTheme = {
   backButtonClass: "bg-gray-300 text-gray-700",
   saveButtonClass: "bg-green-700 text-white",
   backdropBgColor: "bg-gray-700",
+  loginCardClass: 'px-10 py-10 rounded-md flex flex-col flex-grow-0 bg-white overflow-hidden mt-2 max-w-screen-sm border border-gray-200',
   tab_view: {
     container: "",
     tab_container:
