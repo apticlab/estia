@@ -1,16 +1,16 @@
 <template>
-  <div class="align-middle inline-block min-w-full">
+  <div class="inline-block min-w-full align-middle">
     <div v-if="fields && !readonly" class="flex flex-row">
       <div
         :class="addResourceClass"
-        class="ml-auto flex flex-row items-center cursor-pointer"
+        class="flex flex-row items-center ml-auto cursor-pointer"
         @click="addRow()"
       >
-        <i class="ti-plus mr-2" />
+        <i class="mr-2 ti-plus" />
         <span>Aggiungi</span>
       </div>
     </div>
-    <table class="w-full table-auto border-collapse" :class="tableClass">
+    <table class="w-full border-collapse table-auto" :class="tableClass">
       <thead>
         <tr
           :class="{
@@ -48,7 +48,7 @@
             <td
               v-for="(header, index) in headers"
               :key="index"
-              class="py-4 px-4"
+              class="px-4 py-4"
             >
               <div
                 class="flex flex-row items-center h-full text-gray-dark"
@@ -60,21 +60,21 @@
                 >
                   <img
                     :src="deepPick(row, header.fields.image)"
-                    class="bg-no-repeat mr-4 bg-gray-400 bg-auto rounded-full w-12 h-12"
+                    class="w-12 h-12 mr-4 bg-gray-400 bg-no-repeat bg-auto rounded-full"
                   />
                   <div class="flex flex-col">
-                    <div class="mb-1 flex flex-row items-center">
+                    <div class="flex flex-row items-center mb-1">
                       <a
                         target="_blank"
                         :href="
                           ig_usr_url + '/' + deepPick(row, header.fields.title)
                         "
-                        class="text-base mr-2 text-blue-500 hover:text-blue-600"
+                        class="mr-2 text-base text-blue-500 hover:text-blue-600"
                         >{{ deepPick(row, header.fields.title) }}</a
                       >
                       <span
                         v-if="deepPick(row, 'usr.is_verified')"
-                        class="h-4 w-4"
+                        class="w-4 h-4"
                       >
                         <svg-icon
                           name="verified-badge"
@@ -82,7 +82,7 @@
                           height="h-4"
                         />
                       </span>
-                      <span v-if="false" class="h-4 w-4">
+                      <span v-if="false" class="w-4 h-4">
                         <svg-icon
                           name="friendship-badge"
                           width="w-4"
@@ -99,11 +99,11 @@
 
                 <div
                   v-if="header.type == 'image' || header.type == 'ig-media'"
-                  class="flex flex-row justify-center flex-grow items-center"
+                  class="flex flex-row items-center justify-center flex-grow"
                 >
                   <img
                     :src="getImage(row, header.field)"
-                    class="bg-no-repeat bg-gray-400 bg-auto rounded-lg w-10 h-10 object-cover"
+                    class="object-cover w-10 h-10 bg-gray-400 bg-no-repeat bg-auto rounded-lg"
                   />
                 </div>
 
@@ -112,7 +112,7 @@
                   class="flex flex-row items-end"
                 >
                   <a
-                    class="btn bg-blue-500 rounded-md text-white px-4 py-2"
+                    class="px-4 py-2 text-white bg-blue-500 btn rounded-md"
                     target="_blank"
                     :href="
                       'https://www.instagram.com/p/' +
@@ -170,7 +170,7 @@
                   <a
                     target="_blank"
                     :href="ig_usr_url + '/' + deepPick(row, 'user.username')"
-                    class="text-base mr-2 text-blue-500 hover:text-blue-600"
+                    class="mr-2 text-base text-blue-500 hover:text-blue-600"
                     :class="header.class"
                     >{{ deepPick(row, "user.username") }}</a
                   >
@@ -191,14 +191,14 @@
                   class="flex flex-row items-end"
                 >
                   <span
-                    class="font-medium underline text-blue-700 cursor-pointer"
+                    class="font-medium text-blue-700 underline cursor-pointer"
                     >#{{ deepPick(row, header.field) }}</span
                   >
                 </div>
 
                 <template v-if="header.type == 'details'">
                   <div class="flex flex-col">
-                    <div class="text-base mb-1">
+                    <div class="mb-1 text-base">
                       {{ deepPick(row, header.field.title) }}
                     </div>
                     <div class="text-xs text-gray-500">
@@ -248,9 +248,8 @@
                   class="flex flex-row items-center h-full"
                 >
                   <span
-                    class="rounded-lg px-3 py-1 text-xs"
-                    :class="
-                      'pill-color-' + deepPick(row, header.field.color)
+                    class="px-3 py-1 text-xs rounded-lg"
+                    :class="'pill-color-' + deepPick(row, header.field.color)
                         ? deepPick(row, header.field.color)
                         : 'green'
                     "

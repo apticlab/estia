@@ -38,7 +38,7 @@ export default {
     components(Vue)
     mixins(Vue)
     plugins(Vue)
-    filters(Vue)
+    filters(Vue, options.filters || {})
     resources(Vue, options.resources || {})
     store(Vue, options.store)
     viewFields(Vue, options)

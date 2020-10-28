@@ -3,24 +3,33 @@
     <div v-if="!isLoading" class="w-full">
       <div class="flex flex-row items-baseline px-4 py-5">
         <slot name="title" />
-        <button
-          v-if="config.canAdd"
-          :class="addResourceClass"
-          class="ml-auto outline-none focus:outline-none"
-          @click="addResource()"
-        >
-          <span class="flex flex-row justify-center">
-            <i class="mt-1 mr-2 ti-plus text-md" />
-            <span>{{ newResourceLabel }}</span>
-          </span>
-        </button>
+        <div class="flex flex-row ml-auto">
+          <button
+            v-for="(action, index) in multiActions"
+            :class="multiActionClass"
+            class="outline-none focus:outline-none"
+            @click="act(action)"
+          >
+            <span class="flex flex-row justify-center">
+              <icon name="action.icon" class="mr-1"></icon>
+              <span>{{ action.label }}</span>
+            </span>
+          </button>
+        </div>
+      </div>
+      <div class="flex flex-row items-center px-4 my-3">
+        <input
+          @input="search"
+          v-model="searchQuery"
+          type="text"
+          placeholder="Cerca"
+        />
       </div>
       <transition>
         <div class="px-4 py-5">
           <awesome-table
             v-if="!resourceIsLoading"
             :header-class="headerClass"
-            :add-resource-class="addResourceClass"
             :table-class="tableClass"
             :row-class="rowClass"
             :striped="striped"
@@ -71,7 +80,7 @@ export default {
       type: String,
       default: "bg-gray-100 text-gray-700"
     },
-    addResourceClass: {
+    multiActionClass: {
       required: false,
       type: String,
       default: "bg-gray-100 text-gray-700"
@@ -91,9 +100,11 @@ export default {
   },
   data() {
     return {
+      actionScope: "list",
       pagination: null,
       currentPage: 1,
       isLoading: true,
+      searchQuery: null,
       rows: null,
       headers: null,
       actions: null,
@@ -104,16 +115,7 @@ export default {
       }
     };
   },
-  computed: {
-    newResourceLabel() {
-      return "Nuova";
-    },
-    visibleActions() {
-      return this.actions.filter(action => {
-        return !action.scopes || action.scopes.includes("list");
-      });
-    }
-  },
+  computed: {},
   async mounted() {
     this.resourceName =
       this.$route.params.resource || this.$route.meta.resource;
@@ -130,6 +132,9 @@ export default {
     await this.loadData();
   },
   methods: {
+    search: _.debounce(async function() {
+      await this.loadData();
+    }, 350),
     async changePage(newCurrentPage) {
       console.log("Changing page: " + newCurrentPage);
       this.currentPage = newCurrentPage;
@@ -139,10 +144,9 @@ export default {
       this.isLoading = true;
       try {
         let response = await this.$api.list(this.resourceName, {
+          q: this.searchQuery,
           page: this.currentPage
         });
-
-        console.log(response);
 
         if (response.data) {
           this.pagination = {
