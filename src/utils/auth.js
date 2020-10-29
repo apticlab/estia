@@ -114,13 +114,13 @@ async function login(username, password) {
   try {
     response.data = await axios.post(LOGIN_URL, loginFormData);
   } catch (e) {
-    response.error = e;
+    response.error = e.response.data;
     return response;
   }
 
   let data = response.data.data;
 
-  if (!data.access_token) {
+  if (!data.token) {
     data.detail = "missing_token";
 
     return {
@@ -128,10 +128,10 @@ async function login(username, password) {
     };
   }
 
-  localStorage.setItem("token", data.access_token);
+  localStorage.setItem("token", data.token);
 
   axios.defaults.headers.common["Authorization"] =
-    "Bearer " + data.access_token;
+    "Bearer " + data.token;
 
   setProfile(data.user);
 

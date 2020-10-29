@@ -77,7 +77,6 @@
                 'bg-blue-light cursor-not-allowed': submitDisabled,
                 'bg-blue cursor-pointer': !submitDisabled
               }"
-              @click="login"
             >
               {{ submitText }}
             </button>
@@ -171,8 +170,18 @@ export default {
       );
 
       if (loginData.error) {
+        // TODO: move this logic out of Estia and inside client application
+        switch (loginData.error) {
+          case "wrong_credentials":
+            this.errorText = "Credenziali non valide";
+            break;
+          case "account_not_active":
+            this.errorText =
+              "Account non attivo. Contattare l'amministrazione per rinnovare";
+            break;
+        }
+
         this.isLoading = false;
-        this.errorText = "Credenziali non valide";
         return;
       }
 
