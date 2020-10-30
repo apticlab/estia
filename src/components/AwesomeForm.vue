@@ -199,7 +199,7 @@
             :resource="header.resource"
           />
         </div>
-        <div class="mt-2 mr-auto error-container">
+        <div class="ml-2 mt-2 mr-auto error-container">
           <div
             v-if="deepPick(form_validation_status, header.code)"
             class="flex flex-col items-center"
