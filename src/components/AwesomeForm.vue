@@ -3,13 +3,14 @@
     <loading v-if="loading" />
     <FormulateForm
       v-if="!loading"
-      v-model="dataForm"
       name="aw-form"
       class="w-full grid grid-cols-12 col-gap-6"
-      @input="validatedataForm"
+      :values="form"
+      @input="updateFormulate"
     >
       <pre v-if="debug">
-        {{ dataForm }}
+        form: {{ dataForm }}
+        valid: {{ form_is_valid }}
       </pre>
       <div
         v-for="(header, index) in visible_headers"
@@ -22,7 +23,7 @@
           (header.colSpan || 12) +
           ' row-span-' +
           (header.rowSpan || 1)]: header.type != 'form',
-          [fieldClass]: true,
+          [fieldClass]: true
         }"
       >
         <label :class="getLabelClass(header)" :for="header.code">
@@ -45,7 +46,7 @@
             :header="header"
             :form-data="dataForm"
             :value="deepPick(dataForm, header.field)"
-            @change="($event) => updateNested(header.field, $event)"
+            @change="$event => updateNested(header.field, $event)"
           ></component>
         </div>
         <template v-else-if="header.field && header.field.includes('.')">
@@ -56,7 +57,7 @@
             :header="header"
             :placeholder="header.placeholder"
             :value="deepPick(dataForm, header.field)"
-            @change="($event) => updateNested(header.field, $event)"
+            @change="$event => updateNested(header.field, $event)"
           >
           </resource-select>
           <!-- <FormulateInput
@@ -69,7 +70,7 @@
             v-if="header.type == 'text'"
             type="text"
             :value="deepPick(dataForm, header.field)"
-            @input="($event) => updateNested(header.field, $event.target.value)"
+            @input="$event => updateNested(header.field, $event.target.value)"
           />
         </template>
         <div v-else="">
@@ -79,7 +80,7 @@
               :form="dataForm[header.field]"
               :headers="header.headers"
               :validate="header.validate"
-              @change="(value) => (dataForm[header.field] = value)"
+              @change="value => (dataForm[header.field] = value)"
             />
           </template>
           <template v-if="header.type == 'select'">
@@ -167,10 +168,10 @@
                 class="w-full"
                 :value="parseDate(header)"
                 :input-props="{
-                  class: 'form-control w-full',
+                  class: 'form-control w-full'
                 }"
                 :masks="{
-                  input: 'DD/MM/YYYY',
+                  input: 'DD/MM/YYYY'
                 }"
                 locale="it"
                 @input="formatDate($event, header)"
@@ -200,12 +201,14 @@
         </div>
         <div class="mt-2 mr-auto error-container">
           <div
-            v-if="form_validation_status[header.code]"
+            v-if="deepPick(form_validation_status, header.code)"
             class="flex flex-col items-center"
           >
             <span
-              v-for="(error, index) in form_validation_status[header.code]
-                .errors"
+              v-for="(error, index) in deepPick(
+                form_validation_status,
+                header.code
+              ).errors"
               :key="index"
               class="mb-2 text-red-600"
               >{{ error }}</span
@@ -251,29 +254,29 @@ export default {
       type: String,
       default() {
         return this.$theme.separatorClass;
-      },
+      }
     },
     labelClass: {
       required: false,
       type: String,
       default() {
         return this.$theme.labelClass;
-      },
+      }
     },
     inputClass: {
       required: false,
       type: String,
       default() {
         return this.$theme.inputClass;
-      },
+      }
     },
     fieldClass: {
       required: false,
       type: String,
       default() {
         return this.$theme.fieldClass;
-      },
-    },
+      }
+    }
   },
   data() {
     return {
@@ -285,7 +288,7 @@ export default {
       form_options: {},
       form_validation_status: {},
       form_is_valid: {},
-      form_errors: {},
+      form_errors: {}
     };
   },
   async mounted() {
@@ -306,10 +309,21 @@ export default {
     // this.event_bus.$off('aw:form:update', this.forceUpdate);
   },
   methods: {
+    updateFormulate(formulateForm) {
+      Object.keys(formulateForm).forEach(fieldName => {
+        _.set(this.dataForm, fieldName, formulateForm[fieldName]);
+      });
+
+      this.updateOldForm(this.dataForm);
+      this.validatedataForm();
+      this.$forceUpdate();
+    },
     updateNested(field, value) {
       _.set(this.dataForm, field, value);
 
       this.updateOldForm(this.dataForm);
+      this.validatedataForm();
+      this.$forceUpdate();
     },
     listenForAwEvents() {
       this.event_bus.$on("aw:form:update", this.forceUpdate());
@@ -334,7 +348,7 @@ export default {
       let promises = [];
       let selectCodes = [];
 
-      this.headers.forEach((header) => {
+      this.headers.forEach(header => {
         if (header.type == "select" || header.isFetchable) {
           if (header.select && header.select.choices) {
             this.form_options[header.select.code] = header.select.choices;
@@ -374,7 +388,7 @@ export default {
 
       this.form_is_valid = true;
 
-      this.headers.forEach((header) => {
+      this.headers.forEach(header => {
         if (header.type == "form") {
           return;
         }
@@ -384,21 +398,23 @@ export default {
         }
 
         const validation_rules = header.validator || [];
-        this.form_validation_status[header.code] = {};
 
-        this.form_validation_status[header.code].valid = true;
-        this.form_validation_status[header.code].errors = [];
-        this.form_validation_status[header.code].status = "validating";
+        let validationStatus = {
+          valid: true,
+          errors: [],
+          status: "validated"
+        };
 
-        validation_rules.forEach((rule) => {
+        validation_rules.forEach(rule => {
           let ruleTokens = rule.split(":");
 
           let ruleCode = ruleTokens[0];
           let ruleParams = ruleTokens[1] ? ruleTokens[1].split(",") : [];
 
+          let fieldValue = this.deepPick(this.dataForm, header.field);
+
           switch (ruleCode) {
             case "required":
-              let fieldValue = this.dataForm[header.field];
               let fieldValueIsEmpty = false;
 
               switch (typeof fieldValue) {
@@ -414,15 +430,14 @@ export default {
 
               if (fieldValueIsEmpty) {
                 this.form_is_valid = false;
-                this.form_validation_status[header.code].valid = false;
-                this.form_validation_status[header.code].errors.push(
-                  "Campo obbligatorio"
-                );
+
+                validationStatus.valid = false;
+                validationStatus.errors.push("Campo obbligatorio");
               }
               break;
 
             case "equal":
-              let currentValue = this.dataForm[header.field];
+              let currentValue = fieldValue;
               let otherValue = this.dataForm[ruleParams[0]];
 
               if (
@@ -430,23 +445,21 @@ export default {
                 currentValue != otherValue
               ) {
                 this.form_is_valid = false;
-                this.form_validation_status[header.code].valid = false;
-                this.form_validation_status[header.code].errors.push(
-                  "I due valori non corrispondono"
-                );
+                validationStatus.valid = false;
+                validationStatus.errors.push("I due valori non corrispondono");
               }
               break;
 
             case "file_with_owner":
-              let fileObject = this.dataForm[header.field];
+              let fileObject = fieldValue;
 
               if (
                 !_.isEmpty(fileObject) &&
                 (_.isEmpty(fileObject.status) || _.isEmpty(fileObject.doc))
               ) {
                 this.form_is_valid = false;
-                this.form_validation_status[header.code].valid = false;
-                this.form_validation_status[header.code].errors.push(
+                validationStatus.valid = false;
+                validationStatus.errors.push(
                   "Inserire documento e relativo stato"
                 );
               }
@@ -457,7 +470,7 @@ export default {
           }
         });
 
-        this.form_validation_status[header.code].status = "validate";
+        _.set(this.form_validation_status, header.code, validationStatus);
       });
 
       this.$emit("valid", this.form_is_valid);
@@ -473,7 +486,7 @@ export default {
 
       let isVisible = true;
 
-      header.visible.forEach((condition) => {
+      header.visible.forEach(condition => {
         isVisible =
           isVisible && this.evaluateCondition(condition, this.dataForm);
       });
@@ -531,17 +544,15 @@ export default {
 
       let filteredOptions = [];
 
-      filteredOptions = this.form_options[header.select.code].filter(
-        (option) => {
-          let isInFilter = this.evaluateCondition(
-            header.select.filter,
-            option,
-            this.dataForm
-          );
+      filteredOptions = this.form_options[header.select.code].filter(option => {
+        let isInFilter = this.evaluateCondition(
+          header.select.filter,
+          option,
+          this.dataForm
+        );
 
-          return isInFilter;
-        }
-      );
+        return isInFilter;
+      });
 
       if (this.debug) {
         this.log(this.form_options);
@@ -586,22 +597,24 @@ export default {
       }
 
       return cssClass;
-    },
+    }
   },
   computed: {
     ...mapState("user", {
-      user: (state) => state.user,
+      user: state => state.user
     }),
     visible_headers() {
-      return this.headers.filter((header) => {
+      return this.headers.filter(header => {
         return this.fieldIsVisible(header);
       });
-    },
+    }
   },
   watch: {
     dataForm: {
       deep: true,
-      handler(newForm) {
+      handler(newForm, oldForm) {
+        return;
+
         this.headers.forEach((header, index) => {
           if (
             this.deepPick(newForm, header.field) !=
@@ -613,7 +626,7 @@ export default {
             this.$emit("single-change", {
               header,
               header_index: index,
-              value: this.deepPick(newForm, header.field),
+              value: this.deepPick(newForm, header.field)
             });
 
             this.$emit("input", newForm);
@@ -621,9 +634,9 @@ export default {
         });
 
         this.updateOldForm(newForm);
-      },
-    },
-  },
+      }
+    }
+  }
 };
 </script>
 
