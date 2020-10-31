@@ -18,12 +18,13 @@
         </div>
       </div>
       <div class="flex flex-row items-center px-4 my-3">
-        <input
+        <search-input
           @input="search"
           v-model="searchQuery"
-          type="text"
           placeholder="Cerca"
-        />
+          class="flex-grow"
+        >
+        </search-input>
       </div>
       <transition>
         <div class="px-4 py-5">

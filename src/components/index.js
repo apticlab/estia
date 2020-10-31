@@ -30,6 +30,7 @@ import SideNav from '@/components/SideNav.vue'
 import TopBar from '@/components/TopBar.vue'
 import RouterView from '@/views/RouterView.vue'
 import ViewResource from '@/views/ViewResource.vue'
+import SearchInput from '@/components/SearchInput.vue';
 
 export default function (Vue) {
   Vue.component('login', Login)
@@ -63,6 +64,7 @@ export default function (Vue) {
   Vue.component('popper', Popper)
   Vue.component('list-resource-base', ListResourceBase)
   Vue.component('view-resource', ViewResource)
+  Vue.component('search-input', SearchInput);
 }
 
 export {
