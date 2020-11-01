@@ -10,8 +10,14 @@
             class="outline-none focus:outline-none"
             @click="act(action)"
           >
-            <span class="flex flex-row justify-center">
-              <icon name="action.icon" size="m" class="mr-1 text-white"></icon>
+            <span class="flex flex-row items-center">
+              <icon
+                :name="action.icon"
+                color="text-white"
+                size="m"
+                class="mr-1"
+              >
+              </icon>
               <span>{{ action.label }}</span>
             </span>
           </button>
