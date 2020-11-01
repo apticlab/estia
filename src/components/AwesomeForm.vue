@@ -11,6 +11,8 @@
       <pre v-if="debug">
         form: {{ dataForm }}
         valid: {{ form_is_valid }}
+        visible_headers: {{ visible_headers.length }}
+        is_pro: {{
       </pre>
       <div
         v-for="(header, index) in visible_headers"
@@ -280,6 +282,7 @@ export default {
   },
   data() {
     return {
+      updateHeaders: new Date().getTime(),
       loading: true,
       dataForm: {},
       changedFields: {},
@@ -316,14 +319,17 @@ export default {
 
       this.updateOldForm(this.dataForm);
       this.validatedataForm();
-      this.$forceUpdate();
+      this.updateHeaders = new Date().getTime();
+      //this.$forceUpdate();
     },
     updateNested(field, value) {
       _.set(this.dataForm, field, value);
 
       this.updateOldForm(this.dataForm);
       this.validatedataForm();
-      this.$forceUpdate();
+
+      this.updateHeaders = new Date().getTime();
+      //this.$forceUpdate();
     },
     listenForAwEvents() {
       this.event_bus.$on("aw:form:update", this.forceUpdate());
@@ -604,6 +610,8 @@ export default {
       user: state => state.user
     }),
     visible_headers() {
+      let uh = this.updateHeaders;
+
       return this.headers.filter(header => {
         return this.fieldIsVisible(header);
       });
