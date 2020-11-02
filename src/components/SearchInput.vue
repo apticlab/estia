@@ -7,7 +7,7 @@
       <icon name="search" color="text-gray-300" size="l" class="mr-3"></icon>
       <input
         ref="input"
-        class="m-0 p-0 bg-transparent border-none"
+        class="m-0 p-0 bg-transparent border-none focus:outline-none active:outline-none"
         style="height: initial"
         type="text"
         :placeholder="placeholder"
