@@ -5,19 +5,17 @@
       [bgColor]: true,
       'hidden sm:w-16 sm:block': is_collapsed,
       'w-full sm:w-64': !is_collapsed,
-      'right-0': is_mobile
+      'right-0': is_mobile,
     }"
   >
-    <div
-      v-if="!is_mobile"
-      class="flex flex-col justify-center h-12 pt-3 text-xl font-medium text-center"
-    >
-      <div class="px-3 py-4">
-        <template>
-          <slot name="logo" :is_collapsed="!show_text" />
-        </template>
-      </div>
-    </div>
+    <template>
+      <slot name="logo" :is_collapsed="!show_text">
+        <div
+          v-if="!is_mobile"
+          class="flex flex-col justify-center h-12 pt-3 text-xl font-medium text-center"
+        ></div>
+      </slot>
+    </template>
     <div class="flex flex-col flex-grow mt-8">
       <div class="flex flex-col flex-grow-0 pt-0 sm:pt-6">
         <div
@@ -25,7 +23,7 @@
           :key="item.meta.label"
           class="nav-link"
           :class="{
-            selected: linkIsCurrentLink(item)
+            selected: linkIsCurrentLink(item),
           }"
           @click="navigateTo(item)"
         >
@@ -58,17 +56,17 @@ export default {
   name: "SideNav",
   mixins: [SideNavMixin],
   props: {
-    bgColor: { required: false, default: "bg-white", type: String }
+    bgColor: { required: false, default: "bg-white", type: String },
   },
   data: () => ({
     value: 0,
     item: 0,
     mini_variant: false,
-    selected_action: {}
+    selected_action: {},
   }),
   computed: {
     ...mapState("user", {
-      user: state => state.user
+      user: (state) => state.user,
     }),
     currentPath() {
       return this.$router.name;
@@ -79,12 +77,12 @@ export default {
       }
 
       return this.$routes
-        .filter(route => {
+        .filter((route) => {
           // Only routes with the meta.label have to be present
           // in the SideNav
           return route.meta && route.meta.label !== undefined;
         })
-        .filter(route => {
+        .filter((route) => {
           if (route.meta.roles) {
             if (!this.user) {
               return false;
@@ -99,7 +97,7 @@ export default {
     },
     version() {
       return this.APPLICATION_VERSION;
-    }
+    },
   },
   beforeMount() {
     this.listenForSideNavCollapseEvent();
@@ -122,9 +120,9 @@ export default {
       }
     },
     linkIsCurrentLink(link) {
-      return this.$route.matched.map(l => l.name).indexOf(link.name) != -1;
-    }
-  }
+      return this.$route.matched.map((l) => l.name).indexOf(link.name) != -1;
+    },
+  },
 };
 </script>
 
