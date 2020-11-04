@@ -130,7 +130,7 @@
     "vue-select": "^3.10.8",
     "vue-tailwind": "^1.1.7",
     "vue-window-size": "^0.2.5",
-    "vue2-daterange-picker": "^0.4.6",
+    "vue2-daterange-picker": "^0.5.1",
     "vue2-timepicker": "^1.1.3",
     "vuejs-datepicker": "^1.6.2",
     "vuex": "^3.5.1",

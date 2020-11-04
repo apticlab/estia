@@ -3,7 +3,7 @@
     <canvas
       :style="{
         width: width + 'px',
-        height: height + 'px'
+        height: height + 'px',
       }"
       :height="height"
       :width="width"
@@ -19,12 +19,12 @@ const typeHasFill = {
   bar: (fill = true) => fill,
   line: (fill = true) => fill,
   doughnut: (fill = true) => fill,
-  stacked_bar: (fill = true) => fill
+  stacked_bar: (fill = true) => fill,
 };
 
 const typeConfigs = {
   line: (show = false) => {
-    return  {
+    return {
       xTicks: show,
       yTicks: show,
       yGrid: show,
@@ -33,38 +33,38 @@ const typeConfigs = {
           top: 0,
           left: 0,
           right: 0,
-          bottom: 0
-        }
+          bottom: 0,
+        };
       },
       tickMarkLength: 0,
-    }
+    };
   },
   bar: (show = true) => {
     return {
       xTicks: show,
       yTicks: show,
-      yGrid: show 
-    }
+      yGrid: show,
+    };
   },
   stacked_bar: (show = true) => {
     return {
       xTicks: show,
       yTicks: show,
       yGrid: show,
-      stacked: show 
-    }
+      stacked: show,
+    };
   },
   doughnut: (show = false) => {
     return {
       xTicks: show,
       yTicks: show,
-      yGrid: show
-    }
-  }
+      yGrid: show,
+    };
+  },
 };
 
 const chartType = {
-  stacked_bar: "bar"
+  stacked_bar: "bar",
 };
 
 export default {
@@ -76,14 +76,15 @@ export default {
     width: { required: false, default: 300 },
     rim: { required: false, default: 70 },
     grid: { required: false, default: true },
-    fill: { required: false, default: false }
+    fill: { required: false, default: false },
+    title: { required: false, default: null },
   },
   data() {
     return {
       typeConfig: {},
       chart: null,
       ctx: null,
-      sets: []
+      sets: [],
     };
   },
   mounted() {
@@ -97,36 +98,40 @@ export default {
       type: chartType[this.type] || this.type,
       data: {
         labels: this.labels,
-        datasets: this.sets
+        datasets: this.sets,
       },
       options: {
+        title: this.title,
         hover: {
-          intersect: false
+          intersect: false,
         },
         tooltips: {
           mode: "index",
-          intersect: false
+          intersect: false,
         },
         cutoutPercentage: this.rim,
         maintainAspectRatio: false,
         legend: {
-          display: false
+          display: false,
         },
         layout: {
-          padding: this.typeConfig.padding
+          padding: this.typeConfig.padding,
         },
         scales: {
           yAxes: [
             {
               stacked: this.typeConfig["stacked"] || false,
               gridLines: {
-                tickMarkLength: this.typeConfig.tickMarkLength == undefined ? 5 : this.typeConfig.tickMarkLength,
+                tickMarkLength:
+                  this.typeConfig.tickMarkLength == undefined
+                    ? 5
+                    : this.typeConfig.tickMarkLength,
                 display: this.typeConfig["yGrid"],
                 borderDash: [6, 4],
                 color: this.getColor("gray-400"),
                 drawBorder: false,
                 zeroLineWidth: 1,
-                zeroLineColor: this.getColor("blue-700")
+                zeroLineColor: this.getColor("blue-700"),
               },
               ticks: {
                 display: this.typeConfig["yTicks"],
@@ -135,9 +140,9 @@ export default {
                 fontStyle: 700,
                 fontSize: 14,
                 padding: 14,
-                beginAtZero: false 
-              }
-            }
+                beginAtZero: false,
+              },
+            },
           ],
           xAxes: [
             {
@@ -149,7 +154,7 @@ export default {
                 // drawOnChartArea: false,
               },
               scaleLabel: {
-                display: false
+                display: false,
               },
               ticks: {
                 display: this.typeConfig["xTicks"],
@@ -157,20 +162,20 @@ export default {
                 fontSize: 14,
                 fontStyle: 600,
                 fontColor: this.getColor("gray-600"),
-                callback: function(value, index, values) {
+                callback: function (value, index, values) {
                   return value.toUpperCase();
-                }
-              }
-            }
-          ]
-        }
-      }
+                },
+              },
+            },
+          ],
+        },
+      },
     });
   },
   methods: {
     loadDataSets(reload = false) {
       this.sets = [];
-      this.datasets.forEach(ds => {
+      this.datasets.forEach((ds) => {
         if (!ds.visible) {
           return;
         }
@@ -205,7 +210,8 @@ export default {
             borderWidth: 2,
             pointBackgroundColor: this.getColor(ds.color),
             pointHoverRadius: 5,
-            pointRadius: 0
+            pointRadius: 0,
+            title: ds.title,
           };
         case "stacked_bar":
         case "bar":
@@ -217,23 +223,23 @@ export default {
             backgroundColor: this.getColor(ds.color),
             borderWidth: 1,
             pointBackgroundColor: this.getColor(ds.color),
-            pointBorderWidth: 3
+            pointBorderWidth: 3,
           };
         case "doughnut":
           return {
             data: ds.data,
-            backgroundColor: ds.colors
+            backgroundColor: ds.colors,
           };
       }
-    }
+    },
   },
   watch: {
     datasets: {
       handler(newVal, oldVal) {
         this.loadDataSets(true);
       },
-      deep: true
-    }
-  }
+      deep: true,
+    },
+  },
 };
 </script>
