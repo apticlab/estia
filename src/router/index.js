@@ -73,7 +73,13 @@ export default function (options) {
       }
 
       if (roleHolder != null && user != null) {
+        // TODO: move this where we can access the Vue instance
         let userRole = user.role.code.toLowerCase()
+
+        if (options.roleLookup) {
+          userRole = options.roleLookup(user);
+        }
+
         let userHasRole = roleHolder.indexOf(userRole) != -1
 
         if (userHasRole) {

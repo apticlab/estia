@@ -49,12 +49,10 @@
 </template>
 
 <script>
-import SideNavMixin from "@/mixins/sidenav.mixin.js";
 import { mapState } from "vuex";
 
 export default {
   name: "SideNav",
-  mixins: [SideNavMixin],
   props: {
     bgColor: { required: false, default: "bg-white", type: String },
   },
@@ -88,7 +86,8 @@ export default {
               return false;
             }
 
-            let userRole = this.user.role.code.toLowerCase();
+            let userRole = this.getUserRole();
+
             return route.meta.roles.includes(userRole);
           }
 

@@ -34,6 +34,7 @@ export default {
     Vue.prototype.$theme = theme(options)
     Vue.prototype.$actions = options.actions ? options.actions : {};
     Vue.prototype.$moment = moment;
+    Vue.prototype.$roleLookup = options.roleLookup;
 
     components(Vue)
     mixins(Vue)

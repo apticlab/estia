@@ -483,7 +483,7 @@ export default {
     },
     fieldIsVisible(header) {
       if (header.roles) {
-        return header.roles.includes(this.user.role.code);
+        return header.roles.includes(this.getUserRole());
       }
 
       if (header.visible == undefined) {
