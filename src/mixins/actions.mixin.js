@@ -37,7 +37,7 @@ export default {
 
         let actionScope = this.actionScope || 'list';
 
-        let roleBasedFilter = !action.roles || action.roles.includes(this.user.role.code);
+        let roleBasedFilter = !action.roles || action.roles.includes(this.getUserRole());
         let scopeBasedFilter = !action.scopes || action.scopes.includes(actionScope);
 
         return roleBasedFilter && scopeBasedFilter && this.itemIsVisible(action);
@@ -47,7 +47,7 @@ export default {
     },
     multiActions() {
       return this.actions.filter((action) => {
-        let roleBasedFilter = !action.roles || action.roles.includes(this.user.role.code);
+        let roleBasedFilter = !action.roles || action.roles.includes(this.getUserRole());
 
         return action.multi && roleBasedFilter;
       });

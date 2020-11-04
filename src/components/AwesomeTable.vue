@@ -249,7 +249,8 @@
                 >
                   <span
                     class="px-3 py-1 text-xs rounded-lg"
-                    :class="'pill-color-' + deepPick(row, header.field.color)
+                    :class="
+                      'pill-color-' + deepPick(row, header.field.color)
                         ? deepPick(row, header.field.color)
                         : 'green'
                     "
@@ -504,7 +505,7 @@ export default {
           return true;
         }
 
-        return header.roles.includes(this.user.role.code);
+        return header.roles.includes(this.getUserRole());
       });
     }
   },

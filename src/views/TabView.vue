@@ -106,7 +106,7 @@ export default {
           return true;
         }
 
-        return tab.roles.includes(this.$roleLookupthis.user.role.code);
+        return tab.roles.includes(this.getUserRole());
       });
     }
   },

@@ -54,7 +54,7 @@
             <span
               v-if="field.type == 'role'"
               class="rounded-lg px-3 py-1 text-xs mb-3 mr-auto"
-              :class="'pill-color-' + user.role.code"
+              :class="'pill-color-' + getUserRole()"
             >
               {{ user.role.name }}
             </span>
@@ -190,7 +190,7 @@ export default {
   },
   methods: {
     userCanSee(field) {
-      return field.roles.includes(this.loggedUser.role.code);
+      return field.roles.includes(this.getUserRole());
     }
   },
   computed: {}
