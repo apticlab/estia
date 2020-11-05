@@ -18,13 +18,13 @@ export default {
         this.$actions[action.callback](this, row);
       }
     },
-    act(action) {
+    act(action, data = null) {
       if (this[action.callback]) {
-        this[action.callback]();
+        this[action.callback](data);
       }
 
       if (this.$actions[action.callback]) {
-        this.$actions[action.callback](this);
+        this.$actions[action.callback](this, data);
       }
     },
   },
