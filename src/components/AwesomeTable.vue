@@ -14,7 +14,7 @@
       <thead>
         <tr
           :class="{
-            [headerClass]: true
+            [headerClass]: true,
           }"
         >
           <th
@@ -116,7 +116,7 @@
                     target="_blank"
                     :href="
                       'https://www.instagram.com/p/' +
-                        deepPick(row, header.fields.url_link)
+                      deepPick(row, header.fields.url_link)
                     "
                     >{{ deepPick(row, header.fields.url_name) | translate }}</a
                   >
@@ -182,7 +182,11 @@
                 >
                   <span :class="header.class">
                     {{ deepPick(row, header.field, header.type) | size_number }}
-                    {{ header.udm }}
+                    <span :class="header.udm.class || ''">{{
+                      isObject(header.udm)
+                        ? deepPick(row, header.udm.code)
+                        : header.udm
+                    }}</span>
                   </span>
                 </div>
 
@@ -303,7 +307,7 @@
                   <div
                     :class="{
                       'bg-green-400': row.isActive,
-                      'bg-red-400': !row.isActive
+                      'bg-red-400': !row.isActive,
                     }"
                     class="w-5 h-5 rounded-full bg-gray-400"
                   />
@@ -389,8 +393,8 @@
                   :is_edit="true"
                   :headers="fields"
                   :validate="true"
-                  @valid="_valid => (resourceToEditValid = _valid)"
-                  @change="_resource => (resourceToEdit = _resource)"
+                  @valid="(_valid) => (resourceToEditValid = _valid)"
+                  @change="(_resource) => (resourceToEdit = _resource)"
                 />
                 <div class="flex flex-row w-full mt-5">
                   <div class="ml-auto">
@@ -423,8 +427,8 @@
                 :is_edit="false"
                 :headers="fields"
                 :validate="true"
-                @valid="_valid => (resourceToEditValid = _valid)"
-                @change="_resource => (resourceToEdit = _resource)"
+                @valid="(_valid) => (resourceToEditValid = _valid)"
+                @change="(_resource) => (resourceToEdit = _resource)"
               />
               <div class="flex flex-row w-full mt-5">
                 <div class="ml-auto">
@@ -462,12 +466,13 @@
 <script>
 import Popper from "@/components/Popper.vue";
 import SvgIcon from "@/components/SvgIcon.vue";
+import { isObject } from "lodash";
 
 export default {
   name: "AwesomeTable",
   components: {
     "svg-icon": SvgIcon,
-    popper: Popper
+    popper: Popper,
   },
   props: {
     rows: { required: false, default: [] },
@@ -484,8 +489,8 @@ export default {
     readonly: { required: false, default: false },
     tableClass: {
       required: false,
-      type: String
-    }
+      type: String,
+    },
   },
   data() {
     return {
@@ -495,21 +500,22 @@ export default {
       resourceToEditValid: false,
       editIndex: null,
       ig_url: "https://instagram.com/p",
-      ig_usr_url: "https://instagram.com"
+      ig_usr_url: "https://instagram.com",
     };
   },
   computed: {
     visibleHeaders() {
-      return this.headers.filter(header => {
+      return this.headers.filter((header) => {
         if (!header.roles) {
           return true;
         }
 
         return header.roles.includes(this.getUserRole());
       });
-    }
+    },
   },
   methods: {
+    isObject: isObject,
     getImage(obj, header) {
       if (header.type === "image") {
         return this.deepPick(obj, header.field);
@@ -563,7 +569,7 @@ export default {
       if (!this.fields) {
         this.$emit("act", {
           action,
-          index
+          index,
         });
         return;
       }
@@ -601,9 +607,9 @@ export default {
     canAdd() {
       let canAdd = true;
 
-      this.fields.forEach(field => {
+      this.fields.forEach((field) => {
         if (field.validator) {
-          field.validator.forEach(validator => {
+          field.validator.forEach((validator) => {
             switch (validator) {
               case "required":
                 canAdd = canAdd && !!this.resourceToEdit[field.field];
@@ -669,8 +675,8 @@ export default {
       }
 
       this.$emit("row-deleted", this.rows);
-    }
-  }
+    },
+  },
 };
 </script>
 
