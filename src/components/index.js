@@ -31,6 +31,7 @@ import TopBar from '@/components/TopBar.vue'
 import RouterView from '@/views/RouterView.vue'
 import ViewResource from '@/views/ViewResource.vue'
 import SearchInput from '@/components/SearchInput.vue';
+import NoData from '@/components/NoData.vue'
 
 export default function (Vue) {
   Vue.component('login', Login)
@@ -65,6 +66,7 @@ export default function (Vue) {
   Vue.component('list-resource-base', ListResourceBase)
   Vue.component('view-resource', ViewResource)
   Vue.component('search-input', SearchInput);
+  Vue.component('no-data', NoData);
 }
 
 export {
