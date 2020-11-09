@@ -1,5 +1,5 @@
 <template>
-  <div class="p-3 rounded flex flex-row items-center justify-center">
+  <div class="p-3 rounded flex flex-col items-center justify-center">
     <slot name="icon">
       <svg
         class="px-10"
@@ -47,9 +47,9 @@
       </svg>
     </slot>
     <slot name="message">
-      <p class="text-center text-gray-400 font-semibold">
+      <span class="text-center text-gray-400 font-semibold">
         Sembra che non ci siano ancora dati da analizzare.
-      </p>
+      </span>
     </slot>
   </div>
 </template>
