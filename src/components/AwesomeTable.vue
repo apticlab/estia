@@ -452,11 +452,13 @@
         </tr>
         <tr v-if="!rows || rows.length == 0">
           <td :colspan="headers.length + 2">
-            <div
-              class="text-center text-gray font-bold text-md font-semibold bg-white py-5"
-            >
-              Nessuna riga da mostrare
-            </div>
+            <slot name='no-data'>
+              <div
+                class="text-center text-gray font-bold text-md font-semibold bg-white py-5"
+              >
+                Nessuna riga da mostrare
+              </div>
+            </slot>
           </td>
         </tr>
       </tbody>
