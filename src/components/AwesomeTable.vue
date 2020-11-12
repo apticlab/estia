@@ -182,7 +182,7 @@
                 >
                   <span :class="header.class">
                     {{ deepPick(row, header.field, header.type) | size_number }}
-                    <span :class="header.udm.class || ''">{{
+                    <span v-if='header.udm' :class="header.udm.class || ''">{{
                       isObject(header.udm)
                         ? deepPick(row, header.udm.code)
                         : header.udm
