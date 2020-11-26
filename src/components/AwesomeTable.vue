@@ -14,7 +14,7 @@
       <thead>
         <tr
           :class="{
-            [headerClass]: true,
+            [headerClass]: true
           }"
         >
           <th
@@ -43,7 +43,7 @@
             :key="index"
             class="cursor-pointer"
             :class="rowClass"
-            @click="selectable ? selectRow(row) : null"
+            @click="handleRowClick(row, index)"
           >
             <td
               v-for="(header, index) in visibleHeaders"
@@ -116,7 +116,7 @@
                     target="_blank"
                     :href="
                       'https://www.instagram.com/p/' +
-                      deepPick(row, header.fields.url_link)
+                        deepPick(row, header.fields.url_link)
                     "
                     >{{ deepPick(row, header.fields.url_name) | translate }}</a
                   >
@@ -182,7 +182,7 @@
                 >
                   <span :class="header.class">
                     {{ deepPick(row, header.field, header.type) | size_number }}
-                    <span v-if='header.udm' :class="header.udm.class || ''">{{
+                    <span v-if="header.udm" :class="header.udm.class || ''">{{
                       isObject(header.udm)
                         ? deepPick(row, header.udm.code)
                         : header.udm
@@ -307,7 +307,7 @@
                   <div
                     :class="{
                       'bg-green-400': row.isActive,
-                      'bg-red-400': !row.isActive,
+                      'bg-red-400': !row.isActive
                     }"
                     class="w-5 h-5 rounded-full bg-gray-400"
                   />
@@ -393,8 +393,8 @@
                   :is_edit="true"
                   :headers="fields"
                   :validate="true"
-                  @valid="(_valid) => (resourceToEditValid = _valid)"
-                  @change="(_resource) => (resourceToEdit = _resource)"
+                  @valid="_valid => (resourceToEditValid = _valid)"
+                  @change="_resource => (resourceToEdit = _resource)"
                 />
                 <div class="flex flex-row w-full mt-5">
                   <div class="ml-auto">
@@ -427,8 +427,8 @@
                 :is_edit="false"
                 :headers="fields"
                 :validate="true"
-                @valid="(_valid) => (resourceToEditValid = _valid)"
-                @change="(_resource) => (resourceToEdit = _resource)"
+                @valid="_valid => (resourceToEditValid = _valid)"
+                @change="_resource => (resourceToEdit = _resource)"
               />
               <div class="flex flex-row w-full mt-5">
                 <div class="ml-auto">
@@ -452,7 +452,7 @@
         </tr>
         <tr v-if="!rows || rows.length == 0">
           <td :colspan="headers.length + 2">
-            <slot name='no-data'>
+            <slot name="no-data">
               <div
                 class="text-center text-gray font-bold text-md font-semibold bg-white py-5"
               >
@@ -474,7 +474,7 @@ export default {
   name: "AwesomeTable",
   components: {
     "svg-icon": SvgIcon,
-    popper: Popper,
+    popper: Popper
   },
   props: {
     rows: { required: false, default: [] },
@@ -491,30 +491,34 @@ export default {
     readonly: { required: false, default: false },
     tableClass: {
       required: false,
-      type: String,
-    },
+      type: String
+    }
   },
   data() {
     return {
+      defaultAction: null,
       selected_row: null,
       mode: "create",
       resourceToEdit: {},
       resourceToEditValid: false,
       editIndex: null,
       ig_url: "https://instagram.com/p",
-      ig_usr_url: "https://instagram.com",
+      ig_usr_url: "https://instagram.com"
     };
+  },
+  mounted() {
+    this.defaultAction = this.actions.find(a => a.default);
   },
   computed: {
     visibleHeaders() {
-      return this.headers.filter((header) => {
+      return this.headers.filter(header => {
         if (!header.roles) {
           return true;
         }
 
         return header.roles.includes(this.getUserRole());
       });
-    },
+    }
   },
   methods: {
     isObject: isObject,
@@ -567,11 +571,25 @@ export default {
       if (!this.selected_row) return false;
       return this.selected_row.id == row.id;
     },
+    handleRowClick(row, index) {
+      if (this.selectable) {
+        this.selectRow(row);
+        return;
+      }
+
+      // If default action, act accordingly
+      if (this.defaultAction) {
+        this.$emit("act", {
+          action: this.defaultAction,
+          index
+        });
+      }
+    },
     actOnRow(action, index) {
       if (!this.fields) {
         this.$emit("act", {
           action,
-          index,
+          index
         });
         return;
       }
@@ -609,9 +627,9 @@ export default {
     canAdd() {
       let canAdd = true;
 
-      this.fields.forEach((field) => {
+      this.fields.forEach(field => {
         if (field.validator) {
-          field.validator.forEach((validator) => {
+          field.validator.forEach(validator => {
             switch (validator) {
               case "required":
                 canAdd = canAdd && !!this.resourceToEdit[field.field];
@@ -677,8 +695,8 @@ export default {
       }
 
       this.$emit("row-deleted", this.rows);
-    },
-  },
+    }
+  }
 };
 </script>
 
