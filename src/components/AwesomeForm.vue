@@ -74,6 +74,46 @@
             :value="deepPick(dataForm, header.field)"
             @input="$event => updateNested(header.field, $event.target.value)"
           />
+          <input
+            v-if="header.type == 'number'"
+            type="number"
+            :value="deepPick(dataForm, header.field)"
+            @input="$event => updateNested(header.field, $event.target.value)"
+          />
+          <template v-if="header.type == 'boolean'">
+            <label
+              class="flex custom-label"
+              @click="handleBooleanClick(header)"
+            >
+              <div
+                class="flex items-center justify-center w-6 h-6 p-1 mr-2 bg-white shadow"
+              >
+                <svg
+                  :class="!!deepPick(dataForm, header.field) ? '' : 'hidden'"
+                  class="w-4 h-4 text-green-600 pointer-events-none"
+                  viewBox="0 0 172 172"
+                >
+                  <g
+                    fill="none"
+                    stroke-width="none"
+                    stroke-miterlimit="10"
+                    font-family="none"
+                    font-weight="none"
+                    font-size="none"
+                    text-anchor="none"
+                    style="mix-blend-mode: normal"
+                  >
+                    <path d="M0 172V0h172v172z" />
+                    <path
+                      d="M145.433 37.933L64.5 118.8658 33.7337 88.0996l-10.134 10.1341L64.5 139.1341l91.067-91.067z"
+                      fill="currentColor"
+                      stroke-width="1"
+                    />
+                  </g>
+                </svg>
+              </div>
+            </label>
+          </template>
           <textarea
             v-if="header.type == 'textarea'"
             :value="deepPick(dataForm, header.field)"
@@ -318,6 +358,10 @@ export default {
     // this.event_bus.$off('aw:form:update', this.forceUpdate);
   },
   methods: {
+    handleBooleanClick(header) {
+      let currentValue = this.deepPick(this.dataForm, header.field);
+      this.updateNested(header.field, !currentValue);
+    },
     updateFormulate(formulateForm) {
       Object.keys(formulateForm).forEach(fieldName => {
         _.set(this.dataForm, fieldName, formulateForm[fieldName]);
@@ -379,7 +423,11 @@ export default {
         }
 
         if (header.type == "boolean") {
-          this.dataForm[header.field] = header.default ? header.default : false;
+          this.updateNested(
+            this.dataForm,
+            header.field,
+            header.default ? header.default : false
+          );
         }
       });
 
