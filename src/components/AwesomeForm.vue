@@ -74,6 +74,21 @@
             :value="deepPick(dataForm, header.field)"
             @input="$event => updateNested(header.field, $event.target.value)"
           />
+          <textarea
+            v-if="header.type == 'textarea'"
+            :value="deepPick(dataForm, header.field)"
+            @input="$event => updateNested(header.field, $event.target.value)"
+          ></textarea>
+          <v-date-picker
+            locale="it"
+            :value="deepPick(dataForm, header.field)"
+            @input="$event => updateNested(header.field, formatDate($event))"
+            v-if="header.type == 'date'"
+          >
+            <template v-slot="{ inputValue, inputEvents }">
+              <input :value="inputValue" v-on="inputEvents" />
+            </template>
+          </v-date-picker>
         </template>
         <div v-else="">
           <template v-if="header.type == 'form'">
@@ -165,20 +180,11 @@
             </label>
           </template>
           <template v-else-if="header.type == 'date'">
-            <div class="flex">
-              <v-date-picker
-                class="w-full"
-                :value="parseDate(header)"
-                :input-props="{
-                  class: 'form-control w-full'
-                }"
-                :masks="{
-                  input: 'DD/MM/YYYY'
-                }"
-                locale="it"
-                @input="formatDate($event, header)"
-              />
-            </div>
+            <v-date-picker v-model="dataForm[header.field]">
+              <template v-slot="{ inputValue, inputEvents }">
+                <input :value="inputValue" v-on="inputEvents" />
+              </template>
+            </v-date-picker>
           </template>
           <template v-else-if="header.type == 'image_upload'">
             <FormulateInput
@@ -342,10 +348,8 @@ export default {
 
       return parsedDate;
     },
-    formatDate(newDate, header) {
-      this.dataForm[header.field] = this.moment(newDate).format("YYYY-MM-DD");
-      this.validatedataForm();
-      this.forceUpdate();
+    formatDate(newDate) {
+      return this.moment(newDate).format("YYYY-MM-DD");
     },
     forceUpdate() {
       this.$forceUpdate();
