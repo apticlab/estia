@@ -11,6 +11,7 @@ const helpers = {
   getColor,
   createRandomArray,
   evaluateCondition,
+  dateFromConditionValue,
   deepPick,
   moment,
   getDayWeekNumber,
@@ -128,6 +129,7 @@ function deepPick(object, nestedField) {
   return _.get(object, nestedField);
 }
 
+/*
 function evaluateCondition(condition, object, reference = null) {
   const conditionValueDefaults = {
     NULL: null,
@@ -201,6 +203,132 @@ function evaluateCondition(condition, object, reference = null) {
   }
 
   return conditionIsMet;
+}
+*/
+
+function evaluateCondition(condition, object, reference = null) {
+  const conditionValueDefaults = {
+    NULL: null,
+    UNDEFINED: undefined,
+    FALSE: false,
+    TRUE: true
+  };
+
+  // condition: [<field>, <operator>, <value>]
+  let conditionIsMet = false;
+  let conditionFieldValue = this.deepPick(object, condition[0]);
+  let conditionOperator = condition[1];
+  let conditionValue = condition[2];
+
+  if (conditionValue in conditionValueDefaults) {
+    conditionValue = conditionValueDefaults[conditionValue];
+  }
+
+  if (condition[2]) {
+    if (condition[2][0] == "$") {
+      // Pick the value from the object not from the actual string value
+      let conditionValueField = condition[2].substring(1);
+      conditionValue = this.deepPick(reference, conditionValueField);
+    }
+  }
+
+  if (_.isFunction(conditionOperator)) {
+    conditionIsMet = conditionOperator(conditionFieldValue, conditionValue);
+  } else {
+    switch (conditionOperator) {
+      case "=":
+        conditionIsMet = conditionFieldValue == conditionValue;
+        break;
+      case "!=":
+        // !!conditionFieldValue is for ensuring conditionFieldValue is not null or undefined
+        conditionIsMet =
+          !!conditionFieldValue && conditionFieldValue != conditionValue;
+        break;
+      case "IN":
+        var conditionValueTokens = [];
+
+        // Use both string separated arrays and normal js arrays
+        if (Array.isArray(conditionValue)) {
+          conditionValueTokens = conditionValue;
+        } else {
+          if (typeof conditionValue && conditionValue.indexOf(",") != -1) {
+            conditionValueTokens = conditionValue.split(",");
+          }
+        }
+
+        conditionIsMet =
+          !!conditionFieldValue &&
+          conditionValueTokens.indexOf("" + conditionFieldValue) > -1;
+        break;
+      case "NOT IN":
+        var conditionValueTokens = [];
+
+        // Use both string separated arrays and normal js arrays
+        if (Array.isArray(conditionValue)) {
+          conditionValueTokens = conditionValue;
+        } else {
+          if (typeof conditionValue && conditionValue.indexOf(",") != -1) {
+            conditionValueTokens = conditionValue.split(",");
+          }
+        }
+
+        conditionIsMet =
+          !!conditionFieldValue &&
+          !conditionValueTokens.includes("" + conditionFieldValue);
+        break;
+      case "NULL":
+        conditionIsMet =
+          conditionFieldValue == null || conditionFieldValue == undefined;
+        break;
+      case "AFTER":
+        conditionValue = this.dateFromConditionValue(conditionValue);
+        conditionIsMet = moment(conditionFieldValue).isAfter(conditionValue);
+        break;
+      case "BEFORE":
+        conditionValue = this.dateFromConditionValue(conditionValue);
+        conditionIsMet = moment(conditionFieldValue).isBefore(conditionValue);
+        break;
+      case "AFTER_OR_EQUAL":
+        conditionValue = this.dateFromConditionValue(conditionValue);
+        conditionIsMet = moment(conditionFieldValue).isSameOrAfter(
+          conditionValue
+        );
+        break;
+      case "BEFORE_OR_EQUAL":
+        conditionValue = this.dateFromConditionValue(conditionValue);
+        conditionIsMet = moment(conditionFieldValue).isSameOrBefore(
+          conditionValue
+        );
+        break;
+    }
+  }
+
+  return conditionIsMet;
+}
+
+function dateFromConditionValue(dateString) {
+  let date = null;
+
+  switch (dateString) {
+    case "TODAY":
+      date = moment().startOf("day");
+      break;
+    case "YESTERDAY":
+      date = moment()
+        .add(-1, "days")
+        .startOf("day");
+      break;
+    case "TOMORROW":
+      date = moment()
+        .add(1, "days")
+        .startOf("day");
+      break;
+    default:
+      date = moment(dateString);
+      break;
+  }
+
+  return date;
 }
 
 function getVisibleItemsByRole(items, user) {

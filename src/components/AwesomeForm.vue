@@ -219,13 +219,6 @@
               </div>
             </label>
           </template>
-          <template v-else-if="header.type == 'date'">
-            <v-date-picker v-model="dataForm[header.field]">
-              <template v-slot="{ inputValue, inputEvents }">
-                <input :value="inputValue" v-on="inputEvents" />
-              </template>
-            </v-date-picker>
-          </template>
           <template v-else-if="header.type == 'image_upload'">
             <FormulateInput
               :id="header.code"
@@ -363,8 +356,13 @@ export default {
       this.updateNested(header.field, !currentValue);
     },
     updateFormulate(formulateForm) {
+      // Merge data from Formulate and from our own nested two way bindings
       Object.keys(formulateForm).forEach(fieldName => {
-        _.set(this.dataForm, fieldName, formulateForm[fieldName]);
+        _.set(
+          this.dataForm,
+          fieldName,
+          this.deepPick(formulateForm, fieldName)
+        );
       });
 
       this.updateOldForm(this.dataForm);
@@ -471,6 +469,8 @@ export default {
 
           let fieldValue = this.deepPick(this.dataForm, header.field);
 
+          let conditions = [];
+
           switch (ruleCode) {
             case "required":
               let fieldValueIsEmpty = false;
@@ -519,6 +519,42 @@ export default {
                 validationStatus.valid = false;
                 validationStatus.errors.push(
                   "Inserire documento e relativo stato"
+                );
+              }
+              break;
+
+            case "after_or_equal":
+              conditions = [header.field, "AFTER_OR_EQUAL", ruleParams[0]];
+
+              if (
+                !this.evaluateCondition(
+                  conditions,
+                  this.dataForm,
+                  this.dataForm
+                )
+              ) {
+                this.form_is_valid = false;
+                validationStatus.validationStatus = false;
+                validationStatus.errors.push(
+                  "La data deve essere maggiore o uguale a: " + ruleParams[0]
+                );
+              }
+              break;
+
+            case "after":
+              conditions = [header.field, "AFTER", ruleParams[0]];
+
+              if (
+                !this.evaluateCondition(
+                  conditions,
+                  this.dataForm,
+                  this.dataForm
+                )
+              ) {
+                this.form_is_valid = false;
+                validationStatus.validationStatus = false;
+                validationStatus.errors.push(
+                  "La data deve essere maggiore di: " + ruleParams[0]
                 );
               }
               break;
