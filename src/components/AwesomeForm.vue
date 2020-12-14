@@ -402,7 +402,7 @@ export default {
       let promises = [];
       let selectCodes = [];
 
-      this.headers.forEach(header => {
+      this.visible_headers.forEach(header => {
         if (header.type == "select" || header.isFetchable) {
           if (header.select && header.select.choices) {
             this.form_options[header.select.code] = header.select.choices;
