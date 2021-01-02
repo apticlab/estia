@@ -282,23 +282,23 @@ function evaluateCondition(condition, object, reference = null) {
         break;
       case "AFTER":
         conditionValue = this.dateFromConditionValue(conditionValue);
-        conditionIsMet = moment(conditionFieldValue).isAfter(conditionValue);
+        conditionIsMet = conditionFieldValue ? moment(conditionFieldValue).isAfter(conditionValue) : true;
         break;
       case "BEFORE":
         conditionValue = this.dateFromConditionValue(conditionValue);
-        conditionIsMet = moment(conditionFieldValue).isBefore(conditionValue);
+        conditionIsMet = conditionFieldValue ? moment(conditionFieldValue).isBefore(conditionValue) : true;
         break;
       case "AFTER_OR_EQUAL":
         conditionValue = this.dateFromConditionValue(conditionValue);
-        conditionIsMet = moment(conditionFieldValue).isSameOrAfter(
+        conditionIsMet = conditionFieldValue ? moment(conditionFieldValue).isSameOrAfter(
           conditionValue
-        );
+        ) : true;
         break;
       case "BEFORE_OR_EQUAL":
         conditionValue = this.dateFromConditionValue(conditionValue);
-        conditionIsMet = moment(conditionFieldValue).isSameOrBefore(
+        conditionIsMet = conditionFieldValue ? moment(conditionFieldValue).isSameOrBefore(
           conditionValue
-        );
+        ) : true;
         break;
     }
   }
@@ -324,9 +324,11 @@ function dateFromConditionValue(dateString) {
         .startOf("day");
       break;
     default:
-      date = moment(dateString);
-      break;
+      if (dateString) {
+        date = moment(dateString);
+      }
   }
+
 
   return date;
 }

@@ -471,6 +471,9 @@ export default {
 
           let conditions = [];
 
+          let currentValue;
+          let otherValue;
+
           switch (ruleCode) {
             case "required":
               let fieldValueIsEmpty = false;
@@ -494,9 +497,34 @@ export default {
               }
               break;
 
+            case "required_if":
+              currentValue = fieldValue;
+              otherValue = this.deepPick(this.dataForm, ruleParams[0]);
+
+              if (otherValue) {
+                switch (typeof fieldValue) {
+                  case "object":
+                    fieldValueIsEmpty = _.isEmpty(fieldValue);
+                    break;
+                  default:
+                    fieldValueIsEmpty = ["", undefined, null, NaN].includes(
+                      fieldValue
+                    );
+                    break;
+                }
+
+                if (fieldValueIsEmpty) {
+                  this.form_is_valid = false;
+
+                  validationStatus.valid = false;
+                  validationStatus.errors.push("Campo obbligatorio");
+                }
+              }
+              break;
+
             case "equal":
-              let currentValue = fieldValue;
-              let otherValue = this.dataForm[ruleParams[0]];
+              currentValue = fieldValue;
+              otherValue = this.dataForm[ruleParams[0]];
 
               if (
                 (!!currentValue || !!otherValue) &&
@@ -570,22 +598,26 @@ export default {
       this.$emit("valid", this.form_is_valid);
     },
     fieldIsVisible(header) {
+      let isRoleVisible = true;
+      let isFilterVisible = true;
+      let isScopeVisible = true;
+
       if (header.roles) {
-        return header.roles.includes(this.getUserRole());
+        isRoleVisible = header.roles.includes(this.getUserRole());
       }
 
-      if (header.visible == undefined) {
-        return true;
+      if (header.visible) {
+        header.visible.forEach(condition => {
+          isFilterVisible =
+            isFilterVisible && this.evaluateCondition(condition, this.dataForm);
+        });
       }
 
-      let isVisible = true;
+      if (header.scopes) {
+        isScopeVisible = header.scopes.includes(this.scope);
+      }
 
-      header.visible.forEach(condition => {
-        isVisible =
-          isVisible && this.evaluateCondition(condition, this.dataForm);
-      });
-
-      return isVisible;
+      return isRoleVisible && isFilterVisible && isScopeVisible;
     },
     fieldIsReadonly(header) {
       if (this.readonly) {
@@ -600,7 +632,7 @@ export default {
         return header.readonly;
       }
 
-      let mode = this.is_edit ? "edit" : "create";
+      let mode = this.isEdit ? "edit" : "create";
 
       // If it's false or not set I return false
       // otherwise I simply return the value
@@ -697,6 +729,9 @@ export default {
     ...mapState("user", {
       user: state => state.user
     }),
+    scope() {
+      return this.isEdit ? "edit" : "create";
+    },
     visible_headers() {
       let uh = this.updateHeaders;
 
