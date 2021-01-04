@@ -66,7 +66,7 @@ export default {
           component: 'resource-image-uploader'
         },
         'date': {
-          component: 'date-picker'
+          component: 'date-picker',
         }
       }
     })

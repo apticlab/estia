@@ -2,6 +2,7 @@
   <div class="">
     <v-date-picker
       locale="it"
+      :min-date="context.attributes.header.minDate"
       :value="context.model"
       @input="updateDate"
       :popover="{ visibility: 'click' }"

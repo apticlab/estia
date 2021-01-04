@@ -112,11 +112,13 @@
           ></textarea>
           <v-date-picker
             locale="it"
+            :min-date="header.minDate"
             :value="deepPick(dataForm, header.field)"
             @input="$event => updateNested(header.field, formatDate($event))"
             v-if="header.type == 'date'"
           >
             <template v-slot="{ inputValue, inputEvents }">
+              MinHeader: {{ header.minDate }}
               <input :value="inputValue" v-on="inputEvents" />
             </template>
           </v-date-picker>
@@ -228,6 +230,7 @@
             :type="header.type"
             :placeholder="header.placeholder"
             :name="header.field"
+            :header="header"
             :resource="header.resource"
           />
         </div>
