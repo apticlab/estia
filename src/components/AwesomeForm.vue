@@ -118,7 +118,6 @@
             v-if="header.type == 'date'"
           >
             <template v-slot="{ inputValue, inputEvents }">
-              MinHeader: {{ header.minDate }}
               <input :value="inputValue" v-on="inputEvents" />
             </template>
           </v-date-picker>

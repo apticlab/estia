@@ -12,9 +12,6 @@
         <span>Aggiungi</span>
       </div>
     </div>
-    <pre>
-      {{ model }}
-    </pre>
     <select
       v-if="options"
       @change="onChange"
