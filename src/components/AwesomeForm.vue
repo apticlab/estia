@@ -560,10 +560,19 @@ export default {
                   this.dataForm
                 )
               ) {
+                let referencedHeader = this.visible_headers.find(header => {
+                  return `\$${header.code}` == ruleParams[0];
+                });
+
+                let referencedHeaderName = referencedHeader
+                  ? referencedHeader.label
+                  : ruleParams[0];
+
                 this.form_is_valid = false;
                 validationStatus.validationStatus = false;
                 validationStatus.errors.push(
-                  "La data deve essere maggiore o uguale a: " + ruleParams[0]
+                  "La data deve essere maggiore o uguale a: " +
+                    referencedHeaderName
                 );
               }
               break;
@@ -578,10 +587,19 @@ export default {
                   this.dataForm
                 )
               ) {
+                let referencedHeader = this.visible_headers.find(header => {
+                  // ruleParams[0] is in the form "$<name_of_target_input>"
+                  return `\$${header.code}` == ruleParams[0];
+                });
+
+                let referencedHeaderName = referencedHeader
+                  ? referencedHeader.label
+                  : ruleParams[0];
+
                 this.form_is_valid = false;
                 validationStatus.validationStatus = false;
                 validationStatus.errors.push(
-                  "La data deve essere maggiore di: " + ruleParams[0]
+                  "La data deve essere maggiore di: " + referencedHeaderName
                 );
               }
               break;
