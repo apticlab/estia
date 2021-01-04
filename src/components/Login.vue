@@ -100,6 +100,11 @@
 <script>
 import { login, resetPassword } from "../utils/auth";
 
+const defaultErrorTexts = {
+  "wrong-credentials": "Credenziali non valide",
+  "generic-error": "Errore generico"
+};
+
 export default {
   name: "Login",
   props: {
@@ -114,6 +119,10 @@ export default {
       required: false,
       type: String,
       default: ""
+    },
+    errorTexts: {
+      required: false,
+      type: Object
     }
   },
   data() {
@@ -125,6 +134,7 @@ export default {
         password: ""
       },
       isLoading: false,
+      mergedErrorTexts: {},
       errorText: "",
       errorCodeDict: {
         user_not_found: "Matricola non appartenente a nessun utente",
@@ -154,6 +164,11 @@ export default {
     if (this.$refs.username) {
       this.$refs.username.focus();
     }
+
+    this.mergedErrorTexts = {
+      ...defaultErrorTexts,
+      ...this.errorTexts
+    };
   },
   methods: {
     async login() {
@@ -169,21 +184,15 @@ export default {
         this.credentials.password
       );
 
-      if (loginData.error) {
-        // TODO: move this logic out of Estia and inside client application
-        switch (loginData.error) {
-          case "wrong_credentials":
-            this.errorText = "Credenziali non valide";
-            break;
-          case "account_not_active":
-            this.errorText =
-              "Account non attivo. Contattare l'amministrazione per rinnovare";
-            break;
-        }
+      let errorCode = loginData.error || "generic-error";
 
-        this.isLoading = false;
-        return;
+      // Try to look up for error messages from props and default ones
+      if (!(errorCode in this.mergedErrorTexts)) {
+        // revert to "generic-error" when errorCode is not recognized
+        errorCode = "generic-error";
       }
+
+      this.errorText = this.mergedErrorTexts[errorCode];
 
       var redirect = $route.query.redirect || "";
 
