@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col flex-grow">
     <div v-if="!isLoading" class="w-full">
-      <div class="flex flex-row items-baseline px-4 py-5">
+      <div class="flex flex-row items-baseline py-5">
         <slot name="title" />
         <div class="flex flex-row ml-auto">
           <button
@@ -23,7 +23,7 @@
           </button>
         </div>
       </div>
-      <div class="flex flex-row items-center px-4 my-3">
+      <div class="flex flex-row items-center my-3">
         <search-input
           @input="search"
           v-model="searchQuery"
@@ -33,7 +33,7 @@
         </search-input>
       </div>
       <transition>
-        <div class="px-4 py-5">
+        <div class="py-5">
           <awesome-table
             v-if="!resourceIsLoading"
             :header-class="headerClass"
