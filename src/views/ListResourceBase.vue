@@ -32,6 +32,9 @@
         >
         </search-input>
       </div>
+      <div class="flex flex-row items-center my-3">
+        <slot name="filters" :filter-data="loadData" :filters="filters" />
+      </div>
       <transition>
         <div class="py-5">
           <awesome-table
@@ -115,6 +118,7 @@ export default {
       rows: null,
       headers: null,
       actions: null,
+      filters: {},
       resourceName: null,
       resourceIsLoading: false,
       baseConfig: {
@@ -148,6 +152,7 @@ export default {
       await this.loadData();
     },
     async loadData() {
+      console.log(this.filters);
       this.isLoading = true;
       try {
         let response = await this.$api.list(this.resourceName, {

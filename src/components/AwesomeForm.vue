@@ -12,21 +12,12 @@
         form: {{ dataForm }}
         valid: {{ form_is_valid }}
         visible_headers: {{ visible_headers.length }}
-        is_pro: {{
       </pre>
       <div
         v-for="(header, index) in visible_headers"
         :key="index"
-        class="relative focus-within:text-blue grid grid-cols-3"
-        :class="{
-          'border border-rounded-sm border-dotted border-gray-light':
-            header.type == 'form',
-          ['mb-3 col-span-' +
-          (header.colSpan || 12) +
-          ' row-span-' +
-          (header.rowSpan || 1)]: header.type != 'form',
-          [fieldClass]: true
-        }"
+        class="relative focus-within:text-blue"
+        :class="formFieldClass(header)"
       >
         <label :class="getLabelClass(header)" :for="header.code">
           {{ header.label }}
@@ -290,6 +281,11 @@ export default {
     readonly: { required: false, default: false },
     validate: { required: false, default: false },
     headers: { required: true, default: {} },
+    layout: {
+      required: false,
+      default: "vertical",
+      type: String
+    },
     separatorClass: {
       required: false,
       type: String,
@@ -723,6 +719,28 @@ export default {
       }
 
       return cssClass;
+    },
+    formFieldClass(header) {
+      let formFieldClass = this.fieldClass;
+      let minColSpan;
+
+      if (this.layout == "vertical") {
+        formFieldClass += " grid grid-cols-3 flex flex-row items-center";
+        minColSpan = 12;
+      } else {
+        formFieldClass += " flex flex-col";
+        minColSpan = parseInt(12 / this.visible_headers.length);
+      }
+
+      if (header.type == "form") {
+        formFieldClass +=
+          " border border-rounded-sm border-dotted border-gray-light";
+      } else {
+        formFieldClass += " mb-3 col-span-" + (header.colSpan || minColSpan);
+        formFieldClass += " row-span-" + (header.rowSpan || 1);
+      }
+
+      return formFieldClass;
     }
   },
   computed: {
@@ -765,6 +783,16 @@ export default {
         });
 
         this.updateOldForm(newForm);
+      }
+    },
+    form(newForm, oldForm) {
+      console.log("Form watch");
+      console.log(newForm);
+      console.log(oldForm);
+      if (_.isEmpty(newForm)) {
+        console.log("Reset form");
+        this.dataForm = {};
+        this.$forceUpdate();
       }
     }
   }
