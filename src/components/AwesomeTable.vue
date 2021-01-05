@@ -370,6 +370,7 @@
                     size="l"
                     color="text-gray-500"
                     class="mr-1 focus:outline-none p-1"
+                    :stop-propagation="true"
                     @click="actOnRow(action, index)"
                   />
                 </popper>
