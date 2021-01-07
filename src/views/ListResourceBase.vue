@@ -33,35 +33,34 @@
         </search-input>
       </div>
       <div class="flex flex-row items-center my-3">
-        <slot name="filters" :filter-data="loadData" :filters="filters" />
+        <slot name="filters" :filter-data="filterData" />
       </div>
-      <transition>
-        <div class="py-5">
-          <awesome-table
-            v-if="!resourceIsLoading"
-            :header-class="headerClass"
-            :table-class="tableClass"
-            :row-class="rowClass"
-            :striped="striped"
-            :headers="headers"
-            :actions="visibleActions"
-            :rows="rows"
-            @act="actOnRow"
+      <div class="py-5" v-if="!dataLoading">
+        <awesome-table
+          v-if="!resourceIsLoading"
+          :header-class="headerClass"
+          :table-class="tableClass"
+          :row-class="rowClass"
+          :striped="striped"
+          :headers="headers"
+          :actions="visibleActions"
+          :rows="rows"
+          @act="actOnRow"
+        />
+        <div v-if="pagination" class="flex flex-row w-full my-3">
+          <t-pagination
+            class="mx-auto"
+            :total-items="pagination.totalItems"
+            :per-page="pagination.perPage"
+            :num-pages="pagination.numPages"
+            :limit="5"
+            :classes="paginationClasses"
+            :value="currentPage"
+            @change="changePage"
           />
-          <div v-if="pagination" class="flex flex-row w-full my-3">
-            <t-pagination
-              class="mx-auto"
-              :total-items="pagination.totalItems"
-              :per-page="pagination.perPage"
-              :num-pages="pagination.numPages"
-              :limit="5"
-              :classes="paginationClasses"
-              :value="currentPage"
-              @change="changePage"
-            />
-          </div>
         </div>
-      </transition>
+      </div>
+      <loading v-if="dataLoading" class="flex-grow w-full h-64" />
     </div>
     <loading v-if="isLoading" class="flex-grow w-full h-64" />
   </div>
@@ -114,6 +113,7 @@ export default {
       pagination: null,
       currentPage: 1,
       isLoading: true,
+      dataLoading: true,
       searchQuery: null,
       rows: null,
       headers: null,
@@ -140,23 +140,25 @@ export default {
     this.resourceInfo = this.resources[this.resourceName].info || {};
     this.config = this.resources[this.resourceName].config || this.baseConfig;
 
+    this.isLoading = true;
     await this.loadData();
+    this.isLoading = false;
   },
   methods: {
     search: _.debounce(async function() {
       await this.loadData();
     }, 350),
     async changePage(newCurrentPage) {
-      console.log("Changing page: " + newCurrentPage);
       this.currentPage = newCurrentPage;
       await this.loadData();
     },
     async loadData() {
       console.log(this.filters);
-      this.isLoading = true;
+      this.dataLoading = true;
       try {
         let response = await this.$api.list(this.resourceName, {
           q: this.searchQuery,
+          filters: this.filters,
           page: this.currentPage
         });
 
@@ -174,7 +176,11 @@ export default {
         this.rows = [];
       }
 
-      this.isLoading = false;
+      this.dataLoading = false;
+    },
+    async filterData(filters) {
+      this.filters = filters;
+      await this.loadData();
     },
     addResource() {
       this.$router.push({

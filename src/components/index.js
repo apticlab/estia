@@ -48,7 +48,7 @@ export default function (Vue) {
   Vue.component('page-error', PageError)
   Vue.component('error-boundary', ErrorBoundary)
   Vue.component('awesome-form', AwesomeForm)
-  Vue.component('resource-select', ResourceSelect)
+  Vue.component('old-resource-select', ResourceSelect)
   Vue.component('field-view', FieldView)
   Vue.component('resource-editor', ResourceEditor)
   Vue.component('field-edit', FieldEdit)

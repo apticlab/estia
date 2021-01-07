@@ -399,7 +399,7 @@ export default {
       let selectCodes = [];
 
       this.visible_headers.forEach(header => {
-        if (header.type == "select" || header.isFetchable) {
+        if (header.type == "select" || header.isFetchable || header.select) {
           if (header.select && header.select.choices) {
             this.form_options[header.select.code] = header.select.choices;
           } else {
