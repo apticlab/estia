@@ -35,7 +35,7 @@
       <div class="flex flex-row items-center my-3">
         <slot name="filters" :filter-data="filterData" />
       </div>
-      <div class="py-5" v-if="!dataLoading">
+      <div class="my-3" v-if="!dataLoading">
         <awesome-table
           v-if="!resourceIsLoading"
           :header-class="headerClass"
@@ -153,7 +153,6 @@ export default {
       await this.loadData();
     },
     async loadData() {
-      console.log(this.filters);
       this.dataLoading = true;
       try {
         let response = await this.$api.list(this.resourceName, {
