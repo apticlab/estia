@@ -146,6 +146,8 @@ export default {
   },
   methods: {
     search: _.debounce(async function() {
+      // When searching "reset" pagination
+      this.currentPage = 1;
       await this.loadData();
     }, 350),
     async changePage(newCurrentPage) {
