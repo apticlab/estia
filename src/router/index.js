@@ -74,12 +74,12 @@ export default function (options) {
 
       if (roleHolder != null && user != null) {
         // TODO: move this where we can access the Vue instance
-        let userRole;
+        let userRole
 
         if (options.roleLookup) {
-          userRole = options.roleLookup(user);
+          userRole = options.roleLookup(user)
         } else {
-          userRole = user.role.code.toLowerCase();
+          userRole = user.role.code.toLowerCase()
         }
 
         let userHasRole = roleHolder.indexOf(userRole) != -1
@@ -123,7 +123,7 @@ export default function (options) {
       component: Logout
     },
     {
-      path: '/',
+      path: baseComponents.mainPath || '/',
       name: 'main',
       component: baseComponents.main,
       meta: {
