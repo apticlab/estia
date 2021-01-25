@@ -2,7 +2,7 @@
   <div class="flex flex-col items-center overflow-hidden rounded align-center">
     <loading v-if="loading" class="w-full my-16" />
     <div v-if="!loading" class="w-full mx-auto max-w-screen-xl">
-      <div class="px-4">
+      <div class="">
         <awesome-form
           :debug="debug"
           v-if="!loading"

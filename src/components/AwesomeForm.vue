@@ -12,21 +12,12 @@
         form: {{ dataForm }}
         valid: {{ form_is_valid }}
         visible_headers: {{ visible_headers.length }}
-        is_pro: {{
       </pre>
       <div
         v-for="(header, index) in visible_headers"
         :key="index"
-        class="relative focus-within:text-blue grid grid-cols-3"
-        :class="{
-          'border border-rounded-sm border-dotted border-gray-light':
-            header.type == 'form',
-          ['mb-3 col-span-' +
-          (header.colSpan || 12) +
-          ' row-span-' +
-          (header.rowSpan || 1)]: header.type != 'form',
-          [fieldClass]: true
-        }"
+        class="relative focus-within:text-blue"
+        :class="formFieldClass(header)"
       >
         <label :class="getLabelClass(header)" :for="header.code">
           {{ header.label }}
@@ -74,6 +65,62 @@
             :value="deepPick(dataForm, header.field)"
             @input="$event => updateNested(header.field, $event.target.value)"
           />
+          <input
+            v-if="header.type == 'number'"
+            type="number"
+            :value="deepPick(dataForm, header.field)"
+            @input="$event => updateNested(header.field, $event.target.value)"
+          />
+          <template v-if="header.type == 'boolean'">
+            <label
+              class="flex custom-label"
+              @click="handleBooleanClick(header)"
+            >
+              <div
+                class="flex items-center justify-center w-6 h-6 p-1 mr-2 bg-white shadow"
+              >
+                <svg
+                  :class="!!deepPick(dataForm, header.field) ? '' : 'hidden'"
+                  class="w-4 h-4 text-green-600 pointer-events-none"
+                  viewBox="0 0 172 172"
+                >
+                  <g
+                    fill="none"
+                    stroke-width="none"
+                    stroke-miterlimit="10"
+                    font-family="none"
+                    font-weight="none"
+                    font-size="none"
+                    text-anchor="none"
+                    style="mix-blend-mode: normal"
+                  >
+                    <path d="M0 172V0h172v172z" />
+                    <path
+                      d="M145.433 37.933L64.5 118.8658 33.7337 88.0996l-10.134 10.1341L64.5 139.1341l91.067-91.067z"
+                      fill="currentColor"
+                      stroke-width="1"
+                    />
+                  </g>
+                </svg>
+              </div>
+            </label>
+          </template>
+          <textarea
+            v-if="header.type == 'textarea'"
+            :value="deepPick(dataForm, header.field)"
+            @input="$event => updateNested(header.field, $event.target.value)"
+          ></textarea>
+          <v-date-picker
+            locale="it"
+            :min-date="header.minDate"
+            :value="deepPick(dataForm, header.field)"
+            @input="$event => updateNested(header.field, formatDate($event))"
+            v-if="header.type == 'date'"
+          >
+            <template v-slot="{ inputValue, inputEvents }">
+              <input :value="inputValue" v-on="inputEvents" />
+            </template>
+          </v-date-picker>
         </template>
         <div v-else="">
           <template v-if="header.type == 'form'">
@@ -164,22 +211,6 @@
               </div>
             </label>
           </template>
-          <template v-else-if="header.type == 'date'">
-            <div class="flex">
-              <v-date-picker
-                class="w-full"
-                :value="parseDate(header)"
-                :input-props="{
-                  class: 'form-control w-full'
-                }"
-                :masks="{
-                  input: 'DD/MM/YYYY'
-                }"
-                locale="it"
-                @input="formatDate($event, header)"
-              />
-            </div>
-          </template>
           <template v-else-if="header.type == 'image_upload'">
             <FormulateInput
               :id="header.code"
@@ -198,6 +229,7 @@
             :type="header.type"
             :placeholder="header.placeholder"
             :name="header.field"
+            :header="header"
             :resource="header.resource"
           />
         </div>
@@ -251,6 +283,11 @@ export default {
     readonly: { required: false, default: false },
     validate: { required: false, default: false },
     headers: { required: true, default: {} },
+    layout: {
+      required: false,
+      default: "vertical",
+      type: String
+    },
     separatorClass: {
       required: false,
       type: String,
@@ -312,9 +349,18 @@ export default {
     // this.event_bus.$off('aw:form:update', this.forceUpdate);
   },
   methods: {
+    handleBooleanClick(header) {
+      let currentValue = this.deepPick(this.dataForm, header.field);
+      this.updateNested(header.field, !currentValue);
+    },
     updateFormulate(formulateForm) {
+      // Merge data from Formulate and from our own nested two way bindings
       Object.keys(formulateForm).forEach(fieldName => {
-        _.set(this.dataForm, fieldName, formulateForm[fieldName]);
+        _.set(
+          this.dataForm,
+          fieldName,
+          this.deepPick(formulateForm, fieldName)
+        );
       });
 
       this.updateOldForm(this.dataForm);
@@ -342,10 +388,8 @@ export default {
 
       return parsedDate;
     },
-    formatDate(newDate, header) {
-      this.dataForm[header.field] = this.moment(newDate).format("YYYY-MM-DD");
-      this.validatedataForm();
-      this.forceUpdate();
+    formatDate(newDate) {
+      return this.moment(newDate).format("YYYY-MM-DD");
     },
     forceUpdate() {
       this.$forceUpdate();
@@ -354,8 +398,8 @@ export default {
       let promises = [];
       let selectCodes = [];
 
-      this.headers.forEach(header => {
-        if (header.type == "select" || header.isFetchable) {
+      this.visible_headers.forEach(header => {
+        if (header.type == "select" || header.isFetchable || header.select) {
           if (header.select && header.select.choices) {
             this.form_options[header.select.code] = header.select.choices;
           } else {
@@ -375,7 +419,11 @@ export default {
         }
 
         if (header.type == "boolean") {
-          this.dataForm[header.field] = header.default ? header.default : false;
+          this.updateNested(
+            this.dataForm,
+            header.field,
+            header.default ? header.default : false
+          );
         }
       });
 
@@ -419,6 +467,11 @@ export default {
 
           let fieldValue = this.deepPick(this.dataForm, header.field);
 
+          let conditions = [];
+
+          let currentValue;
+          let otherValue;
+
           switch (ruleCode) {
             case "required":
               let fieldValueIsEmpty = false;
@@ -442,9 +495,34 @@ export default {
               }
               break;
 
+            case "required_if":
+              currentValue = fieldValue;
+              otherValue = this.deepPick(this.dataForm, ruleParams[0]);
+
+              if (otherValue) {
+                switch (typeof fieldValue) {
+                  case "object":
+                    fieldValueIsEmpty = _.isEmpty(fieldValue);
+                    break;
+                  default:
+                    fieldValueIsEmpty = ["", undefined, null, NaN].includes(
+                      fieldValue
+                    );
+                    break;
+                }
+
+                if (fieldValueIsEmpty) {
+                  this.form_is_valid = false;
+
+                  validationStatus.valid = false;
+                  validationStatus.errors.push("Campo obbligatorio");
+                }
+              }
+              break;
+
             case "equal":
-              let currentValue = fieldValue;
-              let otherValue = this.dataForm[ruleParams[0]];
+              currentValue = fieldValue;
+              otherValue = this.dataForm[ruleParams[0]];
 
               if (
                 (!!currentValue || !!otherValue) &&
@@ -471,6 +549,60 @@ export default {
               }
               break;
 
+            case "after_or_equal":
+              conditions = [header.field, "AFTER_OR_EQUAL", ruleParams[0]];
+
+              if (
+                !this.evaluateCondition(
+                  conditions,
+                  this.dataForm,
+                  this.dataForm
+                )
+              ) {
+                let referencedHeader = this.visible_headers.find(header => {
+                  return `\$${header.code}` == ruleParams[0];
+                });
+
+                let referencedHeaderName = referencedHeader
+                  ? referencedHeader.label
+                  : ruleParams[0];
+
+                this.form_is_valid = false;
+                validationStatus.validationStatus = false;
+                validationStatus.errors.push(
+                  "La data deve essere maggiore o uguale a: " +
+                    referencedHeaderName
+                );
+              }
+              break;
+
+            case "after":
+              conditions = [header.field, "AFTER", ruleParams[0]];
+
+              if (
+                !this.evaluateCondition(
+                  conditions,
+                  this.dataForm,
+                  this.dataForm
+                )
+              ) {
+                let referencedHeader = this.visible_headers.find(header => {
+                  // ruleParams[0] is in the form "$<name_of_target_input>"
+                  return `\$${header.code}` == ruleParams[0];
+                });
+
+                let referencedHeaderName = referencedHeader
+                  ? referencedHeader.label
+                  : ruleParams[0];
+
+                this.form_is_valid = false;
+                validationStatus.validationStatus = false;
+                validationStatus.errors.push(
+                  "La data deve essere maggiore di: " + referencedHeaderName
+                );
+              }
+              break;
+
             default:
               break;
           }
@@ -482,22 +614,26 @@ export default {
       this.$emit("valid", this.form_is_valid);
     },
     fieldIsVisible(header) {
+      let isRoleVisible = true;
+      let isFilterVisible = true;
+      let isScopeVisible = true;
+
       if (header.roles) {
-        return header.roles.includes(this.getUserRole());
+        isRoleVisible = header.roles.includes(this.getUserRole());
       }
 
-      if (header.visible == undefined) {
-        return true;
+      if (header.visible) {
+        header.visible.forEach(condition => {
+          isFilterVisible =
+            isFilterVisible && this.evaluateCondition(condition, this.dataForm);
+        });
       }
 
-      let isVisible = true;
+      if (header.scopes) {
+        isScopeVisible = header.scopes.includes(this.scope);
+      }
 
-      header.visible.forEach(condition => {
-        isVisible =
-          isVisible && this.evaluateCondition(condition, this.dataForm);
-      });
-
-      return isVisible;
+      return isRoleVisible && isFilterVisible && isScopeVisible;
     },
     fieldIsReadonly(header) {
       if (this.readonly) {
@@ -512,7 +648,7 @@ export default {
         return header.readonly;
       }
 
-      let mode = this.is_edit ? "edit" : "create";
+      let mode = this.isEdit ? "edit" : "create";
 
       // If it's false or not set I return false
       // otherwise I simply return the value
@@ -603,12 +739,37 @@ export default {
       }
 
       return cssClass;
+    },
+    formFieldClass(header) {
+      let formFieldClass = this.fieldClass;
+      let minColSpan;
+
+      if (this.layout == "vertical") {
+        formFieldClass += " grid grid-cols-3 flex flex-row items-center";
+        minColSpan = 12;
+      } else {
+        formFieldClass += " flex flex-col";
+        minColSpan = parseInt(12 / this.visible_headers.length);
+      }
+
+      if (header.type == "form") {
+        formFieldClass +=
+          " border border-rounded-sm border-dotted border-gray-light";
+      } else {
+        formFieldClass += " mb-3 col-span-" + (header.colSpan || minColSpan);
+        formFieldClass += " row-span-" + (header.rowSpan || 1);
+      }
+
+      return formFieldClass;
     }
   },
   computed: {
     ...mapState("user", {
       user: state => state.user
     }),
+    scope() {
+      return this.isEdit ? "edit" : "create";
+    },
     visible_headers() {
       let uh = this.updateHeaders;
 
@@ -642,6 +803,16 @@ export default {
         });
 
         this.updateOldForm(newForm);
+      }
+    },
+    form(newForm, oldForm) {
+      console.log("Form watch");
+      console.log(newForm);
+      console.log(oldForm);
+      if (_.isEmpty(newForm)) {
+        console.log("Reset form");
+        this.dataForm = {};
+        this.$forceUpdate();
       }
     }
   }

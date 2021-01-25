@@ -39,8 +39,9 @@ export default {
 
         let roleBasedFilter = !action.roles || action.roles.includes(this.getUserRole());
         let scopeBasedFilter = !action.scopes || action.scopes.includes(actionScope);
+        let visibilityFilter = this.itemIsVisible(action, this);
 
-        return roleBasedFilter && scopeBasedFilter && this.itemIsVisible(action);
+        return roleBasedFilter && scopeBasedFilter && visibilityFilter;
       });
 
       return actions;

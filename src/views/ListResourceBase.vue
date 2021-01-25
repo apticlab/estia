@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col flex-grow">
     <div v-if="!isLoading" class="w-full">
-      <div class="flex flex-row items-baseline px-4 py-5">
+      <div class="flex flex-row items-baseline py-5">
         <slot name="title" />
         <div class="flex flex-row ml-auto">
           <button
@@ -23,7 +23,7 @@
           </button>
         </div>
       </div>
-      <div class="flex flex-row items-center px-4 my-3">
+      <div class="flex flex-row items-center my-3">
         <search-input
           @input="search"
           v-model="searchQuery"
@@ -32,33 +32,35 @@
         >
         </search-input>
       </div>
-      <transition>
-        <div class="px-4 py-5">
-          <awesome-table
-            v-if="!resourceIsLoading"
-            :header-class="headerClass"
-            :table-class="tableClass"
-            :row-class="rowClass"
-            :striped="striped"
-            :headers="headers"
-            :actions="visibleActions"
-            :rows="rows"
-            @act="actOnRow"
+      <div class="flex flex-row items-center my-3">
+        <slot name="filters" :filter-data="filterData" />
+      </div>
+      <div class="my-3" v-if="!dataLoading">
+        <awesome-table
+          v-if="!resourceIsLoading"
+          :header-class="headerClass"
+          :table-class="tableClass"
+          :row-class="rowClass"
+          :striped="striped"
+          :headers="headers"
+          :actions="visibleActions"
+          :rows="rows"
+          @act="actOnRow"
+        />
+        <div v-if="pagination" class="flex flex-row w-full my-3">
+          <t-pagination
+            class="mx-auto"
+            :total-items="pagination.totalItems"
+            :per-page="pagination.perPage"
+            :num-pages="pagination.numPages"
+            :limit="5"
+            :classes="paginationClasses"
+            :value="currentPage"
+            @change="changePage"
           />
-          <div v-if="pagination" class="flex flex-row w-full my-3">
-            <t-pagination
-              class="mx-auto"
-              :total-items="pagination.totalItems"
-              :per-page="pagination.perPage"
-              :num-pages="pagination.numPages"
-              :limit="5"
-              :classes="paginationClasses"
-              :value="currentPage"
-              @change="changePage"
-            />
-          </div>
         </div>
-      </transition>
+      </div>
+      <loading v-if="dataLoading" class="flex-grow w-full h-64" />
     </div>
     <loading v-if="isLoading" class="flex-grow w-full h-64" />
   </div>
@@ -111,10 +113,12 @@ export default {
       pagination: null,
       currentPage: 1,
       isLoading: true,
+      dataLoading: true,
       searchQuery: null,
       rows: null,
       headers: null,
       actions: null,
+      filters: {},
       resourceName: null,
       resourceIsLoading: false,
       baseConfig: {
@@ -136,22 +140,26 @@ export default {
     this.resourceInfo = this.resources[this.resourceName].info || {};
     this.config = this.resources[this.resourceName].config || this.baseConfig;
 
+    this.isLoading = true;
     await this.loadData();
+    this.isLoading = false;
   },
   methods: {
     search: _.debounce(async function() {
+      // When searching "reset" pagination
+      this.currentPage = 1;
       await this.loadData();
     }, 350),
     async changePage(newCurrentPage) {
-      console.log("Changing page: " + newCurrentPage);
       this.currentPage = newCurrentPage;
       await this.loadData();
     },
     async loadData() {
-      this.isLoading = true;
+      this.dataLoading = true;
       try {
         let response = await this.$api.list(this.resourceName, {
           q: this.searchQuery,
+          filters: this.filters,
           page: this.currentPage
         });
 
@@ -169,7 +177,11 @@ export default {
         this.rows = [];
       }
 
-      this.isLoading = false;
+      this.dataLoading = false;
+    },
+    async filterData(filters) {
+      this.filters = filters;
+      await this.loadData();
     },
     addResource() {
       this.$router.push({

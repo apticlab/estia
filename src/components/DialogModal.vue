@@ -124,8 +124,6 @@ export default {
       this.type = params.type;
       this.onConfirm = params.onConfirm;
 
-      console.log(this.$modalWidgets);
-
       // making modal visible
       this.visible = true;
     },

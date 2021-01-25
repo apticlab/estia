@@ -50,9 +50,11 @@ export default {
 
     Vue.use(VueFormulate, {
       library: {
+        /*
         'resource-select': {
           component: 'resource-select'
         },
+        */
         resource: {
           component: 'resource-editor'
         },
@@ -64,6 +66,9 @@ export default {
         },
         'image-uploader': {
           component: 'resource-image-uploader'
+        },
+        'date': {
+          component: 'date-picker',
         }
       }
     })
