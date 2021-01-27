@@ -50,11 +50,9 @@ export default {
 
     Vue.use(VueFormulate, {
       library: {
-        /*
         'resource-select': {
           component: 'resource-select'
         },
-        */
         resource: {
           component: 'resource-editor'
         },
