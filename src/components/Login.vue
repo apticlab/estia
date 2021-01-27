@@ -207,7 +207,10 @@ export default {
       var redirect = $route.query.redirect || ''
 
       this.isLoading = false
-      $router.push('/' + redirect)
+
+      if (!loginData.error) {
+        $router.push('/' + redirect)
+      }
     },
     sendPasswordReset: function () {
       this.isLoading = true
