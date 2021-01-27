@@ -1,16 +1,23 @@
 <template>
   <div class="flex flex-col items-center overflow-hidden rounded align-center">
-    <loading v-if="loading" class="w-full my-16" />
-    <div v-if="!loading" class="w-full mx-auto max-w-screen-xl">
+    <loading
+      v-if="loading"
+      class="w-full my-16"
+    />
+    <div
+      v-if="!loading"
+      class="w-full mx-auto max-w-screen-xl"
+    >
       <div class="">
         <awesome-form
-          :debug="debug"
           v-if="!loading"
+          :debug="debug"
           class="py-5"
           :form.sync="resource"
           :is_edit="is_edit"
           :headers="form_fields"
           :validate="true"
+          :layout="layout"
           @valid="_valid => (valid = _valid)"
           @change="updateResource"
         />
@@ -40,7 +47,10 @@
               @click="act(action)"
             >
               <span class="flex flex-row justify-center">
-                <i :class="action.icon" class="mt-1 mr-2 text-md" />
+                <i
+                  :class="action.icon"
+                  class="mt-1 mr-2 text-md"
+                />
                 <span>{{ action.label }}</span>
               </span>
             </button>
@@ -66,7 +76,10 @@
             <p class="text-red-600 text-weigth-600">
               {{ error }}
             </p>
-            <button class="ml-auto btn btn-primary" @click="retry()">
+            <button
+              class="ml-auto btn btn-primary"
+              @click="retry()"
+            >
               <i class="mr-2 fas fa-redo-alt" />
               <span>Riprova</span>
             </button>
@@ -78,14 +91,14 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapState } from 'vuex'
 
 const rest_resources = {
-  profile: "users"
-};
+  profile: 'users'
+}
 
 export default {
-  name: "ResourceEdit",
+  name: 'ResourceEdit',
   props: {
     component: { required: false, default: false },
     propResourceName: {
@@ -98,12 +111,16 @@ export default {
       type: Number,
       default: null
     },
+    layout: {
+      required: false,
+      default: 'vertical'
+    },
     debug: {
       required: false,
       default: false
     }
   },
-  data() {
+  data () {
     return {
       resourceErrors: null,
       changedResource: {},
@@ -115,41 +132,41 @@ export default {
       actions: [],
       is_edit: false,
       valid: false
-    };
+    }
   },
-  async mounted() {
-    this.loading = true;
+  async mounted () {
+    this.loading = true
 
-    this.resource_id = this.propResourceId || this.$route.params.id;
+    this.resource_id = this.propResourceId || this.$route.params.id
     this.resource_name =
       this.propResourceName ||
       this.$route.params.resource ||
-      this.$route.meta.resource;
+      this.$route.meta.resource
 
     this.resource_rest_name =
-      rest_resources[this.resource_name] || this.resource_name;
+      rest_resources[this.resource_name] || this.resource_name
 
-    this.actions = this.resources[this.resource_name].actions || [];
+    this.actions = this.resources[this.resource_name].actions || []
 
     if (this.debug) {
-      this.log("ResourceName: " + this.resource_name);
-      this.log("ResourceId: " + this.resource_id);
+      this.log('ResourceName: ' + this.resource_name)
+      this.log('ResourceId: ' + this.resource_id)
     }
 
     if (this.resource_id) {
-      this.is_edit = true;
+      this.is_edit = true
       this.resource = await this.$api.get(
         this.resource_rest_name,
         this.resource_id
-      );
+      )
     }
 
-    this.loading = false;
+    this.loading = false
   },
   methods: {
-    async saveResource() {
-      this.resourceErrors = null;
-      let resource_name = this.resource_rest_name || this.resource_name;
+    async saveResource () {
+      this.resourceErrors = null
+      let resource_name = this.resource_rest_name || this.resource_name
 
       try {
         if (this.is_edit) {
@@ -157,114 +174,114 @@ export default {
             resource_name,
             this.resource_id,
             this.changedResource
-          );
+          )
         } else {
-          let resource = _.clone(this.changedResource);
-          await this.$api.create(resource_name, resource);
+          let resource = _.clone(this.changedResource)
+          await this.$api.create(resource_name, resource)
           if (this.p_resource) {
-            this.$emit("save", true);
-            return;
+            this.$emit('save', true)
+            return
           }
         }
 
-        this.$router.back();
+        this.$router.back()
       } catch (err) {
-        console.log(err);
+        console.log(err)
 
         if (err.errors) {
-          this.resourceErrors = [];
+          this.resourceErrors = []
 
           Object.keys(err.errors).map(e => {
-            console.log(err.errors[e]);
-            this.resourceErrors = this.resourceErrors.concat(err.errors[e]);
-          });
+            console.log(err.errors[e])
+            this.resourceErrors = this.resourceErrors.concat(err.errors[e])
+          })
 
-          return;
+          return
         }
 
         switch (err.message) {
-          case "The given data was invalid.":
-            this.error = "Alcuni campi non sono validi.";
-            break;
+          case 'The given data was invalid.':
+            this.error = 'Alcuni campi non sono validi.'
+            break
 
           default:
-            this.error = "Ops! C'è stato un errore.";
+            this.error = "Ops! C'è stato un errore."
         }
       }
     },
-    async retry() {
-      this.error = null;
+    async retry () {
+      this.error = null
 
-      await this.saveResource();
+      await this.saveResource()
     },
-    back() {
+    back () {
       if (this.p_resource) {
-        this.$emit("close");
-        return;
+        this.$emit('close')
+        return
       }
 
-      this.$router.back();
+      this.$router.back()
     },
-    updateResource(newResource) {
+    updateResource (newResource) {
       if (this.debug) {
-        this.log("NewResource");
-        this.log(newResource);
+        this.log('NewResource')
+        this.log(newResource)
       }
 
-      this.changedResource = newResource;
+      this.changedResource = newResource
     },
-    act(action) {
+    act (action) {
       if (this[action.callback]) {
-        this[action.callback]();
+        this[action.callback]()
       }
     },
-    delete() {
-      if (confirm("Vuoi davvero eliminare questa risorsa?")) {
-        this.isLoading = true;
-        this.$api.delete(this.resource_name, this.resource_id);
-        this.isLoading = false;
+    delete () {
+      if (confirm('Vuoi davvero eliminare questa risorsa?')) {
+        this.isLoading = true
+        this.$api.delete(this.resource_name, this.resource_id)
+        this.isLoading = false
 
-        this.$router.push("../list");
+        this.$router.push('../list')
       }
     }
   },
   computed: {
-    ...mapState("user", {
+    ...mapState('user', {
       user: state => state.user
     }),
-    form_fields() {
-      let fields = this.resources[this.resource_name].fields || [];
+    form_fields () {
+      let fields = this.resources[this.resource_name].fields || []
 
       return fields.filter(field => {
         if (!field.scopes) {
-          return true;
+          return true
         }
 
-        return field.scopes.includes("edit");
-      });
+        return field.scopes.includes('edit')
+      })
     },
-    button_label() {
-      return this.is_edit ? "Conferma" : "Conferma";
+    button_label () {
+      return this.is_edit ? 'Conferma' : 'Conferma'
     },
-    action_name() {
-      return this.is_edit ? "Modifica" : "Nuova";
+    action_name () {
+      return this.is_edit ? 'Modifica' : 'Nuova'
     },
-    resourceInfo() {
-      return this.resources[this.resource_name].info || {};
+    resourceInfo () {
+      return this.resources[this.resource_name].info || {}
     },
-    options() {
-      return this.resourceInfo.singular || "Risorsa";
+    options () {
+      return this.resourceInfo.singular || 'Risorsa'
     },
-    visibleActions() {
+    visibleActions () {
       return this.actions.filter(action => {
         return (
           !action.scopes ||
-          action.scopes.includes(this.is_edit ? "edit" : "create")
-        );
-      });
+          action.scopes.includes(this.is_edit ? 'edit' : 'create')
+        )
+      })
     }
   }
-};
+}
 </script>
 
 <style></style>
