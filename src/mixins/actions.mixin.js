@@ -26,16 +26,16 @@ export default {
       if (this.$actions[action.callback]) {
         this.$actions[action.callback](this, data)
       }
-    }
-  },
-  computed: {
+    },
     isActionVisible (action, row) {
       if (!action.visible) {
         return true
       }
 
       return this.itemIsVisible(action, row, this)
-    },
+    }
+  },
+  computed: {
     visibleActions () {
       let actions = this.actions.filter((action) => {
         if (action.multi) {
