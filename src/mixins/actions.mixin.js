@@ -1,57 +1,80 @@
 export default {
-  data() {
-    return {};
+  data () {
+    return {}
   },
-  mounted() {},
+  mounted () {},
   methods: {
-    actOnRow(event) {
-      let action = event.action;
-      let index = event.index;
+    actOnRow (event) {
+      let action = event.action
+      let index = event.index
 
       if (this[action.callback]) {
-        let row = this.rows[index];
-        this[action.callback](row);
+        let row = this.rows[index]
+        this[action.callback](row)
       }
 
       if (this.$actions[action.callback]) {
-        let row = this.rows[index];
-        this.$actions[action.callback](this, row);
+        let row = this.rows[index]
+        this.$actions[action.callback](this, row)
       }
     },
-    act(action, data = null) {
+    act (action, data = null) {
       if (this[action.callback]) {
-        this[action.callback](data);
+        this[action.callback](data)
       }
 
       if (this.$actions[action.callback]) {
-        this.$actions[action.callback](this, data);
+        this.$actions[action.callback](this, data)
       }
-    },
+    }
   },
   computed: {
-    visibleActions() {
+    isActionVisible (action, row) {
+      if (!action.visible) {
+        return true
+      }
+
+      return this.itemIsVisible(action, row, this)
+    },
+    visibleActions () {
       let actions = this.actions.filter((action) => {
         if (action.multi) {
-          return false;
+          return false
         }
 
-        let actionScope = this.actionScope || 'list';
+        let actionScope = this.actionScope || 'list'
 
-        let roleBasedFilter = !action.roles || action.roles.includes(this.getUserRole());
-        let scopeBasedFilter = !action.scopes || action.scopes.includes(actionScope);
-        let visibilityFilter = this.itemIsVisible(action, this);
+        let roleBasedFilter = !action.roles || action.roles.includes(this.getUserRole())
+        let scopeBasedFilter = !action.scopes || action.scopes.includes(actionScope)
+        let visibilityFilter = this.itemIsVisible(action, this)
 
-        return roleBasedFilter && scopeBasedFilter && visibilityFilter;
-      });
+        return roleBasedFilter && scopeBasedFilter && visibilityFilter
+      })
 
-      return actions;
+      return actions
     },
-    multiActions() {
+    scopedActions () {
+      let actions = this.actions.filter((action) => {
+        if (action.multi) {
+          return false
+        }
+
+        let actionScope = this.actionScope || 'list'
+
+        let roleBasedFilter = !action.roles || action.roles.includes(this.getUserRole())
+        let scopeBasedFilter = !action.scopes || action.scopes.includes(actionScope)
+
+        return roleBasedFilter && scopeBasedFilter
+      })
+
+      return actions
+    },
+    multiActions () {
       return this.actions.filter((action) => {
-        let roleBasedFilter = !action.roles || action.roles.includes(this.getUserRole());
+        let roleBasedFilter = !action.roles || action.roles.includes(this.getUserRole())
 
-        return action.multi && roleBasedFilter;
-      });
-    },
-  },
-};
+        return action.multi && roleBasedFilter
+      })
+    }
+  }
+}

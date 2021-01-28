@@ -1,6 +1,9 @@
 <template>
   <div class="flex flex-col flex-grow">
-    <div v-if="!isLoading" class="w-full">
+    <div
+      v-if="!isLoading"
+      class="w-full"
+    >
       <div class="flex flex-row items-baseline py-5">
         <slot name="title" />
         <div class="flex flex-row ml-auto">
@@ -16,8 +19,7 @@
                 color="text-white"
                 size="m"
                 class="mr-1"
-              >
-              </icon>
+              />
               <span>{{ action.label }}</span>
             </span>
           </button>
@@ -25,17 +27,22 @@
       </div>
       <div class="flex flex-row items-center my-3">
         <search-input
-          @input="search"
           v-model="searchQuery"
           placeholder="Cerca"
           class="flex-grow"
-        >
-        </search-input>
+          @input="search"
+        />
       </div>
       <div class="flex flex-row items-center my-3">
-        <slot name="filters" :filter-data="filterData" />
+        <slot
+          name="filters"
+          :filter-data="filterData"
+        />
       </div>
-      <div class="my-3" v-if="!dataLoading">
+      <div
+        v-if="!dataLoading"
+        class="my-3"
+      >
         <awesome-table
           v-if="!resourceIsLoading"
           :header-class="headerClass"
@@ -43,11 +50,14 @@
           :row-class="rowClass"
           :striped="striped"
           :headers="headers"
-          :actions="visibleActions"
+          :actions="scopedActions"
           :rows="rows"
           @act="actOnRow"
         />
-        <div v-if="pagination" class="flex flex-row w-full my-3">
+        <div
+          v-if="pagination"
+          class="flex flex-row w-full my-3"
+        >
           <t-pagination
             class="mx-auto"
             :total-items="pagination.totalItems"
@@ -60,39 +70,45 @@
           />
         </div>
       </div>
-      <loading v-if="dataLoading" class="flex-grow w-full h-64" />
+      <loading
+        v-if="dataLoading"
+        class="flex-grow w-full h-64"
+      />
     </div>
-    <loading v-if="isLoading" class="flex-grow w-full h-64" />
+    <loading
+      v-if="isLoading"
+      class="flex-grow w-full h-64"
+    />
   </div>
 </template>
 <script>
-import ActionsMixin from "@/mixins/actions.mixin.js";
+import ActionsMixin from '@/mixins/actions.mixin.js'
 
 export default {
-  name: "ListResourceBase",
+  name: 'ListResourceBase',
   mixins: [ActionsMixin],
   props: {
     tableClass: {
       required: false,
       type: String,
-      default() {
-        return this.$theme.tableClass;
+      default () {
+        return this.$theme.tableClass
       }
     },
     headerClass: {
       required: false,
       type: String,
-      default: "bg-gray-500 text-white"
+      default: 'bg-gray-500 text-white'
     },
     rowClass: {
       required: false,
       type: String,
-      default: "bg-gray-100 text-gray-700"
+      default: 'bg-gray-100 text-gray-700'
     },
     multiActionClass: {
       required: false,
       type: String,
-      default: "bg-gray-100 text-gray-700"
+      default: 'bg-gray-100 text-gray-700'
     },
     striped: {
       required: false,
@@ -102,14 +118,14 @@ export default {
     paginationClasses: {
       required: false,
       type: Object,
-      default() {
-        return this.$theme.paginationClasses;
+      default () {
+        return this.$theme.paginationClasses
       }
     }
   },
-  data() {
+  data () {
     return {
-      actionScope: "list",
+      actionScope: 'list',
       pagination: null,
       currentPage: 1,
       isLoading: true,
@@ -124,95 +140,95 @@ export default {
       baseConfig: {
         canAdd: true
       }
-    };
+    }
   },
   computed: {},
-  async mounted() {
+  async mounted () {
     this.resourceName =
-      this.$route.params.resource || this.$route.meta.resource;
+      this.$route.params.resource || this.$route.meta.resource
 
     if (!this.resourceName) {
-      return;
+      return
     }
 
-    this.headers = this.resources[this.resourceName].headers || [];
-    this.actions = this.resources[this.resourceName].actions || [];
-    this.resourceInfo = this.resources[this.resourceName].info || {};
-    this.config = this.resources[this.resourceName].config || this.baseConfig;
+    this.headers = this.resources[this.resourceName].headers || []
+    this.actions = this.resources[this.resourceName].actions || []
+    this.resourceInfo = this.resources[this.resourceName].info || {}
+    this.config = this.resources[this.resourceName].config || this.baseConfig
 
-    this.isLoading = true;
-    await this.loadData();
-    this.isLoading = false;
+    this.isLoading = true
+    await this.loadData()
+    this.isLoading = false
   },
   methods: {
-    search: _.debounce(async function() {
+    search: _.debounce(async function () {
       // When searching "reset" pagination
-      this.currentPage = 1;
-      await this.loadData();
+      this.currentPage = 1
+      await this.loadData()
     }, 350),
-    async changePage(newCurrentPage) {
-      this.currentPage = newCurrentPage;
-      await this.loadData();
+    async changePage (newCurrentPage) {
+      this.currentPage = newCurrentPage
+      await this.loadData()
     },
-    async loadData() {
-      this.dataLoading = true;
+    async loadData () {
+      this.dataLoading = true
       try {
         let response = await this.$api.list(this.resourceName, {
           q: this.searchQuery,
           filters: this.filters,
           page: this.currentPage
-        });
+        })
 
         if (response.data) {
           this.pagination = {
             totalItems: response.total,
             perPage: response.per_page
-          };
+          }
 
-          this.rows = response.data;
+          this.rows = response.data
         } else {
-          this.rows = response || [];
+          this.rows = response || []
         }
       } catch (e) {
-        this.rows = [];
+        this.rows = []
       }
 
-      this.dataLoading = false;
+      this.dataLoading = false
     },
-    async filterData(filters) {
-      this.filters = filters;
-      await this.loadData();
+    async filterData (filters) {
+      this.filters = filters
+      await this.loadData()
     },
-    addResource() {
+    addResource () {
       this.$router.push({
         name: `create_${this.resourceName}`
-      });
+      })
     },
-    view(resource) {
+    view (resource) {
       this.$router.push({
         name: `view_${this.resourceName}`,
         params: {
           id: resource.id
         }
-      });
+      })
     },
-    edit(resource) {
+    edit (resource) {
       this.$router.push({
         name: `edit_${this.resourceName}`,
         params: {
           id: resource.id
         }
-      });
+      })
     },
-    async delete(resource) {
-      if (confirm("Vuoi davvero eliminare questa risorsa?")) {
-        this.isLoading = true;
-        this.$api.delete(this.resourceName, resource.id);
-        this.isLoading = false;
+    async delete (resource) {
+      if (confirm('Vuoi davvero eliminare questa risorsa?')) {
+        this.isLoading = true
+        this.$api.delete(this.resourceName, resource.id)
+        this.isLoading = false
 
-        await this.loadData();
+        await this.loadData()
       }
     }
   }
-};
+}
 </script>
