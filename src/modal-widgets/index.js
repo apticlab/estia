@@ -1,7 +1,9 @@
 import ChangePasswordStrong from '@/components/ChangePasswordStrong.vue'
+import Confirm from '@/components/Confirm.vue'
 
 const baseModalWidgets = {
-  'change-password-strong': ChangePasswordStrong
+  'change-password-strong': ChangePasswordStrong,
+  'confirm': Confirm
 }
 
 export default function (Vue, options) {
