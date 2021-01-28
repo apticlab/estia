@@ -502,6 +502,7 @@
 import Popper from '@/components/Popper.vue'
 import SvgIcon from '@/components/SvgIcon.vue'
 import { isObject } from 'lodash'
+import ActionsMixin from '@/mixins/actions.mixin.js'
 
 export default {
   name: 'AwesomeTable',
@@ -509,6 +510,7 @@ export default {
     'svg-icon': SvgIcon,
     popper: Popper
   },
+  mixins: [ActionsMixin],
   props: {
     rows: { required: false, default: [] },
     headers: {},
