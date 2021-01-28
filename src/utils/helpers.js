@@ -339,7 +339,7 @@ function getVisibleItemsByRole (items, user) {
 }
 
 function itemIsVisible (item, reference, other = null) {
-  if (!item.visible || !item.visible.isArray()) {
+  if (!item.visible || !Array.isArray(item.visible)) {
     return true
   }
 
