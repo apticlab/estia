@@ -5,15 +5,18 @@
       [bgColor]: true,
       'hidden sm:w-16 sm:block': is_collapsed,
       'w-full sm:w-64': !is_collapsed,
-      'right-0': is_mobile,
+      'right-0': is_mobile
     }"
   >
     <template>
-      <slot name="logo" :is_collapsed="!show_text">
+      <slot
+        name="logo"
+        :is_collapsed="!show_text"
+      >
         <div
           v-if="!is_mobile"
           class="flex flex-col justify-center h-12 pt-3 text-xl font-medium text-center"
-        ></div>
+        />
       </slot>
     </template>
     <div class="flex flex-col flex-grow mt-8">
@@ -23,7 +26,7 @@
           :key="item.meta.label"
           class="nav-link"
           :class="{
-            selected: linkIsCurrentLink(item),
+            selected: linkIsCurrentLink(item)
           }"
           @click="navigateTo(item)"
         >
@@ -49,80 +52,86 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapState } from 'vuex'
 
 export default {
-  name: "SideNav",
+  name: 'SideNav',
   props: {
-    bgColor: { required: false, default: "bg-white", type: String },
+    bgColor: { required: false, default: 'bg-white', type: String }
   },
   data: () => ({
     value: 0,
     item: 0,
     mini_variant: false,
-    selected_action: {},
+    selected_action: {}
   }),
   computed: {
-    ...mapState("user", {
-      user: (state) => state.user,
+    ...mapState('user', {
+      user: state => state.user
     }),
-    currentPath() {
-      return this.$router.name;
+    currentPath () {
+      return this.$router.name
     },
-    items() {
+    items () {
       if (!this.$routes.length) {
-        return [];
+        return []
       }
 
       return this.$routes
-        .filter((route) => {
+        .filter(route => {
           // Only routes with the meta.label have to be present
           // in the SideNav
-          return route.meta && route.meta.label !== undefined;
+          return route.meta && route.meta.label !== undefined
         })
-        .filter((route) => {
+        .filter(route => {
           if (route.meta.roles) {
             if (!this.user) {
-              return false;
+              return false
             }
 
-            let userRole = this.getUserRole();
+            let userRole = this.getUserRole()
 
-            return route.meta.roles.includes(userRole);
+            return route.meta.roles.includes(userRole)
           }
 
-          return true;
-        });
+          return true
+        })
     },
-    version() {
-      return this.APPLICATION_VERSION;
-    },
+    version () {
+      return this.APPLICATION_VERSION
+    }
   },
-  beforeMount() {
-    this.listenForSideNavCollapseEvent();
+  beforeMount () {
+    this.listenForSideNavCollapseEvent()
   },
-  mounted() {},
+  mounted () {},
   methods: {
-    doUserAction(action) {
-      this.$router.push(action.path);
+    doUserAction (action) {
+      this.$router.push(action.path)
     },
-    navigateTo(link) {
+    navigateTo (link) {
       // Don't navigate to same route or root route
       if (
         link.path != this.$route.name &&
         link.path != this.$route.redirectedFrom
       ) {
         if (this.is_mobile) {
-          this.collapseSideBar();
+          this.collapseSideBar()
         }
-        this.$router.push(link.path);
+        if (link.name) {
+          this.$router.push({
+            name: link.name
+          })
+        } else {
+          this.$router.push(link.path)
+        }
       }
     },
-    linkIsCurrentLink(link) {
-      return this.$route.matched.map((l) => l.name).indexOf(link.name) != -1;
-    },
-  },
-};
+    linkIsCurrentLink (link) {
+      return this.$route.matched.map(l => l.name).indexOf(link.name) != -1
+    }
+  }
+}
 </script>
 
 <style>
