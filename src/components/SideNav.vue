@@ -128,7 +128,23 @@ export default {
       }
     },
     linkIsCurrentLink (link) {
-      return this.$route.matched.map(l => l.name).indexOf(link.name) != -1
+      if (link.name) {
+        return this.$route.matched.map(l => l.name).indexOf(link.name) != -1
+      }
+
+      if (link.meta && link.meta.sectionName) {
+        return (
+          this.$route.matched
+            .map(l => {
+              if (l.meta && l.meta.sectionName) {
+                return l.meta.sectionName
+              }
+
+              return null
+            })
+            .indexOf(link.meta.sectionName) !== -1
+        )
+      }
     }
   }
 }
