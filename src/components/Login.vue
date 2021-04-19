@@ -1,6 +1,9 @@
 <template>
   <div
     :style="{ 'background-image': bgImage }"
+    :class="{
+      [bgColor]: true
+    }"
     class="flex flex-col items-center justify-center h-screen px-4 bg-center bg-no-repeat bg-cover sm:px-0"
   >
     <div
@@ -129,6 +132,11 @@ export default {
       required: false,
       type: String,
       default: ''
+    },
+    bgColor: {
+      required: false,
+      type: String,
+      default: 'bg-white'
     },
     errorTexts: {
       required: false,
