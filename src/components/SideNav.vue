@@ -1,18 +1,16 @@
 <template>
   <div
-    class="fixed left-0 z-20 flex flex-col h-full top-14 sm:top-0 shadow-xs transition-all duration-200 ease-in"
+    class="fixed left-0 z-20 flex flex-col h-full top-14 sm:top-0 transition-all duration-200 ease-in"
     :class="{
       [bgColor]: true,
+      [shadow]: true,
       'hidden sm:w-16 sm:block': is_collapsed,
       'w-full sm:w-64': !is_collapsed,
-      'right-0': is_mobile
+      'right-0': is_mobile,
     }"
   >
     <template>
-      <slot
-        name="logo"
-        :is_collapsed="!show_text"
-      >
+      <slot name="logo" :is_collapsed="!show_text">
         <div
           v-if="!is_mobile"
           class="flex flex-col justify-center h-12 pt-3 text-xl font-medium text-center"
@@ -26,7 +24,7 @@
           :key="item.meta.label"
           class="nav-link"
           :class="{
-            selected: linkIsCurrentLink(item)
+            selected: linkIsCurrentLink(item),
           }"
           @click="navigateTo(item)"
         >
@@ -52,102 +50,100 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState } from "vuex";
 
 export default {
-  name: 'SideNav',
+  name: "SideNav",
   props: {
-    bgColor: { required: false, default: 'bg-white', type: String }
+    bgColor: { required: false, default: "bg-white", type: String },
+    shadow: { required: false, default: "shadow-xs", type: String },
   },
   data: () => ({
     value: 0,
     item: 0,
     mini_variant: false,
-    selected_action: {}
+    selected_action: {},
   }),
   computed: {
-    ...mapState('user', {
-      user: state => state.user
+    ...mapState("user", {
+      user: (state) => state.user,
     }),
-    currentPath () {
-      return this.$router.name
+    currentPath() {
+      return this.$router.name;
     },
-    items () {
+    items() {
       if (!this.$routes.length) {
-        return []
+        return [];
       }
 
       return this.$routes
-        .filter(route => {
+        .filter((route) => {
           // Only routes with the meta.label have to be present
           // in the SideNav
-          return route.meta && route.meta.label !== undefined
+          return route.meta && route.meta.label !== undefined;
         })
-        .filter(route => {
+        .filter((route) => {
           if (route.meta.roles) {
             if (!this.user) {
-              return false
+              return false;
             }
 
-            let userRole = this.getUserRole()
+            let userRole = this.getUserRole();
 
-            return route.meta.roles.includes(userRole)
+            return route.meta.roles.includes(userRole);
           }
 
-          return true
+          return true;
+        });
+    },
+    version() {
+      return this.APPLICATION_VERSION;
+    },
+    routesNames() {
+      return this.$route.matched
+        .filter((l) => {
+          return l.meta && l.meta.sectionName;
         })
+        .map((l) => l.meta.sectionName);
     },
-    version () {
-      return this.APPLICATION_VERSION
-    }
   },
-  beforeMount () {
-    this.listenForSideNavCollapseEvent()
+  beforeMount() {
+    this.listenForSideNavCollapseEvent();
   },
-  mounted () {},
+  mounted() {},
   methods: {
-    doUserAction (action) {
-      this.$router.push(action.path)
+    doUserAction(action) {
+      this.$router.push(action.path);
     },
-    navigateTo (link) {
+    navigateTo(link) {
       // Don't navigate to same route or root route
       if (
         link.path != this.$route.name &&
         link.path != this.$route.redirectedFrom
       ) {
         if (this.is_mobile) {
-          this.collapseSideBar()
+          this.collapseSideBar();
         }
         if (link.name) {
           this.$router.push({
-            name: link.name
-          })
+            name: link.name,
+          });
         } else {
-          this.$router.push(link.path)
+          this.$router.push(link.path);
         }
       }
     },
-    linkIsCurrentLink (link) {
+    linkIsCurrentLink(link) {
+      this.log(link);
       if (link.name) {
-        return this.$route.matched.map(l => l.name).indexOf(link.name) != -1
+        return this.$route.matched.map((l) => l.name).indexOf(link.name) != -1;
       }
-
       if (link.meta && link.meta.sectionName) {
-        return (
-          this.$route.matched
-            .map(l => {
-              if (l.meta && l.meta.sectionName) {
-                return l.meta.sectionName
-              }
-
-              return null
-            })
-            .indexOf(link.meta.sectionName) !== -1
-        )
+        return this.routesNames.includes(link.meta.sectionName);
       }
-    }
-  }
-}
+    },
+  },
+};
 </script>
 
 <style>
