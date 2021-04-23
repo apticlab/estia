@@ -134,7 +134,6 @@ export default {
       }
     },
     linkIsCurrentLink(link) {
-      this.log(link);
       if (link.name) {
         return this.$route.matched.map((l) => l.name).indexOf(link.name) != -1;
       }
