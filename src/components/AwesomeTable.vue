@@ -268,9 +268,11 @@
                   <span
                     class="px-3 py-1 text-xs rounded-lg"
                     :class="
-                      'pill-color-' + deepPick(row, header.field.color)
-                        ? deepPick(row, header.field.color)
-                        : 'green'
+                      [deepPick(row, header.field.color)
+                        ?  deepPick(row, header.field.color)
+                        : 'bg-gray-500',
+                        deepPick(row, header.field.text_color) || 'text-white'
+                      ]
                     "
                   >{{ deepPick(row, header.field.text) }}</span>
                 </div>
