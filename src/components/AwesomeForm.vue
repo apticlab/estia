@@ -54,12 +54,6 @@
             :value="deepPick(dataForm, header.field)"
             @change="$event => updateNested(header.field, $event)"
           />
-          <!-- <FormulateInput
-              type="resource-select"
-              class="flex-grow"
-              :name="header.field"
-              :select="header.select"
-            /> -->
           <input
             v-if="header.type == 'text'"
             type="text"
@@ -164,7 +158,7 @@
               <FormulateInput
                 :id="header.code"
                 :key="header.field"
-                type="custom-number"
+                type="number"
                 :readonly="fieldIsReadonly(header)"
                 :placeholder="header.placeholder"
                 :name="header.field"
@@ -776,7 +770,7 @@ export default {
       return this.isEdit ? 'edit' : 'create'
     },
     visible_headers () {
-      let uh = this.updateHeaders
+      let uh = this.updateHeaders;
 
       return this.headers.filter(header => {
         return this.fieldIsVisible(header)
