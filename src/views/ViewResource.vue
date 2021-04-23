@@ -94,8 +94,8 @@ export default {
     }
   },
   async mounted () {
-    let resourceName = this.$route.meta.resource || this.$route.params.resource
-    let resourceId = this.$route.params.id
+    let resourceName = this.$route.meta.resource || this.$route.params.resource;
+    let resourceId = this.$route.params.id;
 
     this.isLoading = true
 
