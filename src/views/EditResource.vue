@@ -228,7 +228,7 @@ export default {
         this.log(newResource)
       }
 
-      this.changedResource = newResource
+      this.changedResource = newResource;
     },
     act (action) {
       if (this[action.callback]) {
