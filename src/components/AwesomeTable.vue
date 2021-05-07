@@ -171,9 +171,10 @@
                   v-if="header.type == 'text'"
                   class="flex flex-row items-end"
                 >
-                  <span :class="header.class">
+                  <span :class="header.class" v-if='deepPick(row, header.field, header.type) '>
                     {{ deepPick(row, header.field, header.type) }}
                   </span>
+                  <span>{{ header.on_empty }}</span>
                 </div>
 
                 <div
@@ -192,7 +193,7 @@
                   v-if="header.type == 'number'"
                   class="flex flex-row items-end"
                 >
-                  <span :class="header.class">
+                  <span :class="header.class" v-if='deepPick(row, header.field, header.type)'>
                     {{ deepPick(row, header.field, header.type) | size_number }}
                     <span
                       v-if="header.udm"
@@ -203,6 +204,7 @@
                         : header.udm
                     }}</span>
                   </span>
+                  <span v-else class="text-gray-400">{{ header.on_empty }}</span>
                 </div>
 
                 <div
