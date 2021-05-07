@@ -1,9 +1,6 @@
 <template>
-  <div class="flex flex-col flex-grow px-4 xl:px-0 max-w-screen-xl mx-auto">
-    <div
-      v-if="!isLoading"
-      class="w-full"
-    >
+  <div class="">
+    <div v-if="!isLoading" class="w-full">
       <div class="flex flex-row mb-8">
         <div class="flex flex-row items-baseline ml-auto py-4">
           <button
@@ -14,10 +11,7 @@
             @click="act(action)"
           >
             <span class="flex flex-row justify-center">
-              <i
-                :class="action.icon"
-                class="mr-2 mt-1 text-md"
-              />
+              <i :class="action.icon" class="mr-2 mt-1 text-md" />
               <span>{{ action.label }}</span>
             </span>
           </button>
@@ -44,34 +38,31 @@
           >
             {{ header.label }}
           </label>
-          <field-view
-            :data="resource"
-            :field="header"
-          />
+          <field-view :data="resource" :field="header" />
         </div>
       </div>
     </div>
-    <loading
-      v-if="isLoading"
-      class="flex-grow w-full h-64"
-    />
+    <loading v-if="isLoading" class="flex-grow w-full h-64" />
   </div>
 </template>
 <script>
 export default {
-  name: 'ViewResource',
-  props: {},
-  data () {
+  name: "ViewResource",
+  props: {
+    id: { type: Number, default: null },
+    resourceNameProp: { type: String, default: null },
+  },
+  data() {
     return {
       isLoading: true,
       headers: null,
       actions: null,
-      resource: null
-    }
+      resource: null,
+    };
   },
   computed: {
-    newResourceLabel () {
-      return 'Nuova'
+    newResourceLabel() {
+      return "Nuova";
 
       /*
       let newResourceLabel = "Aggiungi ";
@@ -80,73 +71,77 @@ export default {
       return newResourceLabel;
       */
     },
-    resourceName () {
+    resourceName() {
       let resourceNameField = this.resourceInfo
         ? this.resourceInfo.singular
-        : null
+        : null;
 
-      return resourceNameField || 'Risorsa'
+      return resourceNameField || "Risorsa";
     },
-    visibleActions () {
+    visibleActions() {
       return this.actions.filter((action) => {
-        return !action.scopes || action.scopes.includes('view')
-      })
-    }
+        return !action.scopes || action.scopes.includes("view");
+      });
+    },
   },
-  async mounted () {
-    let resourceName = this.$route.meta.resource || this.$route.params.resource;
-    let resourceId = this.$route.params.id;
+  async mounted() {
+    let resourceName =
+      this.resourceNameProp ||
+      this.$route.meta.resource ||
+      this.$route.params.resource;
 
-    this.isLoading = true
+    let resourceId = this.id || this.$route.params.id;
 
-    this.resource = (await this.$api.get(resourceName, resourceId)) || {}
+    this.isLoading = true;
 
-    let headers = this.resources[resourceName].fields || []
+    this.resource = (await this.$api.get(resourceName, resourceId)) || {};
+
+    let headers = this.resources[resourceName].fields || [];
     this.headers = headers.filter((field) => {
       if (!field.scopes) {
-        return true
+        return true;
       }
 
-      return field.scopes.includes('view')
-    })
+      return field.scopes.includes("view");
+    });
 
-    this.actions = this.resources[resourceName].actions || []
-    this.resourceInfo = this.resources[resourceName].info || {}
+    this.actions = this.resources[resourceName].actions || [];
+    this.resourceInfo = this.resources[resourceName].info || {};
 
-    this.isLoading = false
+    this.isLoading = false;
   },
   methods: {
-    labelClass (header) {
-      let cssClass = ''
+    labelClass(header) {
+      let cssClass = "";
 
       switch (header.type) {
-        case 'form':
-          cssClass = 'text-gray-700 text-normal'
-          break
+        case "form":
+          cssClass = "text-gray-700 text-normal";
+          break;
 
-        case 'fieldset':
-          cssClass = 'text-gray-dark text-xl font-bold my-5'
-          break
+        case "fieldset":
+          cssClass = "text-gray-dark text-xl font-bold my-5";
+          break;
 
         default:
-          cssClass = 'text-gray-600 text-sm'
-          break
+          cssClass = "text-gray-600 text-sm";
+          break;
       }
 
-      return cssClass
+      return cssClass;
     },
-    act (action) {
+    act(action) {
       if (this[action.callback]) {
-        this[action.callback]()
+        this[action.callback]();
       }
     },
-    edit () {
-      this.$router.push('../edit/' + this.resource.id)
+    edit() {
+      this.$router.push("../edit/" + this.resource.id);
     },
-    delete () {},
-    goToList () {
-      this.$router.push('../list')
-    }
-  }
-}
+    delete() {},
+    goToList() {
+      this.$router.push("../list");
+    },
+  },
+};
 </script>
