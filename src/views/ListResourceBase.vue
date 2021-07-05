@@ -200,7 +200,6 @@ export default {
       await this.loadData()
     },
     addResource () {
-      this.log(this.resourceName);
       this.$router.push({
         name: `create_${this.resourceName}`
       })
