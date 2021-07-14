@@ -4,7 +4,8 @@
     :class="{
       [bgColor]: true,
       [shadow]: true,
-      'hidden sm:w-16 sm:block': is_collapsed,
+      [width]: true,
+      'hidden sm:block': is_collapsed,
       'w-full sm:w-64': !is_collapsed,
       'right-0': is_mobile,
     }"
@@ -57,6 +58,7 @@ export default {
   props: {
     bgColor: { required: false, default: "bg-white", type: String },
     shadow: { required: false, default: "shadow-xs", type: String },
+    width: { required: false, default: "sm:w-16", type: String },
   },
   data: () => ({
     value: 0,
