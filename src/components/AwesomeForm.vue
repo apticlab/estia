@@ -351,7 +351,6 @@ export default {
       this.updateNested(header.field, !currentValue);
     },
     updateFormulate(formulateForm) {
-      this.log('updateFormulate');
       // Merge data from Formulate and from our own nested two way bindings
       Object.keys(formulateForm).forEach((fieldName) => {
         this.$set(
@@ -367,7 +366,6 @@ export default {
       // this.$forceUpdate();
     },
     updateNested(field, value) {
-      this.log('updateNested');
       _.set(this.dataForm, field, value);
 
       this.updateOldForm(this.dataForm);
@@ -716,7 +714,6 @@ export default {
       return filteredOptions;
     },
     updateOldForm(newForm) {
-      this.log('updateNested');
       this.oldForm = JSON.parse(JSON.stringify(newForm));
       
       // Update form for parent component
@@ -781,14 +778,11 @@ export default {
         // fare il watch delle variabili presenti in var
         // eseguire la funzione computed passando le variabili presenti in var
         let varToWatch = header.depends_on.var[0];
-        this.log(`oldForm.${varToWatch}`);
 
         // add the unwatch
         this.$watch(
           `dataForm.${varToWatch}`,
           (newV, oldV) => {
-            this.log("changed form", newV, oldV);
-            this.log(header.code, header.depends_on.computed(newV));
             this.$set(
               this.dataForm,
               header.code,
