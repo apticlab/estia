@@ -1,7 +1,7 @@
 <template>
   <div
     class="h-12 w-full fixed left-0 right-0 top-0 z-10 flex flex-row items-center justify-between duration-200 transition-all ease-in"
-    :class="is_collapsed ? 'pl-0 sm:pl-16' : 'pl-0 sm:pl-64'"
+    :class="{ [shift]: true}"
   >
     <div>
       <slot
@@ -39,6 +39,9 @@ import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
 
 export default {
   name: "TopBar",
+  props: {
+    shift: { required: false, default: "sm:w-16", type: String },
+  },
   mixins: [SideNavMixin],
   data: () => ({
     showUserMenu: false,
