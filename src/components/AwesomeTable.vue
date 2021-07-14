@@ -796,13 +796,12 @@ export default {
       this.$emit("row-deleted", this.rows);
     },
     getPillBgColor(color) {
-      if(!color) {
-        return 'bg-gray-500'
+      if (!color) {
+        return "bg-gray-500";
       }
-
-      if(color.chartAt(0))
-      console.log(color);
-    }
+      
+      return color;
+    },
   },
 };
 </script>
