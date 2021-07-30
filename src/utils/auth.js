@@ -17,7 +17,7 @@ export {
   getActiveRole
 };
 
-const HOST = process.env.VUE_APP_API_HOST  || "https://api.treebu.io";
+const HOST = process.env.VUE_APP_API_HOST  || "";
 
 const API_URL = HOST + "/api";
 const LOGIN_URL = API_URL + "/login";
