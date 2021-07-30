@@ -21,15 +21,15 @@ const helpers = {
 
 export { helpers }
 
-function getDayWeekNumber (_date) {
+function getDayWeekNumber(_date) {
   return this.moment(_date).day()
 }
 
-function clone (value) {
+function clone(value) {
   return JSON.parse(JSON.stringify(value))
 }
 
-function getNestedField (resource, field) {
+function getNestedField(resource, field) {
   if (!field) {
     return ''
   }
@@ -45,7 +45,7 @@ function getNestedField (resource, field) {
   return resource
 }
 
-function getInfoFromOptions (resource, header, infoType) {
+function getInfoFromOptions(resource, header, infoType) {
   let tagId = getNestedField(resource, header.value)
   let tagField = 'name'
   let currentTag = {}
@@ -73,11 +73,11 @@ function getInfoFromOptions (resource, header, infoType) {
   }
 }
 
-function sleep (ms) {
+function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
 
-function deepFind (obj, path) {
+function deepFind(obj, path) {
   var paths = path.split('.')
   var current = obj
   var i
@@ -97,7 +97,7 @@ function deepFind (obj, path) {
   return current
 }
 
-function getColor (colorString) {
+function getColor(colorString) {
   if (!Array.isArray(colorString)) {
     colorString = colorString || 'gray-400'
     let elem = document.querySelector('.color-swatch.bg-' + colorString)
@@ -111,7 +111,7 @@ function getColor (colorString) {
   })
 }
 
-function createRandomArray (min, max, number) {
+function createRandomArray(min, max, number) {
   let array = []
 
   for (var i = 0; i < number; i++) {
@@ -121,7 +121,7 @@ function createRandomArray (min, max, number) {
   return array
 }
 
-function deepPick (object, nestedField) {
+function deepPick(object, nestedField) {
   if (nestedField == '.') {
     return object
   }
@@ -206,7 +206,7 @@ function evaluateCondition(condition, object, reference = null) {
 }
 */
 
-function evaluateCondition (condition, object, reference = null) {
+function evaluateCondition(condition, object, reference = null) {
   const conditionValueDefaults = {
     NULL: null,
     UNDEFINED: undefined,
@@ -332,13 +332,13 @@ function dateFromConditionValue (dateString) {
   return date
 }
 
-function getVisibleItemsByRole (items, user) {
+function getVisibleItemsByRole(items, user) {
   return items.filter(item => {
     return !item.roles || item.roles.includes(user.role.code)
   })
 }
 
-function itemIsVisible (item, reference, other = null) {
+function itemIsVisible(item, reference, other = null) {
   if (!item.visible || !Array.isArray(item.visible)) {
     return true
   }
