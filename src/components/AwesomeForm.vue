@@ -4,7 +4,7 @@
     <FormulateForm
       v-if="!loading"
       name="aw-form"
-      class="w-full grid grid-cols-12 col-gap-6"
+      class="w-full grid grid-cols-12 gap-x-6"
       :values="form"
       @input="updateFormulate"
     >
@@ -70,7 +70,17 @@
               @click="handleBooleanClick(header)"
             >
               <div
-                class="flex items-center justify-center w-6 h-6 p-1 mr-2 bg-white shadow"
+                class="
+                  flex
+                  items-center
+                  justify-center
+                  w-6
+                  h-6
+                  p-1
+                  mr-2
+                  bg-white
+                  shadow
+                "
               >
                 <svg
                   :class="!!deepPick(dataForm, header.field) ? '' : 'hidden'"
@@ -125,7 +135,21 @@
               @change="(value) => (dataForm[header.field] = value)"
             />
           </template>
-          <template v-if="header.type == 'select'">
+          <template v-else-if="header.type == 'dynamicRadio'">
+            <p v-if="!form_options[header.code]">{{ header.info }}</p>
+            <FormulateInput
+              :id="header.code"
+              :key="header.field"
+              v-if="form_options[header.code]"
+              :readonly="fieldIsReadonly(header)"
+              type="radio"
+              :placeholder="header.placeholder"
+              :name="header.field"
+              :header="header"
+              :options="form_options[header.code]"
+            />
+          </template>
+          <template v-else-if="header.type == 'select'">
             <FormulateInput
               type="resource-select"
               class="flex-grow"
@@ -160,7 +184,14 @@
                 class="flex-grow rounded-r-none"
               />
               <div
-                class="flex items-center bg-gray-200 border border-l-0 border-gray-300 rounded rounded-l-none border-l-none"
+                class="
+                  flex
+                  items-center
+                  bg-gray-200
+                  border border-l-0 border-gray-300
+                  rounded rounded-l-none
+                  border-l-none
+                "
               >
                 <span class="px-3 text-gray-600">{{ header.udm }}</span>
               </div>
@@ -169,7 +200,17 @@
           <template v-else-if="header.type == 'boolean'">
             <label class="flex custom-label">
               <div
-                class="flex items-center justify-center w-6 h-6 p-1 mr-2 bg-white shadow"
+                class="
+                  flex
+                  items-center
+                  justify-center
+                  w-6
+                  h-6
+                  p-1
+                  mr-2
+                  bg-white
+                  shadow
+                "
               >
                 <FormulateInput
                   :id="header.code"
@@ -224,6 +265,7 @@
             :name="header.field"
             :header="header"
             :resource="header.resource"
+            :options="header.options"
           />
         </div>
         <div class="ml-2 mt-2 mr-auto error-container">
@@ -339,6 +381,7 @@ export default {
     this.validatedataForm();
 
     this.setDependableVariables();
+    this.watchableOptions();
 
     this.loading = false;
   },
@@ -346,6 +389,53 @@ export default {
     // this.event_bus.$off('aw:form:update', this.forceUpdate);
   },
   methods: {
+    /**
+     * This function check if option has @ symbol and if it true it checks if the function named
+     * after @ is present then execute the function and return the list of options based on the
+     * condition present in the function
+     */
+    watchableOptions() {
+      // add the unwatch
+      this.$watch(
+        `dataForm`,
+        (newV, oldV) => {
+          let optionstoCheck = this.visible_headers.filter(
+            (header) => header.type == "dynamicRadio"
+          );
+
+          this.log("optionsToCheck", optionstoCheck);
+          optionstoCheck.forEach((header) => {
+            let result = null;
+
+            Object.values(header.options)
+              .filter((option) => {
+                // se c'è una condizione da validare viene validata
+                if (!option.visible) {
+                  return true;
+                }
+
+                let isOptionVisible = true;
+                console.log(option.visible);
+                option.visible.forEach((condition) => {
+                  isOptionVisible =
+                    isOptionVisible &&
+                    this.evaluateCondition(condition, this.dataForm);
+                });
+                return isOptionVisible;
+              })
+              .forEach((option) => {
+                // se è una semplice option fa il return
+                if (!result) {
+                  result = {};
+                }
+                result[option.value] = option.name;
+              });
+            this.form_options[header.code] = result;
+          });
+        },
+        { deep: true }
+      );
+    },
     handleBooleanClick(header) {
       let currentValue = this.deepPick(this.dataForm, header.field);
       this.updateNested(header.field, !currentValue);
@@ -715,7 +805,7 @@ export default {
     },
     updateOldForm(newForm) {
       this.oldForm = JSON.parse(JSON.stringify(newForm));
-      
+
       // Update form for parent component
       this.$emit("change", this.dataForm);
     },
@@ -811,7 +901,7 @@ export default {
     },
   },
   watch: {
-   /*  form(newForm, oldForm) {
+    /*  form(newForm, oldForm) {
       console.log("Form watch");
       console.log(newForm);
       console.log(oldForm);
