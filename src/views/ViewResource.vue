@@ -17,7 +17,7 @@
           </button>
         </div>
       </div>
-      <div class="grid grid-cols-12 col-gap-4">
+      <div class="grid grid-cols-12 gap-x-4">
         <div
           v-for="(header, index) in headers"
           :key="index"
