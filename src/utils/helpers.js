@@ -214,11 +214,51 @@ function evaluateCondition(condition, object, reference = null) {
     TRUE: true
   }
 
+  let conditionIsMet = true;
+
+  // se è un oggetto contente il campo operator and condition verifico il valore del campo `operator` e di `condition`
+  if (condition.operator && condition.condition) {
+    let conditions = condition.condition;
+
+    conditionIsMet = false;
+    for (let i = 0; i < conditions.length; i++) {
+      let _condition = conditions[i];
+
+      switch (condition.operator) {
+        case 'OR':
+          console.log('sto facendo un OR');
+          conditionIsMet = conditionIsMet || evaluateCondition(_condition, object, reference);
+          console.log('risulta', conditionIsMet);
+          break;
+        case 'AND':
+          console.log('AND');
+          conditionIsMet = conditionIsMet && evaluateCondition(_condition, object, reference)
+      }
+    }
+
+    return conditionIsMet;
+  }
+
+  // se il primo campo è un array allora sono altre condizioni da valutare separatamente
+  if (_.isArray(condition[0])) {
+    let conditions = condition;
+
+    for (let i = 0; i < conditions.length; i++) {
+      let condition = conditions[i];
+      conditionIsMet = conditionIsMet && evaluateCondition(condition, object, reference)
+    }
+
+    return conditionIsMet;
+
+  }
+
+
+
   // condition: [<field>, <operator>, <value>]
-  let conditionIsMet = false
-  let conditionFieldValue = this.deepPick(object, condition[0])
+  let conditionFieldValue = deepPick(object, condition[0])
   let conditionOperator = condition[1]
   let conditionValue = condition[2]
+
 
   if (conditionValue in conditionValueDefaults) {
     conditionValue = conditionValueDefaults[conditionValue]
@@ -228,7 +268,7 @@ function evaluateCondition(condition, object, reference = null) {
     if (condition[2][0] == '$') {
       // Pick the value from the object not from the actual string value
       let conditionValueField = condition[2].substring(1)
-      conditionValue = this.deepPick(reference, conditionValueField)
+      conditionValue = deepPick(reference, conditionValueField)
     }
   }
 
@@ -236,8 +276,20 @@ function evaluateCondition(condition, object, reference = null) {
     conditionIsMet = conditionOperator(conditionFieldValue, conditionValue)
   } else {
     switch (conditionOperator) {
+      case '>':
+        conditionIsMet = Number(conditionFieldValue) > Number(conditionValue);
+        break;
+      case '<':
+        conditionIsMet = Number(conditionFieldValue) < Number(conditionValue);
+        break;
+      case '>=':
+        conditionIsMet = Number(conditionFieldValue) >= Number(conditionValue);
+        break;
+      case '<=':
+        conditionIsMet = Number(conditionFieldValue) <= Number(conditionValue);
+        break;
       case '=':
-        conditionIsMet = conditionFieldValue == conditionValue
+        conditionIsMet = conditionFieldValue == conditionValue;
         break
       case '!=':
         // !!conditionFieldValue is for ensuring conditionFieldValue is not null or undefined
@@ -281,32 +333,36 @@ function evaluateCondition(condition, object, reference = null) {
           conditionFieldValue == null || conditionFieldValue == undefined
         break
       case 'AFTER':
-        conditionValue = this.dateFromConditionValue(conditionValue)
+        conditionValue = dateFromConditionValue(conditionValue)
         conditionIsMet = conditionFieldValue ? moment(conditionFieldValue).isAfter(conditionValue) : true
         break
       case 'BEFORE':
-        conditionValue = this.dateFromConditionValue(conditionValue)
+        conditionValue = dateFromConditionValue(conditionValue)
         conditionIsMet = conditionFieldValue ? moment(conditionFieldValue).isBefore(conditionValue) : true
         break
       case 'AFTER_OR_EQUAL':
-        conditionValue = this.dateFromConditionValue(conditionValue)
+        conditionValue = dateFromConditionValue(conditionValue)
         conditionIsMet = conditionFieldValue ? moment(conditionFieldValue).isSameOrAfter(
           conditionValue
         ) : true
         break
       case 'BEFORE_OR_EQUAL':
-        conditionValue = this.dateFromConditionValue(conditionValue)
+        conditionValue = dateFromConditionValue(conditionValue)
         conditionIsMet = conditionFieldValue ? moment(conditionFieldValue).isSameOrBefore(
           conditionValue
         ) : true
         break
+      case 'LIKE':
+        return !!String(conditionFieldValue).match(conditionValue)
+
     }
   }
 
+  // console.log(conditionFieldValue, conditionOperator, conditionValue, conditionIsMet);
   return conditionIsMet
 }
 
-function dateFromConditionValue (dateString) {
+function dateFromConditionValue(dateString) {
   let date = null
 
   switch (dateString) {
