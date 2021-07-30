@@ -4,10 +4,9 @@ import { EventBus } from './event-bus.js'
 import testApi from './test-api.js'
 
 // TODO: refactor const in a const file to import!
-const HOST = process.env.VUE_APP_API_HOST || 'https://api.treebu.io';
+const HOST = process.env.VUE_APP_API_HOST || '';
 
 console.log('api url', HOST);
-// const API_URL = HOST + "/api";
 const BASE_URL = HOST + '/';
 var API_URL = HOST + '/api';
 
