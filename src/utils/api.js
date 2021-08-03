@@ -3,13 +3,10 @@ import { getToken, hasActiveRole, getActiveRole } from './auth.js'
 import { EventBus } from './event-bus.js'
 import testApi from './test-api.js'
 
-// TODO: refactor const in a const file to import!
-const HOST = process.env.VUE_APP_API_HOST || '';
-
-console.log('api url', HOST);
-const BASE_URL = HOST + '/';
-var API_URL = HOST + '/api';
-
+let ENV = process.env.NODE_ENV == "development" ? "development" : "production";
+let HOST = "";
+let BASE_URL = "";
+let API_URL = "";
 
 function setInterceptorToken () {
   axios.interceptors.request.use(
@@ -54,10 +51,26 @@ const api = {
 }
 
 export default function (options) {
+  console.log(ENV);
+  console.log(options);
+
+  if (options.apiHost) {
+    HOST = options.apiHost ? options.apiHost[ENV] : "";
+  } else {
+    if (process.env.VUE_APP_API_HOST) {
+      HOST = process.env.VUE_APP_API_HOST;
+    }
+  }
+
+  BASE_URL = HOST + '/';
+  API_URL = HOST + '/api';
+
+  console.log('api url', HOST);
+
   if (options.test && options.test.apiTest) {
     return testApi(options.test.resources)
   }
-  
+
   return api
 }
 
