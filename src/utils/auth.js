@@ -6,7 +6,6 @@ export {
   isLoggedIn,
   isUserActive,
   isUserEnabled,
-  login,
   logout,
   getProfile,
   setProfile,
@@ -101,45 +100,6 @@ function logout() {
   delete axios.defaults.headers.common["activerole"];
 }
 
-async function login(username, password) {
-  let loginFormData = new FormData();
-
-  loginFormData.set("username", username);
-  loginFormData.set("password", password);
-
-  let response = {
-    error: null,
-    data: null
-  };
-
-  try {
-    response.data = await axios.post(LOGIN_URL, loginFormData);
-  } catch (e) {
-    response.error = e.response.data;
-    return response;
-  }
-
-  let data = response.data.data;
-
-  if (!data.token) {
-    data.detail = "missing_token";
-
-    return {
-      error: data
-    };
-  }
-
-  localStorage.setItem("token", data.token);
-
-  axios.defaults.headers.common["Authorization"] =
-    "Bearer " + data.token;
-
-  setProfile(data.user);
-
-  return {
-    user: data.user
-  };
-}
 
 function resetPassword(email) {
   return new Promise(function(resolve, reject) {
