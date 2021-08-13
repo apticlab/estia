@@ -1,23 +1,26 @@
 <template>
-  <div class="">
+  <div :class="$theme.viewResource.container">
     <div v-if="!isLoading" class="w-full">
       <div class="flex flex-row mb-8">
-        <div class="flex flex-row items-baseline ml-auto py-4">
+        <div 
+          class="flex flex-row items-baseline ml-auto py-4"
+          :class="$theme.viewResource.actionWrapper">
           <button
             v-for="action in visibleActions"
             :key="action.label"
-            :class="'bg-' + action.color"
-            class="ml-3 px-4 outline-none rounded-none text-white ml-auto focus:outline-none"
+            :class="[$theme.viewResource.action, action.class]"
+            class="ml-3 px-4 outline-none ml-auto focus:outline-none"
             @click="act(action)"
           >
             <span class="flex flex-row justify-center">
-              <i :class="action.icon" class="mr-2 mt-1 text-md" />
+              <i v-if="$icon == 'fontawesome'" :class="action.icon" class="mr-2 mt-1 text-md" />
+              <icon v-else-if="$icon == 'heroicons'" :name="action.icon" class="mr-2 mt-1 text-md" />
               <span>{{ action.label }}</span>
             </span>
           </button>
         </div>
       </div>
-      <div class="grid grid-cols-12 gap-x-4">
+      <div :class="$theme.viewResource.infoContainer" class="grid grid-cols-12 gap-x-4">
         <div
           v-for="(header, index) in headers"
           :key="index"

@@ -35,6 +35,7 @@ export default {
     Vue.prototype.$actions = options.actions ? options.actions : {};
     Vue.prototype.$moment = moment;
     Vue.prototype.$roleLookup = options.roleLookup;
+    Vue.prototype.$icon = options.icon || 'heroicons'
 
     components(Vue)
     mixins(Vue)
