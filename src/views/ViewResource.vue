@@ -11,7 +11,7 @@
             :key="action.label"
             :class="[$theme.viewResource.action, action.class]"
             class="ml-3 px-4 outline-none ml-auto focus:outline-none"
-            @click="act(action)"
+            @click="act(action, resource)"
           >
             <span class="flex flex-row justify-center">
               <i
@@ -65,14 +65,14 @@ export default {
   name: "ViewResource",
   props: {
     id: { type: Number, default: null },
-    resourceNameProp: { type: String, default: null },
+    resourceNameProp: { type: String, default: null }
   },
   data() {
     return {
       isLoading: true,
       headers: null,
       actions: null,
-      resource: null,
+      resource: null
     };
   },
   computed: {
@@ -94,15 +94,15 @@ export default {
       return resourceNameField || "Risorsa";
     },
     visibleActions() {
-      return this.actions.filter((action) => {
+      return this.actions.filter(action => {
         return !action.scopes || action.scopes.includes("view");
       });
     },
     visibleHeaders() {
-      return this.headers.filter((header) =>
+      return this.headers.filter(header =>
         this.fieldIsVisible(header, this.resource)
       );
-    },
+    }
   },
   async mounted() {
     let resourceName =
@@ -117,7 +117,7 @@ export default {
     this.resource = (await this.$api.get(resourceName, resourceId)) || {};
 
     let headers = this.resources[resourceName].fields || [];
-    this.headers = headers.filter((field) => {
+    this.headers = headers.filter(field => {
       if (!field.scopes) {
         return true;
       }
@@ -132,7 +132,7 @@ export default {
   },
   methods: {
     fieldIsVisible(header) {
-      this.log(header)
+      this.log(header);
       let isRoleVisible = true;
       let isFilterVisible = true;
       let isScopeVisible = true;
@@ -142,7 +142,7 @@ export default {
       }
 
       if (header.visible) {
-        header.visible.forEach((condition) => {
+        header.visible.forEach(condition => {
           isFilterVisible =
             isFilterVisible && this.evaluateCondition(condition, this.resource);
         });
@@ -173,18 +173,13 @@ export default {
 
       return cssClass;
     },
-    act(action) {
-      if (this[action.callback]) {
-        this[action.callback]();
-      }
-    },
     edit() {
       this.$router.push("../edit/" + this.resource.id);
     },
     delete() {},
     goToList() {
       this.$router.push("../list");
-    },
-  },
+    }
+  }
 };
 </script>
