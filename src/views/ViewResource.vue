@@ -69,6 +69,7 @@ export default {
   },
   data() {
     return {
+      scope: "view",
       isLoading: true,
       headers: null,
       actions: null,
@@ -116,14 +117,7 @@ export default {
 
     this.resource = (await this.$api.get(resourceName, resourceId)) || {};
 
-    let headers = this.resources[resourceName].fields || [];
-    this.headers = headers.filter(field => {
-      if (!field.scopes) {
-        return true;
-      }
-
-      return field.scopes.includes("view");
-    });
+    this.headers = this.resources[resourceName].fields || [];
 
     this.actions = this.resources[resourceName].actions || [];
     this.resourceInfo = this.resources[resourceName].info || {};
