@@ -226,12 +226,12 @@ function evaluateCondition(condition, object, reference = null) {
 
       switch (condition.operator) {
         case 'OR':
-          console.log('sto facendo un OR');
+          // console.log('sto facendo un OR');
           conditionIsMet = conditionIsMet || evaluateCondition(_condition, object, reference);
-          console.log('risulta', conditionIsMet);
+          // console.log('risulta', conditionIsMet);
           break;
         case 'AND':
-          console.log('AND');
+          // console.log('AND');
           conditionIsMet = conditionIsMet && evaluateCondition(_condition, object, reference)
       }
     }
@@ -353,7 +353,7 @@ function evaluateCondition(condition, object, reference = null) {
         ) : true
         break
       case 'LIKE':
-        return !!String(conditionFieldValue).match(conditionValue)
+        return !!String(conditionFieldValue).match(new RegExp(conditionValue))
 
     }
   }
