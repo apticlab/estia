@@ -5,7 +5,7 @@
       v-if="!loading"
       name="aw-form"
       class="w-full grid grid-cols-12 gap-x-6"
-      :values="form"
+      :values="dataForm"
       @input="updateFormulate"
     >
       <pre v-if="debug">
@@ -257,7 +257,6 @@
           </template>
           <FormulateInput
             v-else
-            :id="header.code"
             :key="header.field"
             :readonly="fieldIsReadonly(header)"
             :type="header.type"
@@ -369,10 +368,16 @@ export default {
   async mounted() {
     this.loading = true;
 
+    this.log(this.$vnode.key, "mounted", this.form);
+
     // Use a private clone so that we can
     // change it entirely to trigger some refresh
-    let dataForm = JSON.parse(JSON.stringify(this.form));
-    this.$set(this, "dataForm", dataForm);
+    try {
+      let dataForm = JSON.parse(JSON.stringify(this.form));
+      this.$set(this, "dataForm", dataForm || {});
+    } catch (e) {
+      this.dataForm = {};
+    }
 
     // load params for select field
     await this.fetchOptions();
@@ -380,7 +385,7 @@ export default {
     this.updateOldForm(this.dataForm);
     this.validatedataForm();
 
-    this.setDependableVariables();
+    // this.setDependableVariables();
     this.watchableOptions();
 
     this.loading = false;
@@ -415,7 +420,6 @@ export default {
                 }
 
                 let isOptionVisible = true;
-                console.log(option.visible);
                 option.visible.forEach((condition) => {
                   isOptionVisible =
                     isOptionVisible &&
@@ -442,6 +446,7 @@ export default {
     },
     updateFormulate(formulateForm) {
       // Merge data from Formulate and from our own nested two way bindings
+
       Object.keys(formulateForm).forEach((fieldName) => {
         this.$set(
           this.dataForm,
@@ -453,6 +458,8 @@ export default {
       this.updateOldForm(this.dataForm);
       this.validatedataForm();
       this.updateHeaders = new Date().getTime();
+
+      this.log(this.$vnode.key, "update", this.dataForm);
       // this.$forceUpdate();
     },
     updateNested(field, value) {
@@ -712,6 +719,7 @@ export default {
       }
 
       if (header.visible) {
+        this.log("visible", header.visible);
         header.visible.forEach((condition) => {
           isFilterVisible =
             isFilterVisible && this.evaluateCondition(condition, this.dataForm);
@@ -852,7 +860,8 @@ export default {
         formFieldClass +=
           " border border-rounded-sm border-dotted border-gray-light";
       } else {
-        formFieldClass += " mb-3 col-span-" + (header.colSpan || minColSpan);
+        formFieldClass +=
+          " mb-3 col-span-" + (header.colSpan || header.col_span || minColSpan);
         formFieldClass += " row-span-" + (header.rowSpan || 1);
       }
 
