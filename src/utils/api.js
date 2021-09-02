@@ -1,15 +1,13 @@
 import axios from 'axios'
-import { getToken, hasActiveRole, getActiveRole } from './auth.js'
+import { getToken, hasActiveRole, getActiveRole, setProfile } from './auth.js'
 import { EventBus } from './event-bus.js'
 import testApi from './test-api.js'
 
-// TODO: refactor const in a const file to import!
-const HOST = process.env.VUE_APP_API_HOST || '';
-
-console.log('api url', HOST);
-const BASE_URL = HOST + '/';
-var API_URL = HOST + '/api';
-
+var ENV = process.env.NODE_ENV == "development" ? "development" : "production";
+var HOST = "";
+var BASE_URL = "";
+var API_URL = "";
+var LOGIN_URL = "";
 
 function setInterceptorToken () {
   axios.interceptors.request.use(
@@ -38,27 +36,88 @@ function setInterceptorToken () {
 
 setInterceptorToken()
 
-const api = {
-  act,
-  list,
-  params,
-  get,
-  image,
-  imageUrl,
-  create,
-  update,
-  delete: _delete,
-  post,
-  upload,
-  download
-}
-
 export default function (options) {
+  console.log(ENV);
+  console.log(options);
+  console.log(process.env);
+
+  if (options.apiHost) {
+    console.log("From apiHost");
+    HOST = options.apiHost ? options.apiHost[ENV] : "";
+  } else {
+    console.log("From Process.env");
+    if (process.env.VUE_APP_API_HOST) {
+      HOST = process.env.VUE_APP_API_HOST;
+    }
+  }
+
+  const api = {
+    act,
+    list,
+    params,
+    get,
+    image,
+    imageUrl,
+    create,
+    login,
+    update,
+    delete: _delete,
+    post,
+    upload,
+    download
+  }
+
+  BASE_URL = HOST + '/';
+  API_URL = HOST + '/api';
+  LOGIN_URL = API_URL + "/login";
+
+  console.log('api url', HOST);
+
   if (options.test && options.test.apiTest) {
     return testApi(options.test.resources)
   }
-  
+
   return api
+}
+
+async function login(username, password) {
+  let loginFormData = new FormData();
+
+  loginFormData.set("username", username);
+  loginFormData.set("password", password);
+
+  let response = {
+    error: null,
+    data: null
+  };
+
+  try {
+    response.data = await axios.post(LOGIN_URL, loginFormData);
+  } catch (e) {
+    response.error = e.response.data;
+    return response;
+  }
+
+  let data = response.data.data;
+
+  if (!data.token) {
+    data.detail = "missing_token";
+
+    return {
+      error: data
+    };
+  }
+
+  localStorage.setItem("token", data.token);
+
+  axios.defaults.headers.common["Authorization"] =
+    "Bearer " + data.token;
+
+  setProfile(data.user);
+
+  return {
+    user: data.user
+  };
 }
 
 function list (resourceName, filter) {

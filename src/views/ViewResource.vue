@@ -1,25 +1,40 @@
 <template>
-  <div class="">
+  <div :class="$theme.viewResource.container">
     <div v-if="!isLoading" class="w-full">
       <div class="flex flex-row mb-8">
-        <div class="flex flex-row items-baseline ml-auto py-4">
+        <div
+          class="flex flex-row items-baseline ml-auto py-4"
+          :class="$theme.viewResource.actionWrapper"
+        >
           <button
             v-for="action in visibleActions"
             :key="action.label"
-            :class="'bg-' + action.color"
-            class="ml-3 px-4 outline-none rounded-none text-white ml-auto focus:outline-none"
-            @click="act(action)"
+            :class="[$theme.viewResource.action, action.class]"
+            class="ml-3 px-4 outline-none ml-auto focus:outline-none"
+            @click="act(action, resource)"
           >
             <span class="flex flex-row justify-center">
-              <i :class="action.icon" class="mr-2 mt-1 text-md" />
+              <i
+                v-if="$icon == 'fontawesome'"
+                :class="action.icon"
+                class="mr-2 mt-1 text-md"
+              />
+              <icon
+                v-else-if="$icon == 'heroicons'"
+                :name="action.icon"
+                class="mr-2 mt-1 text-md"
+              />
               <span>{{ action.label }}</span>
             </span>
           </button>
         </div>
       </div>
-      <div class="grid grid-cols-12 gap-x-4">
+      <div
+        :class="$theme.viewResource.infoContainer"
+        class="grid grid-cols-12 gap-x-4"
+      >
         <div
-          v-for="(header, index) in headers"
+          v-for="(header, index) in visibleHeaders"
           :key="index"
           class="focus-within:text-blue"
           :class="
@@ -50,14 +65,15 @@ export default {
   name: "ViewResource",
   props: {
     id: { type: Number, default: null },
-    resourceNameProp: { type: String, default: null },
+    resourceNameProp: { type: String, default: null }
   },
   data() {
     return {
+      scope: "view",
       isLoading: true,
       headers: null,
       actions: null,
-      resource: null,
+      resource: null
     };
   },
   computed: {
@@ -79,10 +95,15 @@ export default {
       return resourceNameField || "Risorsa";
     },
     visibleActions() {
-      return this.actions.filter((action) => {
+      return this.actions.filter(action => {
         return !action.scopes || action.scopes.includes("view");
       });
     },
+    visibleHeaders() {
+      return this.headers.filter(header =>
+        this.fieldIsVisible(header, this.resource)
+      );
+    }
   },
   async mounted() {
     let resourceName =
@@ -96,14 +117,7 @@ export default {
 
     this.resource = (await this.$api.get(resourceName, resourceId)) || {};
 
-    let headers = this.resources[resourceName].fields || [];
-    this.headers = headers.filter((field) => {
-      if (!field.scopes) {
-        return true;
-      }
-
-      return field.scopes.includes("view");
-    });
+    this.headers = this.resources[resourceName].fields || [];
 
     this.actions = this.resources[resourceName].actions || [];
     this.resourceInfo = this.resources[resourceName].info || {};
@@ -111,6 +125,29 @@ export default {
     this.isLoading = false;
   },
   methods: {
+    fieldIsVisible(header) {
+      this.log(header);
+      let isRoleVisible = true;
+      let isFilterVisible = true;
+      let isScopeVisible = true;
+
+      if (header.roles) {
+        isRoleVisible = header.roles.includes(this.getUserRole());
+      }
+
+      if (header.visible) {
+        header.visible.forEach(condition => {
+          isFilterVisible =
+            isFilterVisible && this.evaluateCondition(condition, this.resource);
+        });
+      }
+
+      if (header.scopes) {
+        isScopeVisible = header.scopes.includes(this.scope);
+      }
+
+      return isRoleVisible && isFilterVisible && isScopeVisible;
+    },
     labelClass(header) {
       let cssClass = "";
 
@@ -130,18 +167,13 @@ export default {
 
       return cssClass;
     },
-    act(action) {
-      if (this[action.callback]) {
-        this[action.callback]();
-      }
-    },
     edit() {
       this.$router.push("../edit/" + this.resource.id);
     },
     delete() {},
     goToList() {
       this.$router.push("../list");
-    },
-  },
+    }
+  }
 };
 </script>
