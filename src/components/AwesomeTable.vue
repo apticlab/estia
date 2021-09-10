@@ -576,9 +576,14 @@ export default {
   },
   mixins: [ActionsMixin],
   props: {
-    rows: { required: false, default: [] },
-    headers: {},
-    actions: {},
+    rows: { required: true, default: [] },
+    headers: { required: true, default: [] },
+    actions: {
+      required: false,
+      default() {
+        return [];
+      },
+    },
     fields: { required: false },
     addResourceClass: { required: false, default: "" },
     headerClass: { required: false, default: "" },
