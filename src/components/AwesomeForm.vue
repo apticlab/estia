@@ -494,7 +494,9 @@ export default {
       let promises = [];
       let selectCodes = [];
 
-      this.visible_headers.forEach((header) => {
+      for(let vhIndex = 0; vhIndex < this.visible_headers.length; vhIndex++) {
+        let header = this.visible_headers[vhIndex];
+
         if (header.type == "select" || header.isFetchable || header.select) {
           if (header.select && header.select.choices) {
             this.form_options[header.select.code] = header.select.choices;
@@ -521,7 +523,7 @@ export default {
             header.default ? header.default : false
           );
         }
-      });
+      };
 
       let selectValues = await Promise.all(promises);
 
