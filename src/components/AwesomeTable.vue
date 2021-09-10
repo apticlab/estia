@@ -806,7 +806,6 @@ export default {
       if (!color) {
         return "bg-gray-500";
       }
-      
       return color;
     },
   },
