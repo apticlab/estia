@@ -682,6 +682,8 @@ export default {
           action: this.defaultAction,
           index,
         });
+      } else {
+        this.$emit("click", index);
       }
     },
     actOnRow(action, index) {
