@@ -18,7 +18,7 @@
         </div>
       </div>
     </div>
-    <router-view></router-view>
+    <router-view v-if='tabsFromRouter'></router-view>
   </div>
 </template>
 
