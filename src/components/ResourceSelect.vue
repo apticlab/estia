@@ -2,11 +2,26 @@
   <div :data-type="context ? context.type : ''">
     <div
       v-if="select.can_add"
-      class="absolute top-0 right-0 flex flex-row items-baseline max-w-screen-xl"
+      class="
+        absolute
+        top-0
+        right-0
+        flex flex-row
+        items-baseline
+        max-w-screen-xl
+      "
     >
       <div
         @click="addResource()"
-        class="flex flex-row items-center ml-auto font-bold cursor-pointer text-blue hover:text-blue-dark"
+        class="
+          flex flex-row
+          items-center
+          ml-auto
+          font-bold
+          cursor-pointer
+          text-blue
+          hover:text-blue-dark
+        "
       >
         <i class="mr-2 ti-plus"></i>
         <span>Aggiungi</span>
@@ -44,31 +59,34 @@ export default {
   props: {
     context: {
       type: Object,
-      required: false
+      required: false,
     },
     value: {
-      required: false
+      required: false,
     },
     resources: {
-      required: false
+      required: false,
     },
     header: {
-      required: false
-    }
+      required: false,
+    },
   },
   data() {
     return {
-      optionsArray: null
+      optionsArray: null,
     };
   },
   beforeMount() {},
   methods: {
     onChange($event) {
-      let newValue = this.options.find(o => o.id == $event.target.value);
+      let newValue = this.options.find((o) => o.id == $event.target.value);
+
+      this.log(this.code);
+
       if (this.context) {
-        this.context.model = newValue;
+        this.context.model = this.code ? newValue[this.code] : newValue;
       } else {
-        this.$emit("change", newValue);
+        this.$emit("change", this.code ? newValue[this.code] : newValue);
       }
     },
     onSearch(search, loading, param) {
@@ -104,9 +122,9 @@ export default {
         resource: this.select.code,
         onConfirm: async () => {
           await this.reloadOptions();
-        }
+        },
       });
-    }
+    },
   },
   computed: {
     options() {
@@ -118,6 +136,9 @@ export default {
     },
     select() {
       return this.attributes.select;
+    },
+    code() {
+      return this.select.option;
     },
     model() {
       if (this.context) {
@@ -136,17 +157,17 @@ export default {
         select: this.header.select,
         resources: this.resources,
         optionField: this.header.select.option,
-        placeholder: this.header.placeholder
+        placeholder: this.header.placeholder,
       };
     },
     formattedOptions() {
-      return this.options.map(opt => {
+      return this.options.map((opt) => {
         return {
           id: opt.id,
-          text: this.deepPick(opt)
+          text: this.deepPick(opt),
         };
       });
-    }
-  }
+    },
+  },
 };
 </script>
