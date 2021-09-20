@@ -140,7 +140,7 @@ export default {
     } else {
       this.resource_id = this.$route.params.id;
       this.resource_name =
-        this.route.params.resource || this.$route.meta.resource;
+        this.$route.params.resource || this.$route.meta.resource;
     }
 
     this.resource_rest_name =
