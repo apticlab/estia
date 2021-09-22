@@ -84,9 +84,9 @@ export default {
       this.log(this.code);
 
       if (this.context) {
-        this.context.model = this.code ? newValue[this.code] : newValue;
+        this.context.model = newValue;
       } else {
-        this.$emit("change", this.code ? newValue[this.code] : newValue);
+        this.$emit("change", newValue);
       }
     },
     onSearch(search, loading, param) {
