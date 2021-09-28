@@ -119,6 +119,7 @@
               {{ submitText }}
             </button>
           </slot>
+          <slot name="register"> </slot>
           <slot name="error" :errorText="errorText">
             <div
               :class="{
