@@ -116,7 +116,7 @@ export default {
     },
     hideActions: {
       required: false,
-      default: true,
+      default: false,
     },
   },
   data() {
