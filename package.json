@@ -1,6 +1,6 @@
 {
   "name": "@apticlab/estia",
-  "version": "1.2.1",
+  "version": "1.2.4",
   "description": "The easiest way to build site in Vue.",
   "main": "dist/estia.umd.js",
   "module": "dist/estia.esm.js",
@@ -60,6 +60,7 @@
     "@vue/cli-service": "^4.3.1",
     "@vue/component-compiler-utils": "^3.1.2",
     "@vue/test-utils": "^1.0.2",
+    "acorn": "^8.5.0",
     "autoprefixer": "^9.7.6",
     "babel-core": "^7.0.0-bridge.0",
     "babel-eslint": "^10.1.0",

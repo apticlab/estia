@@ -131,16 +131,21 @@ export default {
       actions: [],
       is_edit: false,
       valid: false,
+      routerBased: true,
     };
   },
   async mounted() {
     this.loading = true;
 
-    this.resource_id = this.propResourceId || this.$route.params.id;
-    this.resource_name =
-      this.propResourceName ||
-      this.$route.params.resource ||
-      this.$route.meta.resource;
+    if (this.propResourceName) {
+      this.routerBased = false;
+      this.resource_id = this.propResourceId;
+      this.resource_name = this.propResourceName;
+    } else {
+      this.resource_id = this.$route.params.id;
+      this.resource_name =
+        this.$route.params.resource || this.$route.meta.resource;
+    }
 
     this.resource_rest_name =
       rest_resources[this.resource_name] || this.resource_name;
@@ -177,7 +182,7 @@ export default {
         } else {
           let resource = _.clone(this.changedResource);
           await this.$api.create(resource_name, resource);
-          if (this.p_resource) {
+          if (!this.routerBased) {
             this.$emit("save", true);
             return;
           }
@@ -214,7 +219,7 @@ export default {
       await this.saveResource();
     },
     back() {
-      if (this.p_resource) {
+      if (!this.routerBased) {
         this.$emit("close");
         return;
       }

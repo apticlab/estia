@@ -7,7 +7,7 @@
         viewBox="0 0 38 38"
         xmlns="http://www.w3.org/2000/svg"
         fill="#ccc"
-        class="fill-grey-800"
+        :class="fill"
       >
         <defs>
           <linearGradient x1="8.042%" y1="0%" x2="65.682%" y2="23.865%" id="a">
@@ -70,6 +70,11 @@ export default {
       type: String,
       required: false,
       default: "flex flex-col items-center justify-center flex-grow"
+    },
+    fill: {
+      type: String,
+      required: false,
+      default: 'fill-gray-800'
     }
   },
   data() {
