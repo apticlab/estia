@@ -7,7 +7,7 @@ import moment from "moment";
 import { helpers } from "./utils/helpers";
 import { EventBus } from "./utils/event-bus.js";
 import api from "./utils/api";
-import { getProfile } from "./utils/auth";
+import { getProfile, logout } from "./utils/auth";
 
 import theme from "./theme";
 import mixins from "./mixins";
@@ -86,4 +86,4 @@ export default {
   },
 };
 
-export { RouterView, EditResource, ViewResource, SideNavMixin, getProfile };
+export { RouterView, EditResource, ViewResource, SideNavMixin, getProfile, logout };
