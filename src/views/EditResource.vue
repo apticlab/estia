@@ -31,7 +31,7 @@
             </li>
           </ol>
         </div>
-        <div class="flex flex-row items-center justify-end w-full py-5">
+        <div class="flex flex-row items-center justify-end w-full py-5" v-if='!hideActions'>
           <div class="flex flex-row items-baseline mr-auto">
             <button
               v-for="action in visibleActions"
@@ -111,6 +111,10 @@ export default {
       default: "vertical",
     },
     debug: {
+      required: false,
+      default: false,
+    },
+    hideActions: {
       required: false,
       default: false,
     },
