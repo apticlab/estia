@@ -3840,6 +3840,11 @@ codepage@~1.15.0:
   resolved "https://registry.yarnpkg.com/codepage/-/codepage-1.15.0.tgz#2e00519024b39424ec66eeb3ec07227e692618ab"
   integrity sha512-3g6NUTPd/YtuuGrhMnOMRjFc+LJw/bnMp3+0r/Wcz3IXUuCosKRJvMphm5+Q+bvTVGcJJuRvVLuYba+WojaFaA==
 
+codice-fiscale-js@^2.3.9:
+  version "2.3.9"
+  resolved "https://registry.yarnpkg.com/codice-fiscale-js/-/codice-fiscale-js-2.3.9.tgz#05930c3a8d2893b37efa833eb2a96c220025911e"
+  integrity sha512-yrJBn11+t+sYT1fuseBptLkvQ8WkjZdtEOHl7mW4KfLwHCiksqWAhOCzbzpJojy2rex58RwMenAZwwXvMOfQkQ==
+
 collect-v8-coverage@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/collect-v8-coverage/-/collect-v8-coverage-1.0.1.tgz#cc2c8e94fc18bbdffe64d6534570c8a673b27f59"
@@ -9417,6 +9422,11 @@ jstransformer@1.0.0:
   dependencies:
     is-promise "^2.0.0"
     promise "^7.0.1"
+
+jsvat@^2.5.3:
+  version "2.5.3"
+  resolved "https://registry.yarnpkg.com/jsvat/-/jsvat-2.5.3.tgz#44d41d80b8d04a6b98cf721668a872ab35b6009e"
+  integrity sha512-jra/1qujP+vrrCgLcGRRHwLrKj69cLvWUMeFwhwoD/AeHSZ9BY9Bf59GNOtDdDmGhchNwasrWjnKBTbL19FHsg==
 
 kdbush@^3.0.0:
   version "3.0.0"
