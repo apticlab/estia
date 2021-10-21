@@ -21,7 +21,7 @@
       >
         <label
           :class="getLabelClass(header)"
-          :for="header.code"
+          :for="header.field"
         >
           {{ header.label }}
           <span
@@ -140,23 +140,23 @@
               :form="dataForm[header.field]"
               :headers="header.headers"
               :validate="header.validate"
-              @change="value => (dataForm[header.field] = value)"
+              @change="value => updateNested(header.field, value)"
             />
           </template>
           <template v-else-if="header.type == 'dynamicRadio'">
-            <p v-if="!form_options[header.code]">
+            <p v-if="!form_options[header.field]">
               {{ header.info }}
             </p>
             <FormulateInput
-              v-if="form_options[header.code]"
-              :id="header.code"
+              v-if="form_options[header.field]"
+              :id="header.field"
               :key="header.field"
               :readonly="fieldIsReadonly(header)"
               type="radio"
               :placeholder="header.placeholder"
               :name="header.field"
               :header="header"
-              :options="form_options[header.code]"
+              :options="form_options[header.field]"
             />
           </template>
           <template v-else-if="header.type == 'select'">
@@ -185,7 +185,7 @@
           <template v-else-if="header.type == 'balance'">
             <div class="flex">
               <FormulateInput
-                :id="header.code"
+                :id="header.field"
                 :key="header.field"
                 type="number"
                 :readonly="fieldIsReadonly(header)"
@@ -223,7 +223,7 @@
                 "
               >
                 <FormulateInput
-                  :id="header.code"
+                  :id="header.field"
                   :readonly="fieldIsReadonly(header)"
                   type="checkbox"
                   class="hidden"
@@ -257,7 +257,7 @@
           </template>
           <template v-else-if="header.type == 'image_upload'">
             <FormulateInput
-              :id="header.code"
+              :id="header.field"
               :key="header.field"
               type="image-uploader"
               :readonly="fieldIsReadonly(header)"
@@ -275,22 +275,29 @@
             :header="header"
             :resource="header.resource"
             :options="header.options"
+            @blur-context="setDirty(header.field)"
           />
         </div>
         <div class="ml-2 mt-2 mr-auto error-container">
-          <div
-            v-if="deepPick(form_validation_status, header.code)"
-            class="flex flex-col items-center"
+          <slot
+            name="errors"
+            :status="deepPick(form_validation_status, header.field)"
+            :field="header"
           >
-            <span
-              v-for="(error, index) in deepPick(
-                form_validation_status,
-                header.code
-              ).errors"
-              :key="index"
-              class="mb-2 text-red-600"
-            >{{ error }}</span>
-          </div>
+            <div
+              v-if="deepPick(form_validation_status, header.field)"
+              class="flex flex-col items-center"
+            >
+              <span
+                v-for="(error, index) in deepPick(
+                  form_validation_status,
+                  header.field
+                ).errors"
+                :key="index"
+                class="mb-2 text-red-600"
+              >{{ error }}</span>
+            </div>
+          </slot>
         </div>
       </div>
       <div class="hidden">
@@ -371,7 +378,8 @@ export default {
       form_options: {},
       form_validation_status: {},
       form_is_valid: {},
-      form_errors: {}
+      form_errors: {},
+      form_dirty_status: {}
     }
   },
   async mounted () {
@@ -403,6 +411,9 @@ export default {
     // this.event_bus.$off('aw:form:update', this.forceUpdate);
   },
   methods: {
+    setDirty (field) {
+      _.set(this.form_dirty_status, field, true)
+    },
     /**
      * This function check if option has @ symbol and if it true it checks if the function named
      * after @ is present then execute the function and return the list of options based on the
@@ -443,7 +454,7 @@ export default {
                 }
                 result[option.value] = option.name
               })
-            this.form_options[header.code] = result
+            this.form_options[header.field] = result
           })
         },
         { deep: true }
@@ -455,7 +466,7 @@ export default {
     },
     updateFormulate (formulateForm) {
       // Merge data from Formulate and from our own nested two way bindings
-
+      this.log('formulateForm: ', formulateForm)
       Object.keys(formulateForm).forEach(fieldName => {
         this.$set(
           this.dataForm,
@@ -473,6 +484,7 @@ export default {
     },
     updateNested (field, value) {
       _.set(this.dataForm, field, value)
+      this.setDirty(field)
 
       this.updateOldForm(this.dataForm)
       this.validatedataForm()
@@ -503,10 +515,10 @@ export default {
       let promises = []
       let selectCodes = []
 
-      for (let vhIndex = 0; vhIndex < this.visible_headers.length; vhIndex++) {
-        let header = this.visible_headers[vhIndex]
+      for (let vhIndex = 0; vhIndex < this.headers.length; vhIndex++) {
+        let header = this.headers[vhIndex]
 
-        if (header.type == 'select' || header.isFetchable || header.select) {
+        if (header.type === 'select' || header.isFetchable || header.select) {
           if (header.select && header.select.choices) {
             this.form_options[header.select.code] = header.select.choices
           } else {
@@ -667,7 +679,7 @@ export default {
                 )
               ) {
                 let referencedHeader = this.visible_headers.find(header => {
-                  return `\$${header.code}` == ruleParams[0]
+                  return `\$${header.field}` == ruleParams[0]
                 })
 
                 let referencedHeaderName = referencedHeader
@@ -695,7 +707,7 @@ export default {
               ) {
                 let referencedHeader = this.visible_headers.find(header => {
                   // ruleParams[0] is in the form "$<name_of_target_input>"
-                  return `\$${header.code}` == ruleParams[0]
+                  return `\$${header.field}` == ruleParams[0]
                 })
 
                 let referencedHeaderName = referencedHeader
@@ -710,12 +722,37 @@ export default {
               }
               break
 
+            case 'email':
+              if (!this.$validators['email'](fieldValue)) {
+                this.form_is_valid = false
+                validationStatus.valid = false
+                validationStatus.errors.push('Il campo email non è valido')
+              }
+              break
+            case 'fiscal_code':
+              if (!this.$validators['fiscal_code'](fieldValue)) {
+                this.form_is_valid = false
+                validationStatus.valid = false
+                validationStatus.errors.push('Il Codice Fiscale non è valido')
+              }
+              break
+            case 'vat_number':
+              if (!this.$validators['vat_number'](fieldValue)) {
+                this.form_is_valid = false
+                validationStatus.valid = false
+                validationStatus.errors.push('La Partita IVA non è valida')
+              }
+              break
             default:
               break
           }
         })
 
-        _.set(this.form_validation_status, header.code, validationStatus)
+        // if durty set the error unless not set the error
+        if (this.deepPick(this.form_dirty_status, header.field)) {
+          console.log('aggiungo il dirty')
+          _.set(this.form_validation_status, header.field, validationStatus)
+        }
       })
 
       this.$emit('valid', this.form_is_valid)
@@ -891,7 +928,7 @@ export default {
           (newV, oldV) => {
             this.$set(
               this.dataForm,
-              header.code,
+              header.field,
               header.depends_on.computed(newV)
             )
             this.updateHeaders = new Date().getTime()
@@ -915,18 +952,6 @@ export default {
         return this.fieldIsVisible(header)
       })
     }
-  },
-  watch: {
-    /*  form(newForm, oldForm) {
-      console.log("Form watch");
-      console.log(newForm);
-      console.log(oldForm);
-      if (_.isEmpty(newForm)) {
-        console.log("Reset form");
-        this.dataForm = {};
-        this.$forceUpdate();
-      }
-    }, */
   }
 }
 </script>

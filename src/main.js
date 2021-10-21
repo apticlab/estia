@@ -1,13 +1,13 @@
 import VueFormulate from "@braid/vue-formulate";
 import VueSVGIcon from "vue-svgicon";
 import VueTailwind from "vue-tailwind";
-import TPagination from 'vue-tailwind/dist/t-pagination';
+import TPagination from "vue-tailwind/dist/t-pagination";
 import moment from "moment";
 
 import { helpers } from "./utils/helpers";
 import { EventBus } from "./utils/event-bus.js";
 import api from "./utils/api";
-import { getProfile } from "./utils/auth";
+import { getProfile, logout } from "./utils/auth";
 
 import theme from "./theme";
 import mixins from "./mixins";
@@ -22,9 +22,10 @@ import modalWidgets from "./modal-widgets";
 import components, {
   RouterView,
   ViewResource,
-  EditResource,
+  EditResource
 } from "./components";
 import { SideNav as SideNavMixin } from "./mixins";
+import Validators from "./validators";
 
 export default {
   install(Vue, options) {
@@ -35,6 +36,7 @@ export default {
     Vue.prototype.$moment = moment;
     Vue.prototype.$roleLookup = options.roleLookup;
     Vue.prototype.$icon = options.icon || "heroicons";
+    Vue.prototype.$validators = Validators;
 
     components(Vue);
     mixins(Vue);
@@ -46,36 +48,36 @@ export default {
     editFields(Vue, options);
     modalWidgets(Vue, options);
 
-    Object.keys(helpers).forEach((key) => (Vue.prototype[key] = helpers[key]));
+    Object.keys(helpers).forEach(key => (Vue.prototype[key] = helpers[key]));
 
     Vue.use(VueFormulate, {
       library: {
         "resource-select": {
-          component: "resource-select",
+          component: "resource-select"
         },
         resource: {
-          component: "resource-editor",
+          component: "resource-editor"
         },
         "recursivity-picker": {
-          component: "recursivity-picker",
+          component: "recursivity-picker"
         },
         json: {
-          component: "resource-json",
+          component: "resource-json"
         },
         "image-uploader": {
-          component: "resource-image-uploader",
+          component: "resource-image-uploader"
         },
         date: {
-          component: "date-picker",
-        },
-      },
+          component: "date-picker"
+        }
+      }
     });
 
     Vue.use(VueSVGIcon);
     Vue.use(VueTailwind, {
       "t-pagination": {
-        component: TPagination,
-      },
+        component: TPagination
+      }
     });
 
     // Add default routes and router configuration
@@ -83,7 +85,14 @@ export default {
       router(options);
       Vue.prototype.$routes = options.innerRoutes || [];
     }
-  },
+  }
 };
 
-export { RouterView, EditResource, ViewResource, SideNavMixin, getProfile };
+export {
+  RouterView,
+  EditResource,
+  ViewResource,
+  SideNavMixin,
+  getProfile,
+  logout
+};
