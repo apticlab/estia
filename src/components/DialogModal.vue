@@ -1,6 +1,12 @@
 <template>
   <transition name="fade">
     <div v-if="visible" class="fixed inset-0 z-50">
+      <icon
+        name='x'
+        size='l'
+        class="absolute top-[10px] right-[10px] text-gray-500 z-[60]"
+        @click="hide()"
+      />
       <div
         :class="$theme.backdropBgColor"
         class="absolute inset-0 opacity-50 bg-gray-dark"
