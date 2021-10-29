@@ -46,7 +46,7 @@
         </template>
         <template v-else>
           <div
-            :class="is_mobile ? 'h-full w-full' : ''"
+            :class="is_mobile ? 'h-full w-full' : 'h-auto my-10 overflow-y-auto'"
             class="
               flex flex-col
               p-5
@@ -67,7 +67,7 @@
                 <resource-edit
                   v-if="type == 'resource-edit'"
                   :prop-resource-name="params.resource"
-                  class="w-full sm:w-172"
+                  class="w-full sm:w-8/12 h-auto"
                   @save="confirm()"
                   @close="hide()"
                 />
