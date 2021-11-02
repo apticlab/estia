@@ -84,7 +84,11 @@ export default {
       this.log(this.code);
 
       if (this.context) {
-        this.context.model = newValue;
+        if(this.select.option) {
+          this.context.model = newValue[this.select.option];
+        } else {
+          this.context.model = newValue;
+        }
       } else {
         this.$emit("change", newValue);
       }

@@ -51,7 +51,7 @@
           <resource-select
             v-if="header.type == 'select'"
             :disabled="fieldIsReadonly(header)"
-            :resources="filterOptions(header)"
+            :resources="form_options[header.code] || filterOptions(header)"
             :header="header"
             :placeholder="header.placeholder"
             :value="deepPick(dataForm, header.field)"
@@ -165,7 +165,7 @@
               class="flex-grow"
               :disabled="fieldIsReadonly(header)"
               :name="header.field"
-              :resources="filterOptions(header)"
+              :resources="form_options[header.code] || filterOptions(header)"
               :option-field="header.select.option"
               :placeholder="header.placeholder"
               :select="header.select"
@@ -385,8 +385,9 @@ export default {
   async mounted () {
     this.loading = true
 
-    this.log(this.$vnode.key, 'mounted', this.form)
-
+    if(this.debug) {
+      this.log(this.$vnode.key, 'mounted', this.form)
+    }
     // Use a private clone so that we can
     // change it entirely to trigger some refresh
     try {
@@ -425,7 +426,7 @@ export default {
         `dataForm`,
         (newV, oldV) => {
           let optionstoCheck = this.visible_headers.filter(
-            header => header.type == 'dynamicRadio'
+            header => header.type == 'dynamicRadio' || header.type == 'select'
           )
 
           this.log('optionsToCheck', optionstoCheck)
@@ -438,7 +439,7 @@ export default {
                 if (!option.visible) {
                   return true
                 }
-
+                
                 let isOptionVisible = true
                 option.visible.forEach(condition => {
                   isOptionVisible =
@@ -448,13 +449,17 @@ export default {
                 return isOptionVisible
               })
               .forEach(option => {
-                // se è una semplice option fa il return
                 if (!result) {
-                  result = {}
+                  result = header.type == 'dynamicRadio' ? {} : []
                 }
-                result[option.value] = option.name
+
+                if(header.type == 'dynamicRadio') {
+                  result[option.value] = option.name;
+                } else if(header.type == 'select') {
+                  result.push(option);
+                }
               })
-            this.form_options[header.field] = result
+              this.form_options[header.field] = result
           })
         },
         { deep: true }
@@ -466,7 +471,6 @@ export default {
     },
     updateFormulate (formulateForm) {
       // Merge data from Formulate and from our own nested two way bindings
-      this.log('formulateForm: ', formulateForm)
       Object.keys(formulateForm).forEach(fieldName => {
         this.$set(
           this.dataForm,
@@ -479,7 +483,9 @@ export default {
       this.validatedataForm()
       this.updateHeaders = new Date().getTime()
 
-      this.log(this.$vnode.key, 'update', this.dataForm)
+      if(this.debug) {
+        this.log(this.$vnode.key, 'update', this.dataForm)
+      }
       // this.$forceUpdate();
     },
     updateNested (field, value) {
@@ -494,9 +500,9 @@ export default {
     },
     /**
      * deprecated
-    listenForAwEvents() {
-      this.event_bus.$on("aw:form:update", this.forceUpdate());
-    }, */
+     listenForAwEvents() {
+     this.event_bus.$on("aw:form:update", this.forceUpdate());
+     }, */
     parseDate (header) {
       let parsedDate = this.moment(
         this.dataForm[header.field],
@@ -516,11 +522,11 @@ export default {
       let selectCodes = []
 
       for (let vhIndex = 0; vhIndex < this.headers.length; vhIndex++) {
-        let header = this.headers[vhIndex]
+        let header = this.headers[vhIndex];
 
         if (header.type === 'select' || header.isFetchable || header.select) {
-          if (header.select && header.select.choices) {
-            this.form_options[header.select.code] = header.select.choices
+          if ((header.select && header.select.choices) || (header.select && header.options)) {
+            this.form_options[header.select.code] = header.options || header.select.choices 
           } else {
             selectCodes.push(header.select.code)
 
@@ -595,15 +601,39 @@ export default {
             case 'required':
               let fieldValueIsEmpty = false
 
+            switch (typeof fieldValue) {
+              case 'object':
+                fieldValueIsEmpty = _.isEmpty(fieldValue)
+              break
+              default:
+                fieldValueIsEmpty = ['', undefined, null, NaN].includes(
+                  fieldValue
+              )
+              break
+            }
+
+            if (fieldValueIsEmpty) {
+              this.form_is_valid = false
+
+              validationStatus.valid = false
+              validationStatus.errors.push('Campo obbligatorio')
+            }
+            break
+
+            case 'required_if':
+              currentValue = fieldValue
+            otherValue = this.deepPick(this.dataForm, ruleParams[0])
+
+            if (otherValue) {
               switch (typeof fieldValue) {
                 case 'object':
                   fieldValueIsEmpty = _.isEmpty(fieldValue)
-                  break
+                break
                 default:
                   fieldValueIsEmpty = ['', undefined, null, NaN].includes(
                     fieldValue
-                  )
-                  break
+                )
+                break
               }
 
               if (fieldValueIsEmpty) {
@@ -612,61 +642,37 @@ export default {
                 validationStatus.valid = false
                 validationStatus.errors.push('Campo obbligatorio')
               }
-              break
-
-            case 'required_if':
-              currentValue = fieldValue
-              otherValue = this.deepPick(this.dataForm, ruleParams[0])
-
-              if (otherValue) {
-                switch (typeof fieldValue) {
-                  case 'object':
-                    fieldValueIsEmpty = _.isEmpty(fieldValue)
-                    break
-                  default:
-                    fieldValueIsEmpty = ['', undefined, null, NaN].includes(
-                      fieldValue
-                    )
-                    break
-                }
-
-                if (fieldValueIsEmpty) {
-                  this.form_is_valid = false
-
-                  validationStatus.valid = false
-                  validationStatus.errors.push('Campo obbligatorio')
-                }
-              }
-              break
+            }
+            break
 
             case 'equal':
               currentValue = fieldValue
-              otherValue = this.dataForm[ruleParams[0]]
+            otherValue = this.dataForm[ruleParams[0]]
 
-              if (
-                (!!currentValue || !!otherValue) &&
+            if (
+              (!!currentValue || !!otherValue) &&
                 currentValue != otherValue
-              ) {
-                this.form_is_valid = false
-                validationStatus.valid = false
-                validationStatus.errors.push('I due valori non corrispondono')
-              }
-              break
+            ) {
+              this.form_is_valid = false
+              validationStatus.valid = false
+              validationStatus.errors.push('I due valori non corrispondono')
+            }
+            break
 
             case 'file_with_owner':
               let fileObject = fieldValue
 
-              if (
-                !_.isEmpty(fileObject) &&
+            if (
+              !_.isEmpty(fileObject) &&
                 (_.isEmpty(fileObject.status) || _.isEmpty(fileObject.doc))
-              ) {
-                this.form_is_valid = false
-                validationStatus.valid = false
-                validationStatus.errors.push(
-                  'Inserire documento e relativo stato'
-                )
-              }
-              break
+            ) {
+              this.form_is_valid = false
+              validationStatus.valid = false
+              validationStatus.errors.push(
+                'Inserire documento e relativo stato'
+              )
+            }
+            break
 
             case 'after_or_equal':
               conditions = [header.field, 'AFTER_OR_EQUAL', ruleParams[0]]
@@ -695,62 +701,61 @@ export default {
               }
               break
 
-            case 'after':
-              conditions = [header.field, 'AFTER', ruleParams[0]]
+              case 'after':
+                conditions = [header.field, 'AFTER', ruleParams[0]]
 
-              if (
-                !this.evaluateCondition(
-                  conditions,
-                  this.dataForm,
-                  this.dataForm
-                )
-              ) {
-                let referencedHeader = this.visible_headers.find(header => {
-                  // ruleParams[0] is in the form "$<name_of_target_input>"
-                  return `\$${header.field}` == ruleParams[0]
-                })
+                if (
+                  !this.evaluateCondition(
+                    conditions,
+                    this.dataForm,
+                    this.dataForm
+                  )
+                ) {
+                  let referencedHeader = this.visible_headers.find(header => {
+                    // ruleParams[0] is in the form "$<name_of_target_input>"
+                    return `\$${header.field}` == ruleParams[0]
+                  })
 
-                let referencedHeaderName = referencedHeader
-                  ? referencedHeader.label
-                  : ruleParams[0]
+                  let referencedHeaderName = referencedHeader
+                    ? referencedHeader.label
+                    : ruleParams[0]
 
-                this.form_is_valid = false
-                validationStatus.validationStatus = false
-                validationStatus.errors.push(
-                  'La data deve essere maggiore di: ' + referencedHeaderName
-                )
-              }
-              break
+                  this.form_is_valid = false
+                  validationStatus.validationStatus = false
+                  validationStatus.errors.push(
+                    'La data deve essere maggiore di: ' + referencedHeaderName
+                  )
+                }
+                break
 
-            case 'email':
-              if (!this.$validators['email'](fieldValue)) {
-                this.form_is_valid = false
-                validationStatus.valid = false
-                validationStatus.errors.push('Il campo email non è valido')
-              }
-              break
-            case 'fiscal_code':
-              if (!this.$validators['fiscal_code'](fieldValue)) {
-                this.form_is_valid = false
-                validationStatus.valid = false
-                validationStatus.errors.push('Il Codice Fiscale non è valido')
-              }
-              break
-            case 'vat_number':
-              if (!this.$validators['vat_number'](fieldValue)) {
-                this.form_is_valid = false
-                validationStatus.valid = false
-                validationStatus.errors.push('La Partita IVA non è valida')
-              }
-              break
-            default:
-              break
+                case 'email':
+                  if (!this.$validators['email'](fieldValue)) {
+                  this.form_is_valid = false
+                  validationStatus.valid = false
+                  validationStatus.errors.push('Il campo email non è valido')
+                }
+                break
+                case 'fiscal_code':
+                  if (!this.$validators['fiscal_code'](fieldValue)) {
+                  this.form_is_valid = false
+                  validationStatus.valid = false
+                  validationStatus.errors.push('Il Codice Fiscale non è valido')
+                }
+                break
+                case 'vat_number':
+                  if (!this.$validators['vat_number'](fieldValue)) {
+                  this.form_is_valid = false
+                  validationStatus.valid = false
+                  validationStatus.errors.push('La Partita IVA non è valida')
+                }
+                break
+                default:
+                  break
           }
         })
 
         // if durty set the error unless not set the error
         if (this.deepPick(this.form_dirty_status, header.field)) {
-          console.log('aggiungo il dirty')
           _.set(this.form_validation_status, header.field, validationStatus)
         }
       })
@@ -767,7 +772,6 @@ export default {
       }
 
       if (header.visible) {
-        this.log('visible', header.visible)
         header.visible.forEach(condition => {
           isFilterVisible =
             isFilterVisible && this.evaluateCondition(condition, this.dataForm)
@@ -801,19 +805,19 @@ export default {
     },
     /**
      * deprecated
-    toObject(arr, header) {
-      if (!arr) {
-        return;
-      }
+     toObject(arr, header) {
+     if (!arr) {
+     return;
+     }
 
-      var rv = {};
+     var rv = {};
 
-      for (var i = 0; i < arr.length; ++i) {
-        rv[arr[i].id] = this.deepPick(arr[i], header.select.option);
-      }
+     for (var i = 0; i < arr.length; ++i) {
+     rv[arr[i].id] = this.deepPick(arr[i], header.select.option);
+     }
 
-      return rv;
-    }, */
+     return rv;
+     }, */
     filterOptions (header) {
       if (!header.select) {
         return []
@@ -869,15 +873,15 @@ export default {
       switch (header.type) {
         case 'form':
           cssClass = 'text-gray-700 text-normal'
-          break
+        break
 
         case 'fieldset':
           cssClass = this.separatorClass
-          break
+        break
 
         default:
           cssClass = this.labelClass
-          break
+        break
       }
 
       if (header.select) {
