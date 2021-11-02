@@ -173,10 +173,11 @@
                   <span
                     :class="header.class"
                     v-if="deepPick(row, header.field, header.type)"
+                    :title="deepPick(row, header.field, header.type)"
                   >
-                    {{ deepPick(row, header.field, header.type) }}
+                    {{ deepPick(row, header.field, header.type) | truncate(header.truncate) }}
                   </span>
-                  <span>{{ header.on_empty }}</span>
+                  <span v-else>{{ header.on_empty }}</span>
                 </div>
 
                 <div
