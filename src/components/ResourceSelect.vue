@@ -84,8 +84,8 @@ export default {
       this.log(this.code);
 
       if (this.context) {
-        if(this.select.option) {
-          this.context.model = newValue[this.select.option];
+        if(this.select.project) {
+          this.context.model = newValue[this.select.project];
         } else {
           this.context.model = newValue;
         }
