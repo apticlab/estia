@@ -137,9 +137,9 @@ function list (resourceName, filter) {
   })
 }
 
-function params (paramsName) {
+function params (paramsName, params = {}) {
   return new Promise(function (resolve, reject) {
-    axios.get(API_URL + '/params/' + paramsName).then(
+    axios.get(API_URL + '/params/' + paramsName, { params }).then(
       function (data) {
         resolve(data.data)
       },
