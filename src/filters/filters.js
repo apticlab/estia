@@ -111,8 +111,11 @@ export default {
       return null;
     }
   },
-  truncate(text, length, clamp) {
-    clamp = clamp || '...';
+  truncate(text, length, clamp = '...') {
+    if(!length) {
+      return text;
+    }
+
     var node = document.createElement('div');
     node.innerHTML = text;
     var content = node.textContent;
