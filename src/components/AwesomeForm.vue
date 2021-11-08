@@ -429,9 +429,11 @@ export default {
             header => header.type == 'dynamicRadio' || header.type == 'select'
           )
 
-          this.log('optionsToCheck', optionstoCheck)
           optionstoCheck.forEach(header => {
-            let result = null
+            let result = null;
+            if(!header.options) {
+              return;
+            }
 
             Object.values(header.options)
               .filter(option => {
@@ -458,7 +460,7 @@ export default {
                 } else if(header.type == 'select') {
                   result.push(option);
                 }
-              })
+              });
               this.form_options[header.field] = result
           })
         },
