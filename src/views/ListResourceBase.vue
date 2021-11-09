@@ -9,6 +9,7 @@
         <div class="flex flex-row ml-auto">
           <button
             v-for="(action, index) in multiActions"
+            .key="'lrb_action_' + index"
             :class="multiActionClass"
             class="outline-none focus:outline-none"
             @click="act(action)"
@@ -86,7 +87,7 @@
                 />
               </popper>
             </div>
-            <div v-for="header in card" :class="['mb-2', header.class]">
+            <div v-for="(header, index) in card" :key="'lrb_header_' + index" :class="['mb-2', header.class]">
               <template v-if="header.type == 'details'">
                 <div class="flex flex-col">
                   <div class="mb-1 text-base">
