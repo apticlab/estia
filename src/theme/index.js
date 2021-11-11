@@ -25,6 +25,10 @@ const defaultTheme = {
     "opacity-25 w-full h-full cursor-not-allowed rounded-full",
     button: "hover:bg-blue-100 w-full h-full text-blue-500 rounded-full ",
     ellipsis: "text-gray-500"
+  },
+  aw_table: {
+    actionDefaultColor: 'text-gray-400',
+    actionDefaultSize: 'm'
   }
 };
 
