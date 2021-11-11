@@ -9,7 +9,7 @@
         <div class="flex flex-row ml-auto">
           <button
             v-for="(action, index) in multiActions"
-            .key="'lrb_action_' + index"
+            :key="'lrb_action_' + index"
             :class="multiActionClass"
             class="outline-none focus:outline-none"
             @click="act(action)"
