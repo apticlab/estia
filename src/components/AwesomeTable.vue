@@ -175,7 +175,10 @@
                     v-if="deepPick(row, header.field, header.type)"
                     :title="deepPick(row, header.field, header.type)"
                   >
-                    {{ deepPick(row, header.field, header.type) | truncate(header.truncate) }}
+                    {{
+                      deepPick(row, header.field, header.type)
+                        | truncate(header.truncate)
+                    }}
                   </span>
                   <span v-else>{{ header.on_empty }}</span>
                 </div>
@@ -416,8 +419,10 @@
                       slot="reference"
                       :name="action.icon"
                       :class="action.class"
-                      size="l"
-                      color="text-gray-500"
+                      :size="action.size || $theme.aw_table.actionDefaultSize"
+                      :color="
+                        action.color || $theme.aw_table.actionDefaultColor
+                      "
                       class="mr-1 focus:outline-none p-1"
                       :stop-propagation="true"
                       @click="actOnRow(action, index)"
