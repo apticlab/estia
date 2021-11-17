@@ -2,8 +2,8 @@
   <transition name="fade">
     <div v-if="visible" class="fixed inset-0 z-50">
       <icon
-        name='x'
-        size='l'
+        name="x"
+        size="l"
         class="absolute top-[10px] right-[10px] text-gray-500 z-[60]"
         @click="hide()"
       />
@@ -46,7 +46,11 @@
         </template>
         <template v-else>
           <div
-            :class="is_mobile ? 'h-full w-full' : 'h-auto my-10 overflow-y-auto'"
+            :class="
+              is_mobile
+                ? 'h-full w-full'
+                : 'h-auto my-10 overflow-y-auto sm:w-8/12'
+            "
             class="
               flex flex-col
               p-5
@@ -67,7 +71,9 @@
                 <resource-edit
                   v-if="type == 'resource-edit'"
                   :prop-resource-name="params.resource"
-                  class="w-full sm:w-8/12 h-auto"
+                  :prop-resource-id="params.resourceId"
+                  :prop-resource-value="params.values"
+                  class="w-full h-auto"
                   @save="confirm()"
                   @close="hide()"
                 />
