@@ -526,7 +526,7 @@ export default {
       for (let vhIndex = 0; vhIndex < this.headers.length; vhIndex++) {
         let header = this.headers[vhIndex];
 
-        if (header.type === 'select' || header.isFetchable || header.select) {
+        if (header.type === 'select' || header.isFetchable || (header.select && header.type !== 'dynamic-select')) {
           if ((header.select && header.select.choices) || (header.select && header.options)) {
             this.form_options[header.select.code] = header.options || header.select.choices 
           } else {
