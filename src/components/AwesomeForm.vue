@@ -6,7 +6,6 @@
       name="aw-form"
       class="w-full grid grid-cols-12 gap-x-6"
       :values="dataForm"
-      @input="updateFormulate"
     >
       <pre v-if="debug">
         form: {{ dataForm }}
@@ -157,6 +156,7 @@
               :name="header.field"
               :header="header"
               :options="form_options[header.field]"
+              @input="value => updateNested(header.field, value)"
             />
           </template>
           <template v-else-if="header.type == 'select'">
@@ -169,6 +169,7 @@
               :option-field="header.select.option"
               :placeholder="header.placeholder"
               :select="header.select"
+              @input="value => updateNested(header.field, value)"
             />
           </template>
           <template
@@ -180,6 +181,7 @@
               :name="header.field"
               :header="header"
               :readonly="fieldIsReadonly(header)"
+              @input="value => updateNested(header.field, value)"
             />
           </template>
           <template v-else-if="header.type == 'balance'">
@@ -192,6 +194,7 @@
                 :placeholder="header.placeholder"
                 :name="header.field"
                 class="flex-grow rounded-r-none"
+                @input="value => updateNested(header.field, value)"
               />
               <div
                 class="
@@ -228,6 +231,7 @@
                   type="checkbox"
                   class="hidden"
                   :name="header.field"
+                  @input="value => updateNested(header.field, value)"
                 />
                 <svg
                   :class="!!deepFind(dataForm, header.field) ? '' : 'hidden'"
@@ -263,6 +267,7 @@
               :readonly="fieldIsReadonly(header)"
               :placeholder="header.placeholder"
               :name="header.field"
+              @input="value => updateNested(header.field, value)"
             />
           </template>
           <FormulateInput
@@ -276,6 +281,7 @@
             :resource="header.resource"
             :options="header.options"
             @blur-context="setDirty(header.field)"
+            @input="value => updateNested(header.field, value)"
           />
         </div>
         <div class="ml-2 mt-2 mr-auto error-container">
