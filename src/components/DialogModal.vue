@@ -42,6 +42,7 @@
             :is="$modalWidgets[type]"
             :params="params"
             @done="confirm"
+            @hide="hide"
           />
         </template>
         <template v-else>
