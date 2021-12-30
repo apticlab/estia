@@ -4,7 +4,7 @@
       <icon
         name='x'
         size='l'
-        class="absolute top-[10px] right-[10px] text-gray-500 z-[60]"
+        class="absolute top-[10px] right-[10px] text-white z-[60] cursor-pointer"
         @click="hide()"
       />
       <div
