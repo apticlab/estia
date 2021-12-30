@@ -28,7 +28,7 @@ const defaultTheme = {
   },
   aw_table: {
     actionDefaultColor: 'text-gray-400',
-    actionDefaultSize: 'm'
+    actionDefaultSize: 'l'
   }
 };
 

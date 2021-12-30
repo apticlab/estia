@@ -31,7 +31,10 @@
             </li>
           </ol>
         </div>
-        <div class="flex flex-row items-center justify-end w-full py-5" v-if='!hideActions'>
+        <div
+          class="flex flex-row items-center justify-end w-full py-5"
+          v-if="!hideActions"
+        >
           <div class="flex flex-row items-baseline mr-auto">
             <button
               v-for="action in visibleActions"
@@ -106,6 +109,11 @@ export default {
       type: Number,
       default: null,
     },
+    propResourceValue: {
+      required: false,
+      type: () => {},
+      default: null,
+    },
     layout: {
       required: false,
       default: "vertical",
@@ -141,6 +149,7 @@ export default {
       this.routerBased = false;
       this.resource_id = this.propResourceId;
       this.resource_name = this.propResourceName;
+      this.resource = this.propResourceValue;
     } else {
       this.resource_id = this.$route.params.id;
       this.resource_name =
@@ -182,10 +191,11 @@ export default {
         } else {
           let resource = _.clone(this.changedResource);
           await this.$api.create(resource_name, resource);
-          if (!this.routerBased) {
-            this.$emit("save", true);
-            return;
-          }
+        }
+
+        if (!this.routerBased) {
+          this.$emit("save", true);
+          return;
         }
 
         this.$router.back();
