@@ -8,8 +8,8 @@
         @click="hide()"
       />
       <div
-        :class="$theme.backdropBgColor"
-        class="absolute inset-0 opacity-50 bg-gray-dark"
+        :class="$theme.backdropBgColor || 'opacity-50 bg-gray-dark'"
+        class="absolute inset-0"
         @click="hide()"
       />
       <div
