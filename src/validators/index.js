@@ -27,5 +27,11 @@ export default {
     }
 
     return checkVAT(value, [italy]);
+  },
+  min(value, min) {
+    return value > min
+  },
+  max(value, max) {
+    return value < max
   }
 };

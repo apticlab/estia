@@ -18,10 +18,7 @@
         class="relative focus-within:text-blue"
         :class="formFieldClass(header)"
       >
-        <label
-          :class="getLabelClass(header)"
-          :for="header.field"
-        >
+        <label :class="getLabelClass(header)" :for="header.field">
           {{ header.label }}
           <span
             v-if="
@@ -30,12 +27,10 @@
                 : false
             "
             class="ml-1 font-bold text-orange-600"
-          >*</span>
+            >*</span
+          >
         </label>
-        <div
-          v-if="$editFields[header.type]"
-          class="w-full"
-        >
+        <div v-if="$editFields[header.type]" class="w-full">
           <component
             :is="$editFields[header.type]"
             :disabled="fieldIsReadonly(header)"
@@ -43,7 +38,7 @@
             :header="header"
             :form-data="dataForm"
             :value="deepPick(dataForm, header.field)"
-            @change="$event => updateNested(header.field, $event)"
+            @change="($event) => updateNested(header.field, $event)"
           />
         </div>
         <template v-else-if="header.field && header.field.includes('.')">
@@ -54,20 +49,20 @@
             :header="header"
             :placeholder="header.placeholder"
             :value="deepPick(dataForm, header.field)"
-            @change="$event => updateNested(header.field, $event)"
+            @change="($event) => updateNested(header.field, $event)"
           />
           <input
             v-if="header.type == 'text'"
             type="text"
             :value="deepPick(dataForm, header.field)"
-            @input="$event => updateNested(header.field, $event.target.value)"
-          >
+            @input="($event) => updateNested(header.field, $event.target.value)"
+          />
           <input
             v-if="header.type == 'number'"
             type="number"
             :value="deepPick(dataForm, header.field)"
-            @input="$event => updateNested(header.field, $event.target.value)"
-          >
+            @input="($event) => updateNested(header.field, $event.target.value)"
+          />
           <template v-if="header.type == 'boolean'">
             <label
               class="flex custom-label"
@@ -115,20 +110,17 @@
           <textarea
             v-if="header.type == 'textarea'"
             :value="deepPick(dataForm, header.field)"
-            @input="$event => updateNested(header.field, $event.target.value)"
+            @input="($event) => updateNested(header.field, $event.target.value)"
           />
           <v-date-picker
             v-if="header.type == 'date'"
             locale="it"
             :min-date="header.minDate"
             :value="deepPick(dataForm, header.field)"
-            @input="$event => updateNested(header.field, formatDate($event))"
+            @input="($event) => updateNested(header.field, formatDate($event))"
           >
             <template v-slot="{ inputValue, inputEvents }">
-              <input
-                :value="inputValue"
-                v-on="inputEvents"
-              >
+              <input :value="inputValue" v-on="inputEvents" />
             </template>
           </v-date-picker>
         </template>
@@ -139,7 +131,7 @@
               :form="dataForm[header.field]"
               :headers="header.headers"
               :validate="header.validate"
-              @change="value => updateNested(header.field, value)"
+              @change="(value) => updateNested(header.field, value)"
             />
           </template>
           <template v-else-if="header.type == 'dynamicRadio'">
@@ -156,7 +148,7 @@
               :name="header.field"
               :header="header"
               :options="form_options[header.field]"
-              @input="value => updateNested(header.field, value)"
+              @input="(value) => updateNested(header.field, value)"
             />
           </template>
           <template v-else-if="header.type == 'select'">
@@ -169,7 +161,7 @@
               :option-field="header.select.option"
               :placeholder="header.placeholder"
               :select="header.select"
-              @input="value => updateNested(header.field, value)"
+              @input="(value) => updateNested(header.field, value)"
             />
           </template>
           <template
@@ -181,7 +173,7 @@
               :name="header.field"
               :header="header"
               :readonly="fieldIsReadonly(header)"
-              @input="value => updateNested(header.field, value)"
+              @input="(value) => updateNested(header.field, value)"
             />
           </template>
           <template v-else-if="header.type == 'balance'">
@@ -194,7 +186,7 @@
                 :placeholder="header.placeholder"
                 :name="header.field"
                 class="flex-grow rounded-r-none"
-                @input="value => updateNested(header.field, value)"
+                @input="(value) => updateNested(header.field, value)"
               />
               <div
                 class="
@@ -231,7 +223,7 @@
                   type="checkbox"
                   class="hidden"
                   :name="header.field"
-                  @input="value => updateNested(header.field, value)"
+                  @input="(value) => updateNested(header.field, value)"
                 />
                 <svg
                   :class="!!deepFind(dataForm, header.field) ? '' : 'hidden'"
@@ -267,7 +259,7 @@
               :readonly="fieldIsReadonly(header)"
               :placeholder="header.placeholder"
               :name="header.field"
-              @input="value => updateNested(header.field, value)"
+              @input="(value) => updateNested(header.field, value)"
             />
           </template>
           <FormulateInput
@@ -281,7 +273,7 @@
             :resource="header.resource"
             :options="header.options"
             @blur-context="setDirty(header.field)"
-            @input="value => updateNested(header.field, value)"
+            @input="(value) => updateNested(header.field, value)"
           />
         </div>
         <div class="ml-2 mt-2 mr-auto error-container">
@@ -301,7 +293,8 @@
                 ).errors"
                 :key="index"
                 class="mb-2 text-red-600"
-              >{{ error }}</span>
+                >{{ error }}</span
+              >
             </div>
           </slot>
         </div>
@@ -327,11 +320,11 @@
 </template>
 
 <script>
-import _ from 'lodash'
-import { mapState } from 'vuex'
+import _ from "lodash";
+import { mapState } from "vuex";
 
 export default {
-  name: 'AwesomeForm',
+  name: "AwesomeForm",
   props: {
     debug: { required: false, default: false },
     isEdit: { required: false, default: false },
@@ -341,39 +334,39 @@ export default {
     headers: { required: true, default: () => {} },
     layout: {
       required: false,
-      default: 'vertical',
-      type: String
+      default: "vertical",
+      type: String,
     },
     separatorClass: {
       required: false,
       type: String,
-      default () {
-        return this.$theme.separatorClass
-      }
+      default() {
+        return this.$theme.separatorClass;
+      },
     },
     labelClass: {
       required: false,
       type: String,
-      default () {
-        return this.$theme.labelClass
-      }
+      default() {
+        return this.$theme.labelClass;
+      },
     },
     inputClass: {
       required: false,
       type: String,
-      default () {
-        return this.$theme.inputClass
-      }
+      default() {
+        return this.$theme.inputClass;
+      },
     },
     fieldClass: {
       required: false,
       type: String,
-      default () {
-        return this.$theme.fieldClass
-      }
-    }
+      default() {
+        return this.$theme.fieldClass;
+      },
+    },
   },
-  data () {
+  data() {
     return {
       updateHeaders: new Date().getTime(),
       loading: true,
@@ -385,125 +378,125 @@ export default {
       form_validation_status: {},
       form_is_valid: {},
       form_errors: {},
-      form_dirty_status: {}
-    }
+      form_dirty_status: {},
+    };
   },
-  async mounted () {
-    this.loading = true
+  async mounted() {
+    this.loading = true;
 
-    if(this.debug) {
-      this.log(this.$vnode.key, 'mounted', this.form)
+    if (this.debug) {
+      this.log(this.$vnode.key, "mounted", this.form);
     }
     // Use a private clone so that we can
     // change it entirely to trigger some refresh
     try {
-      let dataForm = JSON.parse(JSON.stringify(this.form))
-      this.$set(this, 'dataForm', dataForm || {})
+      let dataForm = JSON.parse(JSON.stringify(this.form));
+      this.$set(this, "dataForm", dataForm || {});
     } catch (e) {
-      this.dataForm = {}
+      this.dataForm = {};
     }
 
     // load params for select field
-    await this.fetchOptions()
+    await this.fetchOptions();
 
-    this.updateOldForm(this.dataForm)
-    this.validatedataForm()
+    this.updateOldForm(this.dataForm);
+    this.validatedataForm();
 
     // this.setDependableVariables();
-    this.watchableOptions()
+    this.watchableOptions();
 
-    this.loading = false
+    this.loading = false;
   },
-  beforeDestroy () {
+  beforeDestroy() {
     // this.event_bus.$off('aw:form:update', this.forceUpdate);
   },
   methods: {
-    setDirty (field) {
-      _.set(this.form_dirty_status, field, true)
+    setDirty(field) {
+      _.set(this.form_dirty_status, field, true);
     },
     /**
      * This function check if option has @ symbol and if it true it checks if the function named
      * after @ is present then execute the function and return the list of options based on the
      * condition present in the function
      */
-    watchableOptions () {
+    watchableOptions() {
       // add the unwatch
       this.$watch(
         `dataForm`,
         (newV, oldV) => {
           let optionstoCheck = this.visible_headers.filter(
-            header => header.type == 'dynamicRadio' || header.type == 'select'
-          )
+            (header) => header.type == "dynamicRadio" || header.type == "select"
+          );
 
-          optionstoCheck.forEach(header => {
+          optionstoCheck.forEach((header) => {
             let result = null;
-            if(!header.options) {
+            if (!header.options) {
               return;
             }
 
             Object.values(header.options)
-              .filter(option => {
+              .filter((option) => {
                 // se c'è una condizione da validare viene validata
                 if (!option.visible) {
-                  return true
-                }
-                
-                let isOptionVisible = true
-                option.visible.forEach(condition => {
-                  isOptionVisible =
-                    isOptionVisible &&
-                    this.evaluateCondition(condition, this.dataForm)
-                })
-                return isOptionVisible
-              })
-              .forEach(option => {
-                if (!result) {
-                  result = header.type == 'dynamicRadio' ? {} : []
+                  return true;
                 }
 
-                if(header.type == 'dynamicRadio') {
+                let isOptionVisible = true;
+                option.visible.forEach((condition) => {
+                  isOptionVisible =
+                    isOptionVisible &&
+                    this.evaluateCondition(condition, this.dataForm);
+                });
+                return isOptionVisible;
+              })
+              .forEach((option) => {
+                if (!result) {
+                  result = header.type == "dynamicRadio" ? {} : [];
+                }
+
+                if (header.type == "dynamicRadio") {
                   result[option.value] = option.name;
-                } else if(header.type == 'select') {
+                } else if (header.type == "select") {
                   result.push(option);
                 }
               });
-              this.form_options[header.field] = result
-          })
+            this.form_options[header.field] = result;
+          });
         },
         { deep: true }
-      )
+      );
     },
-    handleBooleanClick (header) {
-      let currentValue = this.deepPick(this.dataForm, header.field)
-      this.updateNested(header.field, !currentValue)
+    handleBooleanClick(header) {
+      let currentValue = this.deepPick(this.dataForm, header.field);
+      this.updateNested(header.field, !currentValue);
     },
-    updateFormulate (formulateForm) {
+    updateFormulate(formulateForm) {
       // Merge data from Formulate and from our own nested two way bindings
-      Object.keys(formulateForm).forEach(fieldName => {
+      Object.keys(formulateForm).forEach((fieldName) => {
         this.$set(
           this.dataForm,
           fieldName,
           this.deepPick(formulateForm, fieldName)
-        )
-      })
+        );
+      });
 
-      this.updateOldForm(this.dataForm)
-      this.validatedataForm()
-      this.updateHeaders = new Date().getTime()
+      this.updateOldForm(this.dataForm);
+      this.validatedataForm();
+      this.updateHeaders = new Date().getTime();
 
-      if(this.debug) {
-        this.log(this.$vnode.key, 'update', this.dataForm)
+      if (this.debug) {
+        this.log(this.$vnode.key, "update", this.dataForm);
       }
       // this.$forceUpdate();
     },
-    updateNested (field, value) {
-      _.set(this.dataForm, field, value)
-      this.setDirty(field)
+    updateNested(field, value) {
+      _.set(this.dataForm, field, value);
+      this.setDirty(field);
 
-      this.updateOldForm(this.dataForm)
-      this.validatedataForm()
+      this.updateOldForm(this.dataForm);
+      this.validatedataForm();
 
-      this.updateHeaders = new Date().getTime()
+      this.updateHeaders = new Date().getTime();
       // this.$forceUpdate();
     },
     /**
@@ -511,179 +504,187 @@ export default {
      listenForAwEvents() {
      this.event_bus.$on("aw:form:update", this.forceUpdate());
      }, */
-    parseDate (header) {
+    parseDate(header) {
       let parsedDate = this.moment(
         this.dataForm[header.field],
-        'YYYY-MM-DD'
-      ).toDate()
+        "YYYY-MM-DD"
+      ).toDate();
 
-      return parsedDate
+      return parsedDate;
     },
-    formatDate (newDate) {
-      return this.moment(newDate).format('YYYY-MM-DD')
+    formatDate(newDate) {
+      return this.moment(newDate).format("YYYY-MM-DD");
     },
-    forceUpdate () {
-      this.updateHeaders = new Date().getTime()
+    forceUpdate() {
+      this.updateHeaders = new Date().getTime();
     },
-    async fetchOptions () {
-      let promises = []
-      let selectCodes = []
+    async fetchOptions() {
+      let promises = [];
+      let selectCodes = [];
 
       for (let vhIndex = 0; vhIndex < this.headers.length; vhIndex++) {
         let header = this.headers[vhIndex];
 
-        if (header.type === 'select' || header.isFetchable || (header.select && header.type !== 'dynamic-select')) {
-          if ((header.select && header.select.choices) || (header.select && header.options)) {
-            this.form_options[header.select.code] = header.options || header.select.choices 
+        if (
+          header.type === "select" ||
+          header.isFetchable ||
+          (header.select && header.type !== "dynamic-select")
+        ) {
+          if (
+            (header.select && header.select.choices) ||
+            (header.select && header.options)
+          ) {
+            this.form_options[header.select.code] =
+              header.options || header.select.choices;
           } else {
-            selectCodes.push(header.select.code)
+            selectCodes.push(header.select.code);
 
-            let url = header.select.url
+            let url = header.select.url;
             if (header.select.of) {
-              url = url.concat(`/${this.deepFind(this, header.select.of)}`)
+              url = url.concat(`/${this.deepFind(this, header.select.of)}`);
             }
 
-            if (header.select.type && header.select.type == 'param') {
-              promises.push(this.$api.params(url))
+            if (header.select.type && header.select.type == "param") {
+              promises.push(this.$api.params(url));
             } else {
-              promises.push(this.$api.list(url))
+              promises.push(this.$api.list(url));
             }
           }
         }
 
-        if (header.type == 'boolean') {
+        if (header.type == "boolean") {
           this.updateNested(
             this.dataForm,
             header.field,
             header.default ? header.default : false
-          )
+          );
         }
       }
 
-      let selectValues = await Promise.all(promises)
+      let selectValues = await Promise.all(promises);
 
       selectValues.forEach((values, index) => {
-        this.form_options[selectCodes[index]] = values
-      })
+        this.form_options[selectCodes[index]] = values;
+      });
 
-      this.$forceUpdate()
+      this.$forceUpdate();
     },
-    validatedataForm () {
-      if (!this.validate) return 0
-      if (!this.headers) return 0
-      if (!this.dataForm) return 0
+    validatedataForm() {
+      if (!this.validate) return 0;
+      if (!this.headers) return 0;
+      if (!this.dataForm) return 0;
 
-      this.form_is_valid = true
+      this.form_is_valid = true;
 
-      this.headers.forEach(header => {
-        if (header.type == 'form') {
-          return
+      this.headers.forEach((header) => {
+        if (header.type == "form") {
+          return;
         }
 
         if (!this.fieldIsVisible(header)) {
-          return
+          return;
         }
 
-        const validation_rules = header.validator || []
+        const validation_rules = header.validator || [];
 
         let validationStatus = {
           valid: true,
           errors: [],
-          status: 'validated'
-        }
+          status: "validated",
+        };
 
-        validation_rules.forEach(rule => {
-          let ruleTokens = rule.split(':')
+        validation_rules.forEach((rule) => {
+          let ruleTokens = rule.split(":");
 
-          let ruleCode = ruleTokens[0]
-          let ruleParams = ruleTokens[1] ? ruleTokens[1].split(',') : []
+          let ruleCode = ruleTokens[0];
+          let ruleParams = ruleTokens[1] ? ruleTokens[1].split(",") : [];
 
-          let fieldValue = this.deepPick(this.dataForm, header.field)
+          let fieldValue = this.deepPick(this.dataForm, header.field);
 
-          let conditions = []
+          let conditions = [];
 
-          let currentValue
-          let otherValue
+          let currentValue;
+          let otherValue;
 
           switch (ruleCode) {
-            case 'required':
-              let fieldValueIsEmpty = false
+            case "required":
+              let fieldValueIsEmpty = false;
 
-            switch (typeof fieldValue) {
-              case 'object':
-                fieldValueIsEmpty = _.isEmpty(fieldValue)
-              break
-              default:
-                fieldValueIsEmpty = ['', undefined, null, NaN].includes(
-                  fieldValue
-              )
-              break
-            }
-
-            if (fieldValueIsEmpty) {
-              this.form_is_valid = false
-
-              validationStatus.valid = false
-              validationStatus.errors.push('Campo obbligatorio')
-            }
-            break
-
-            case 'required_if':
-              currentValue = fieldValue
-            otherValue = this.deepPick(this.dataForm, ruleParams[0])
-
-            if (otherValue) {
               switch (typeof fieldValue) {
-                case 'object':
-                  fieldValueIsEmpty = _.isEmpty(fieldValue)
-                break
+                case "object":
+                  fieldValueIsEmpty = _.isEmpty(fieldValue);
+                  break;
                 default:
-                  fieldValueIsEmpty = ['', undefined, null, NaN].includes(
+                  fieldValueIsEmpty = ["", undefined, null, NaN].includes(
                     fieldValue
-                )
-                break
+                  );
+                  break;
               }
 
               if (fieldValueIsEmpty) {
-                this.form_is_valid = false
+                this.form_is_valid = false;
 
-                validationStatus.valid = false
-                validationStatus.errors.push('Campo obbligatorio')
+                validationStatus.valid = false;
+                validationStatus.errors.push("Campo obbligatorio");
               }
-            }
-            break
+              break;
 
-            case 'equal':
-              currentValue = fieldValue
-            otherValue = this.dataForm[ruleParams[0]]
+            case "required_if":
+              currentValue = fieldValue;
+              otherValue = this.deepPick(this.dataForm, ruleParams[0]);
 
-            if (
-              (!!currentValue || !!otherValue) &&
+              if (otherValue) {
+                switch (typeof fieldValue) {
+                  case "object":
+                    fieldValueIsEmpty = _.isEmpty(fieldValue);
+                    break;
+                  default:
+                    fieldValueIsEmpty = ["", undefined, null, NaN].includes(
+                      fieldValue
+                    );
+                    break;
+                }
+
+                if (fieldValueIsEmpty) {
+                  this.form_is_valid = false;
+
+                  validationStatus.valid = false;
+                  validationStatus.errors.push("Campo obbligatorio");
+                }
+              }
+              break;
+
+            case "equal":
+              currentValue = fieldValue;
+              otherValue = this.dataForm[ruleParams[0]];
+
+              if (
+                (!!currentValue || !!otherValue) &&
                 currentValue != otherValue
-            ) {
-              this.form_is_valid = false
-              validationStatus.valid = false
-              validationStatus.errors.push('I due valori non corrispondono')
-            }
-            break
+              ) {
+                this.form_is_valid = false;
+                validationStatus.valid = false;
+                validationStatus.errors.push("I due valori non corrispondono");
+              }
+              break;
 
-            case 'file_with_owner':
-              let fileObject = fieldValue
+            case "file_with_owner":
+              let fileObject = fieldValue;
 
-            if (
-              !_.isEmpty(fileObject) &&
+              if (
+                !_.isEmpty(fileObject) &&
                 (_.isEmpty(fileObject.status) || _.isEmpty(fileObject.doc))
-            ) {
-              this.form_is_valid = false
-              validationStatus.valid = false
-              validationStatus.errors.push(
-                'Inserire documento e relativo stato'
-              )
-            }
-            break
+              ) {
+                this.form_is_valid = false;
+                validationStatus.valid = false;
+                validationStatus.errors.push(
+                  "Inserire documento e relativo stato"
+                );
+              }
+              break;
 
-            case 'after_or_equal':
-              conditions = [header.field, 'AFTER_OR_EQUAL', ruleParams[0]]
+            case "after_or_equal":
+              conditions = [header.field, "AFTER_OR_EQUAL", ruleParams[0]];
 
               if (
                 !this.evaluateCondition(
@@ -692,124 +693,152 @@ export default {
                   this.dataForm
                 )
               ) {
-                let referencedHeader = this.visible_headers.find(header => {
-                  return `\$${header.field}` == ruleParams[0]
-                })
+                let referencedHeader = this.visible_headers.find((header) => {
+                  return `\$${header.field}` == ruleParams[0];
+                });
 
                 let referencedHeaderName = referencedHeader
                   ? referencedHeader.label
-                  : ruleParams[0]
+                  : ruleParams[0];
 
-                this.form_is_valid = false
-                validationStatus.validationStatus = false
+                this.form_is_valid = false;
+                validationStatus.validationStatus = false;
                 validationStatus.errors.push(
-                  'La data deve essere maggiore o uguale a: ' +
+                  "La data deve essere maggiore o uguale a: " +
                     referencedHeaderName
-                )
+                );
               }
-              break
+              break;
 
-              case 'after':
-                conditions = [header.field, 'AFTER', ruleParams[0]]
+            case "after":
+              conditions = [header.field, "AFTER", ruleParams[0]];
 
-                if (
-                  !this.evaluateCondition(
-                    conditions,
-                    this.dataForm,
-                    this.dataForm
-                  )
-                ) {
-                  let referencedHeader = this.visible_headers.find(header => {
-                    // ruleParams[0] is in the form "$<name_of_target_input>"
-                    return `\$${header.field}` == ruleParams[0]
-                  })
+              if (
+                !this.evaluateCondition(
+                  conditions,
+                  this.dataForm,
+                  this.dataForm
+                )
+              ) {
+                let referencedHeader = this.visible_headers.find((header) => {
+                  // ruleParams[0] is in the form "$<name_of_target_input>"
+                  return `\$${header.field}` == ruleParams[0];
+                });
 
-                  let referencedHeaderName = referencedHeader
-                    ? referencedHeader.label
-                    : ruleParams[0]
+                let referencedHeaderName = referencedHeader
+                  ? referencedHeader.label
+                  : ruleParams[0];
 
-                  this.form_is_valid = false
-                  validationStatus.validationStatus = false
-                  validationStatus.errors.push(
-                    'La data deve essere maggiore di: ' + referencedHeaderName
-                  )
-                }
-                break
+                this.form_is_valid = false;
+                validationStatus.validationStatus = false;
+                validationStatus.errors.push(
+                  "La data deve essere maggiore di: " + referencedHeaderName
+                );
+              }
+              break;
 
-                case 'email':
-                  if (!this.$validators['email'](fieldValue)) {
-                  this.form_is_valid = false
-                  validationStatus.valid = false
-                  validationStatus.errors.push('Il campo email non è valido')
-                }
-                break
-                case 'fiscal_code':
-                  if (!this.$validators['fiscal_code'](fieldValue)) {
-                  this.form_is_valid = false
-                  validationStatus.valid = false
-                  validationStatus.errors.push('Il Codice Fiscale non è valido')
-                }
-                break
-                case 'vat_number':
-                  if (!this.$validators['vat_number'](fieldValue)) {
-                  this.form_is_valid = false
-                  validationStatus.valid = false
-                  validationStatus.errors.push('La Partita IVA non è valida')
-                }
-                break
-                default:
-                  break
+            case "email":
+              if (!this.$validators["email"](fieldValue)) {
+                this.form_is_valid = false;
+                validationStatus.valid = false;
+                validationStatus.errors.push("Il campo email non è valido");
+              }
+              break;
+            case "fiscal_code":
+              if (!this.$validators["fiscal_code"](fieldValue)) {
+                this.form_is_valid = false;
+                validationStatus.valid = false;
+                validationStatus.errors.push("Il Codice Fiscale non è valido");
+              }
+              break;
+            case "vat_number":
+              if (!this.$validators["vat_number"](fieldValue)) {
+                this.form_is_valid = false;
+                validationStatus.valid = false;
+                validationStatus.errors.push("La Partita IVA non è valida");
+              }
+              break;
+            case "min":
+            case "max":
+              let comparator = ruleParams[0];
+
+              if (comparator.charAt(0) == "$") {
+                comparator = this.deepPick(
+                  this.dataForm,
+                  comparator.substring(1, comparator.length)
+                );
+              }
+
+              this.log(comparator, fieldValue);
+
+              if (!comparator || !fieldValue) {
+                break;
+              }
+
+              if (!this.$validators[ruleCode](fieldValue, comparator)) {
+                this.form_is_valid = false;
+                validationStatus.valid = false;
+                validationStatus.errors.push(
+                  `Non puoi impostare un numero più ${
+                    ruleCode == "max" ? "alto" : "basso"
+                  } di: `,
+                  comparator
+                );
+              }
+              break;
+            default:
+              break;
           }
-        })
+        });
 
         // if durty set the error unless not set the error
         if (this.deepPick(this.form_dirty_status, header.field)) {
-          _.set(this.form_validation_status, header.field, validationStatus)
+          _.set(this.form_validation_status, header.field, validationStatus);
         }
-      })
+      });
 
-      this.$emit('valid', this.form_is_valid)
+      this.$emit("valid", this.form_is_valid);
     },
-    fieldIsVisible (header) {
-      let isRoleVisible = true
-      let isFilterVisible = true
-      let isScopeVisible = true
+    fieldIsVisible(header) {
+      let isRoleVisible = true;
+      let isFilterVisible = true;
+      let isScopeVisible = true;
 
       if (header.roles) {
-        isRoleVisible = header.roles.includes(this.getUserRole())
+        isRoleVisible = header.roles.includes(this.getUserRole());
       }
 
       if (header.visible) {
-        header.visible.forEach(condition => {
+        header.visible.forEach((condition) => {
           isFilterVisible =
-            isFilterVisible && this.evaluateCondition(condition, this.dataForm)
-        })
+            isFilterVisible && this.evaluateCondition(condition, this.dataForm);
+        });
       }
 
       if (header.scopes) {
-        isScopeVisible = header.scopes.includes(this.scope)
+        isScopeVisible = header.scopes.includes(this.scope);
       }
 
-      return isRoleVisible && isFilterVisible && isScopeVisible
+      return isRoleVisible && isFilterVisible && isScopeVisible;
     },
-    fieldIsReadonly (header) {
+    fieldIsReadonly(header) {
       if (this.readonly) {
-        return true
+        return true;
       }
 
       if (header.readonly == undefined) {
-        return false
+        return false;
       }
 
-      if (typeof header.readonly === 'boolean') {
-        return header.readonly
+      if (typeof header.readonly === "boolean") {
+        return header.readonly;
       }
 
-      let mode = this.isEdit ? 'edit' : 'create'
+      let mode = this.isEdit ? "edit" : "create";
 
       // If it's false or not set I return false
       // otherwise I simply return the value
-      return header.readonly[mode] != undefined ? header.readonly[mode] : false
+      return header.readonly[mode] != undefined ? header.readonly[mode] : false;
     },
     /**
      * deprecated
@@ -826,113 +855,117 @@ export default {
 
      return rv;
      }, */
-    filterOptions (header) {
+    filterOptions(header) {
       if (!header.select) {
-        return []
+        return [];
       }
 
       if (header.options) {
-        return header.options
+        return header.options;
       }
 
       if (header.select && header.select.filter == undefined) {
-        return this.form_options[header.select.code]
+        return this.form_options[header.select.code];
       }
 
       if (!this.form_options[header.select.code]) {
-        return []
+        return [];
       }
 
-      let filteredOptions = []
+      let filteredOptions = [];
 
-      filteredOptions = this.form_options[header.select.code].filter(option => {
-        let isInFilter = this.evaluateCondition(
-          header.select.filter,
-          option,
-          this.dataForm
-        )
+      filteredOptions = this.form_options[header.select.code].filter(
+        (option) => {
+          let isInFilter = this.evaluateCondition(
+            header.select.filter,
+            option,
+            this.dataForm
+          );
 
-        return isInFilter
-      })
+          return isInFilter;
+        }
+      );
 
       if (this.debug) {
-        this.log(this.form_options)
-        this.log(header.select.code)
-        this.log(filteredOptions)
+        this.log(this.form_options);
+        this.log(header.select.code);
+        this.log(filteredOptions);
       }
 
       if (this.changedFields[header.select.filter[0]]) {
-        this.dataForm[header.field] = undefined
-        this.changedFields[header.select.filter[0]] = false
-        this.$forceUpdate()
+        this.dataForm[header.field] = undefined;
+        this.changedFields[header.select.filter[0]] = false;
+        this.$forceUpdate();
       }
 
-      return filteredOptions
+      return filteredOptions;
     },
-    updateOldForm (newForm) {
-      this.oldForm = JSON.parse(JSON.stringify(newForm))
+    updateOldForm(newForm) {
+      this.oldForm = JSON.parse(JSON.stringify(newForm));
 
       // Update form for parent component
-      this.$emit('change', this.dataForm)
+      this.$emit("change", this.dataForm);
     },
-    getLabelClass (header) {
-      let cssClass = ''
+    getLabelClass(header) {
+      let cssClass = "";
 
       switch (header.type) {
-        case 'form':
-          cssClass = 'text-gray-700 text-normal'
-        break
+        case "form":
+          cssClass = "text-gray-700 text-normal";
+          break;
 
-        case 'fieldset':
-          cssClass = this.separatorClass
-        break
+        case "fieldset":
+          cssClass = this.separatorClass;
+          break;
 
         default:
-          cssClass = this.labelClass
-        break
+          cssClass = this.labelClass;
+          break;
       }
 
       if (header.select) {
         if (header.select.can_add) {
-          cssClass += ''
+          cssClass += "";
         }
       }
 
-      return cssClass
+      return cssClass;
     },
-    formFieldClass (header) {
-      let formFieldClass = this.fieldClass
-      let minColSpan
+    formFieldClass(header) {
+      let formFieldClass = this.fieldClass;
+      let minColSpan;
 
-      let layout = header.layout || this.layout
+      let layout = header.layout || this.layout;
 
-      if (layout == 'vertical') {
-        formFieldClass += ' grid grid-cols-3 flex flex-row items-center'
-        minColSpan = 12
+      if (layout == "vertical") {
+        formFieldClass += " grid grid-cols-3 flex flex-row items-center";
+        minColSpan = 12;
       } else {
-        formFieldClass += ' flex flex-col'
-        minColSpan = parseInt(12 / this.visible_headers.length)
+        formFieldClass += " flex flex-col";
+        minColSpan = parseInt(12 / this.visible_headers.length);
       }
 
-      if (header.type == 'form') {
+      if (header.type == "form") {
         formFieldClass +=
-          ' border border-rounded-sm border-dotted border-gray-light'
+          " border border-rounded-sm border-dotted border-gray-light";
       } else {
         formFieldClass +=
-          ' mb-3 col-span-' + (header.colSpan || header.col_span || minColSpan)
-        formFieldClass += ' row-span-' + (header.rowSpan || 1)
+          " mb-3 col-span-" + (header.colSpan || header.col_span || minColSpan);
+        formFieldClass += " row-span-" + (header.rowSpan || 1);
       }
 
-      return formFieldClass
+      return formFieldClass;
     },
-    setDependableVariables () {
-      let depandableHeaders = this.headers.filter(header => header.depends_on)
+    setDependableVariables() {
+      let depandableHeaders = this.headers.filter(
+        (header) => header.depends_on
+      );
 
       for (let i = 0; i < depandableHeaders.length; i++) {
-        let header = depandableHeaders[i]
+        let header = depandableHeaders[i];
         // fare il watch delle variabili presenti in var
         // eseguire la funzione computed passando le variabili presenti in var
-        let varToWatch = header.depends_on.var[0]
+        let varToWatch = header.depends_on.var[0];
 
         // add the unwatch
         this.$watch(
@@ -942,30 +975,30 @@ export default {
               this.dataForm,
               header.field,
               header.depends_on.computed(newV)
-            )
-            this.updateHeaders = new Date().getTime()
+            );
+            this.updateHeaders = new Date().getTime();
           },
           { deep: true }
-        )
+        );
       }
-    }
+    },
   },
   computed: {
-    ...mapState('user', {
-      user: state => state.user
+    ...mapState("user", {
+      user: (state) => state.user,
     }),
-    scope () {
-      return this.isEdit ? 'edit' : 'create'
+    scope() {
+      return this.isEdit ? "edit" : "create";
     },
-    visible_headers () {
-      let uh = this.updateHeaders
+    visible_headers() {
+      let uh = this.updateHeaders;
 
-      return this.headers.filter(header => {
-        return this.fieldIsVisible(header)
-      })
-    }
-  }
-}
+      return this.headers.filter((header) => {
+        return this.fieldIsVisible(header);
+      });
+    },
+  },
+};
 </script>
 
 <style></style>
