@@ -64,12 +64,12 @@
 export default {
   name: "ViewResource",
   props: {
+    scope: { type: String, default: 'view' },
     id: { type: Number, default: null },
     resourceNameProp: { type: String, default: null }
   },
   data() {
     return {
-      scope: "view",
       isLoading: true,
       headers: null,
       actions: null,
@@ -96,7 +96,7 @@ export default {
     },
     visibleActions() {
       return this.actions.filter(action => {
-        return !action.scopes || action.scopes.includes("view");
+        return !action.scopes || action.scopes.includes(this.scope);
       });
     },
     visibleHeaders() {
