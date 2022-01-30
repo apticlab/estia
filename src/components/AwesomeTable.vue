@@ -154,9 +154,12 @@
                   v-if="header.type == 'date'"
                   class="flex flex-row items-center"
                 >
-                  <span class>{{
+                  <span v-if='deepPick(row, header.field)' class>{{
                     deepPick(row, header.field) | date(header.dateFormat)
                   }}</span>
+                <span v-else class="text-gray-400 italic">
+                  {{ header.on_empty }}
+                </span>
                 </div>
 
                 <div
