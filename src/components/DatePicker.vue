@@ -2,7 +2,7 @@
   <div class="">
     <v-date-picker
       locale="it"
-      :min-date="context.attributes.header.minDate"
+      :min-date="headers ? headers.minDate : attributes.minDate"
       :value="context.model"
       @input="updateDate"
       :popover="{ visibility: 'click' }"
@@ -19,8 +19,8 @@ export default {
   props: {
     context: {
       type: Object,
-      required: true
-    }
+      required: true,
+    },
   },
   mounted() {},
   data() {
@@ -32,8 +32,15 @@ export default {
     },
     formatDate(newDate) {
       return this.moment(newDate).format("YYYY-MM-DD");
-    }
+    },
   },
-  computed: {}
+  computed: {
+    attributes() {
+      return this.context.attributes;
+    },
+    headers() {
+      return this.attributes.headers;
+    },
+  },
 };
 </script>
