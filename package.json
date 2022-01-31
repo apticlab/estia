@@ -99,7 +99,7 @@
         "watch": "^1.0.2"
     },
     "dependencies": {
-        "@braid/vue-formulate": "^2.4.3",
+        "@braid/vue-formulate": "^2.5.3",
         "@popperjs/core": "^2.4.4",
         "axios": "^0.19.2",
         "chart.js": "^2.9.3",
