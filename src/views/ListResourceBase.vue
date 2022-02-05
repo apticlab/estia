@@ -161,6 +161,7 @@
 </template>
 <script>
 import ActionsMixin from "@/mixins/actions.mixin.js";
+import _ from "lodash";
 
 export default {
   name: "ListResourceBase",
