@@ -2,9 +2,16 @@
   <transition name="fade">
     <div v-if="visible" class="fixed inset-0 z-50">
       <icon
-        name='x'
-        size='l'
-        class="absolute top-[10px] right-[10px] text-white z-[60] cursor-pointer"
+        name="x"
+        size="l"
+        class="
+          absolute
+          top-[10px]
+          right-[10px]
+          text-white
+          z-[60]
+          cursor-pointer
+        "
         @click="hide()"
       />
       <div
@@ -148,9 +155,11 @@ export default {
   },
   beforeMount() {
     Dialog.EventBus.$on("show", this.show);
+    Dialog.EventBus.$on("hide", this.hide);
   },
   beforeDestroy() {
     Dialog.EventBus.$off("show", this.show);
+    Dialog.EventBus.$off("hide", this.hide);
   },
   methods: {
     hide() {

@@ -21,6 +21,9 @@ const Dialog = {
         // if we use this.$modal.show(params) inside our original Vue instance
         // we will emit 'show' event with parameters 'params'
         Dialog.EventBus.$emit("show", params);
+      },
+      hide(params) {
+        Dialog.EventBus.$emit("hide", params);
       }
     };
   }
