@@ -1,5 +1,4 @@
 import VueFormulate from "@braid/vue-formulate";
-import VueSVGIcon from "vue-svgicon";
 import VueTailwind from "vue-tailwind";
 import TPagination from "vue-tailwind/dist/t-pagination";
 import moment from "moment";
@@ -73,7 +72,6 @@ export default {
       }
     });
 
-    Vue.use(VueSVGIcon);
     Vue.use(VueTailwind, {
       "t-pagination": {
         component: TPagination

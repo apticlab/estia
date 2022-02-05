@@ -1,16 +1,19 @@
 <template>
   <div :class="$theme.viewResource.container">
     <div v-if="!isLoading" class="w-full">
-      <div class="flex flex-row mb-8">
+      <div class="flex flex-row mb-6">
         <div
-          class="flex flex-row items-baseline ml-auto py-4"
-          :class="$theme.viewResource.actionWrapper"
+          class="flex-row items-baseline ml-auto py-4"
+          :class="[
+            $theme.viewResource.actionWrapper,
+            visibleActions.length > 3 ? 'hidden xl:flex' : 'flex',
+          ]"
         >
           <button
             v-for="action in visibleActions"
             :key="action.label"
             :class="[$theme.viewResource.action, action.class]"
-            class="ml-3 px-4 outline-none ml-auto focus:outline-none"
+            class="ml-3 px-4 outline-none focus:outline-none"
             @click="act(action, resource)"
           >
             <span class="flex flex-row justify-center">
@@ -28,6 +31,11 @@
             </span>
           </button>
         </div>
+        <select-menu
+          :actions="visibleActions"
+          @act="(action) => act(action, resource)"
+          :class="visibleActions.length <= 3 ? 'hidden' : 'xl:hidden block ml-auto'"
+        />
       </div>
       <div
         :class="$theme.viewResource.infoContainer"
@@ -64,16 +72,16 @@
 export default {
   name: "ViewResource",
   props: {
-    scope: { type: String, default: 'view' },
+    scope: { type: String, default: "view" },
     id: { type: Number, default: null },
-    resourceNameProp: { type: String, default: null }
+    resourceNameProp: { type: String, default: null },
   },
   data() {
     return {
       isLoading: true,
       headers: null,
       actions: null,
-      resource: null
+      resource: null,
     };
   },
   computed: {
@@ -95,15 +103,20 @@ export default {
       return resourceNameField || "Risorsa";
     },
     visibleActions() {
-      return this.actions.filter(action => {
-        return !action.scopes || action.scopes.includes(this.scope);
-      });
+      return this.actions
+        .filter((action) => {
+          return !action.scopes || action.scopes.includes(this.scope);
+        })
+        .filter((action) => {
+          console.log(action.visible);
+          return this.actionIsVisible(action);
+        });
     },
     visibleHeaders() {
-      return this.headers.filter(header =>
+      return this.headers.filter((header) =>
         this.fieldIsVisible(header, this.resource)
       );
-    }
+    },
   },
   async mounted() {
     let resourceName =
@@ -125,6 +138,17 @@ export default {
     this.isLoading = false;
   },
   methods: {
+    actionIsVisible(action) {
+      let isActionVisible = true;
+      if (action.visible) {
+        action.visible.forEach((condition) => {
+          isActionVisible =
+            isActionVisible && this.evaluateCondition(condition, this.resource);
+        });
+      }
+
+      return isActionVisible;
+    },
     fieldIsVisible(header) {
       this.log(header);
       let isRoleVisible = true;
@@ -136,7 +160,7 @@ export default {
       }
 
       if (header.visible) {
-        header.visible.forEach(condition => {
+        header.visible.forEach((condition) => {
           isFilterVisible =
             isFilterVisible && this.evaluateCondition(condition, this.resource);
         });
@@ -173,7 +197,7 @@ export default {
     delete() {},
     goToList() {
       this.$router.push("../list");
-    }
-  }
+    },
+  },
 };
 </script>
