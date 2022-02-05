@@ -9,7 +9,9 @@
           {{ customerData.text }}
         </div>
       </span>
-      <span v-if="field.type == 'text'">{{ value }}</span>
+      <span v-if="field.type == 'text'">{{
+        value ? value : field.on_empty
+      }}</span>
       <span v-if="field.type == 'textarea'">{{ value }}</span>
       <span v-if="field.type == 'select'">{{ value }}</span>
 
@@ -38,7 +40,18 @@
       </span>
       <span v-if="field.type == 'image_upload'">
         <div
-          class="flex items-center justify-center w-48 h-48 text-xl border-2 border-dashed rounded-full border-gray bg-gray-light"
+          class="
+            flex
+            items-center
+            justify-center
+            w-48
+            h-48
+            text-xl
+            border-2 border-dashed
+            rounded-full
+            border-gray
+            bg-gray-light
+          "
           :style="value"
         ></div>
       </span>
@@ -74,13 +87,13 @@ export default {
   name: "FieldView",
   props: {
     data: { required: true },
-    field: { required: true }
+    field: { required: true },
   },
   components: {},
   data() {
     return {
       example:
-        '{"status":200,"error":"","data":[{"news_id":51184,"title":"iPhone X Review: Innovative future with real black technology","source":"Netease phone"},{"news_id":51183,"title":"Traffic paradise: How to design streets for people and unmanned vehicles in the future?","source":"Netease smart","link":"http://netease.smart/traffic-paradise/1235"},{"news_id":51182,"title":"Teslamasks American Business Relations: The government does not pay billions to build factories","source":"AI Finance","members":["Daniel","Mike","John"]}]}'
+        '{"status":200,"error":"","data":[{"news_id":51184,"title":"iPhone X Review: Innovative future with real black technology","source":"Netease phone"},{"news_id":51183,"title":"Traffic paradise: How to design streets for people and unmanned vehicles in the future?","source":"Netease smart","link":"http://netease.smart/traffic-paradise/1235"},{"news_id":51182,"title":"Teslamasks American Business Relations: The government does not pay billions to build factories","source":"AI Finance","members":["Daniel","Mike","John"]}]}',
     };
   },
   mounted() {},
@@ -98,7 +111,7 @@ export default {
         default:
           return null;
       }
-    }
+    },
   },
   computed: {
     value() {
@@ -111,7 +124,7 @@ export default {
         case "image_upload":
           return {
             "background-image":
-              "url(" + this.deepPick(this.data, fieldName) + ")"
+              "url(" + this.deepPick(this.data, fieldName) + ")",
           };
 
         case "json":
@@ -121,7 +134,7 @@ export default {
         default:
           return this.deepPick(this.data, fieldName);
       }
-    }
-  }
+    },
+  },
 };
 </script>
