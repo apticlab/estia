@@ -931,7 +931,7 @@
 
 <script>
 export default {
-  name: "svg-icon",
+  name: "aw-icon",
   props: {
     name: { required: true, default: null },
     width: { required: true, default: "w-4" },
