@@ -7,6 +7,8 @@ import scss from 'rollup-plugin-scss' // handles '.css' and '.scss'
 import alias from '@rollup/plugin-alias'
 import path from 'path'
 import json from 'rollup-plugin-json'
+import resolve from '@rollup/plugin-node-resolve';
+
 
 const projectRoot = path.resolve(__dirname, '..')
 
@@ -17,6 +19,7 @@ export default {
       name: 'Estia',
       exports: 'named',
       globals: {
+        /* 'is-reference': 'is-reference',
         'is-plain-object': 'is-plain-object',
         'nanoid/non-secure': 'nanoid',
         'is-url': 'is-url',
@@ -37,13 +40,19 @@ export default {
         'vue-prism-editor': 'vue-prism-editor',
         'survey-vue': 'survey-vue',
         jquery: 'jquery',
-        'surveyjs-widgets': 'surveyjs-widgets'
+        'surveyjs-widgets': 'surveyjs-widgets' */
+        lodash: '_'
       },
       sourcemap: false
     }
   ],
   external: ['nanoid/non-secure'],
   plugins: [
+    resolve({
+      jsnext: true,
+      main: true,
+      browser: true
+    }),
     alias({
       entries: {
         '@': path.resolve(projectRoot, 'src')
@@ -55,7 +64,9 @@ export default {
       namedExports: true
     }),
     scss(),
-    commonjs(),
+    commonjs({
+      include: ['../node_modules/**'],
+    }),
     autoExternal(),
     vue({
       css: true, // Dynamically inject css as a <style> tag
@@ -63,7 +74,7 @@ export default {
     }),
     buble({
       objectAssign: 'Object.assign',
-      transforms: { asyncAwait: false }
+      transforms: { asyncAwait: false, generator: false }
     }), // Transpile to ES5,
     terser()
   ]

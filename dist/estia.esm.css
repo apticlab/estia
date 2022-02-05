@@ -1,28 +1,21 @@
-@import url(./calendar.css);
-@import url(~vue2-timepicker/dist/VueTimepicker.css);
-@tailwind base;
-@tailwind components;
-.form-control {
-  @apply border-2 border-gray-light px-2 py-3 bg-white text-gray-dark block w-full outline-none; }
-
-.form-control:focus {
-  @apply outline-none; }
-
-.form-control .vs__dropdown-toggle,
-.form-control .vs__selected-options,
-.form-control .vs__selected-options input {
-  padding: 0;
-  margin: 0;
-  border: none; }
-
-pre[class*="language-"] {
-  min-height: 150px;
-  font-family: Menlo, Monaco, "Courier New", monospace;
-  direction: ltr;
+/**
+ * prism.js default theme for JavaScript, CSS and HTML
+ * Based on dabblet (http://dabblet.com)
+ * @author Lea Verou
+ */
+code[class*=language-],
+pre[class*=language-] {
+  color: black;
+  background: none;
+  text-shadow: 0 1px white;
+  font-family: Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace;
+  font-size: 1em;
   text-align: left;
+  white-space: pre;
   word-spacing: normal;
-  white-space: pre-wrap;
+  word-break: normal;
   word-wrap: normal;
+  line-height: 1.5;
   -moz-tab-size: 4;
   -o-tab-size: 4;
   tab-size: 4;
@@ -30,128 +23,115 @@ pre[class*="language-"] {
   -moz-hyphens: none;
   -ms-hyphens: none;
   hyphens: none;
-  @apply border-2 border-gray-light bg-white text-gray-dark; }
+}
 
-pre[class*="language-"]:active,
-pre[class*="language-"]:focus {
-  @apply outline-none border-blue; }
+pre[class*=language-]::-moz-selection, pre[class*=language-] ::-moz-selection,
+code[class*=language-]::-moz-selection, code[class*=language-] ::-moz-selection {
+  text-shadow: none;
+  background: #b3d4fc;
+}
 
-body,
-html {
-  font-family: Muli, sans-serif; }
+pre[class*=language-]::selection, pre[class*=language-] ::selection,
+code[class*=language-]::selection, code[class*=language-] ::selection {
+  text-shadow: none;
+  background: #b3d4fc;
+}
 
-canvas {
-  padding: 0;
-  margin: 0; }
+@media print {
+  code[class*=language-],
+pre[class*=language-] {
+    text-shadow: none;
+  }
+}
+/* Code blocks */
+pre[class*=language-] {
+  padding: 1em;
+  margin: 0.5em 0;
+  overflow: auto;
+}
 
-.nav-link.selected {
-  @apply text-white bg-blue; }
+:not(pre) > code[class*=language-],
+pre[class*=language-] {
+  background: #f5f2f0;
+}
 
-.nav-link.selected > div {
-  @apply border-transparent; }
+/* Inline code */
+:not(pre) > code[class*=language-] {
+  padding: 0.1em;
+  border-radius: 0.3em;
+  white-space: normal;
+}
 
-.nav-link.selected span {
-  @apply text-white; }
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+  color: slategray;
+}
 
-.nav-link.selected i {
-  @apply text-yellow; }
+.token.punctuation {
+  color: #999;
+}
 
-input,
-textarea {
-  /* @apply rounded bg-green-100 text-base text-gray-600 px-3 py-3 outline-none border-b border-solid border-green-200; */
-  @apply border-2 border-gray-light px-2 py-3 bg-white text-gray-dark block w-full outline-none; }
+.token.namespace {
+  opacity: 0.7;
+}
 
-input:focus {
-  @apply border-blue; }
+.token.property,
+.token.tag,
+.token.boolean,
+.token.number,
+.token.constant,
+.token.symbol,
+.token.deleted {
+  color: #905;
+}
 
-button {
-  @apply rounded px-4 py-2; }
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.inserted {
+  color: #690;
+}
 
-button.disabled,
-button:disabled {
-  @apply cursor-not-allowed text-gray-dark; }
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string {
+  color: #9a6e3a;
+  /* This background color was intended by the author of this theme. */
+  background: rgba(255, 255, 255, 0.5);
+}
 
-.progress-step.selected > span {
-  @apply text-blue text-lg; }
+.token.atrule,
+.token.attr-value,
+.token.keyword {
+  color: #07a;
+}
 
-.progress-step.selected > div {
-  @apply bg-blue text-white; }
+.token.function,
+.token.class-name {
+  color: #DD4A68;
+}
 
-.card {
-  @apply rounded bg-white px-4 py-3 shadow; }
+.token.regex,
+.token.important,
+.token.variable {
+  color: #e90;
+}
 
-/* width */
-::-webkit-scrollbar {
-  width: 6px; }
+.token.important,
+.token.bold {
+  font-weight: bold;
+}
 
-/* button */
-::-webkit-scrollbar-button {
-  background: #efefef;
-  display: none; }
+.token.italic {
+  font-style: italic;
+}
 
-/* Handle */
-::-webkit-scrollbar-thumb {
-  background: #999;
-  border-radius: 6px; }
-
-/* Handle on hover */
-::-webkit-scrollbar-thumb:hover {
-  background: #666; }
-
-/* Track */
-::-webkit-scrollbar-track {
-  background: #666;
-  border-radius: 50%; }
-
-/* The track NOT covered by the handle. */
-::-webkit-scrollbar-track-piece {
-  background: #efefef; }
-
-/* Corner */
-::-webkit-scrollbar-corner {
-  background: #999; }
-
-/* Resizer */
-::-webkit-resizer {
-  background: #111; }
-
-@tailwind utilities;
-/* Enter and leave animations can use different */
-/* durations and timing functions.              */
-.slide-fade-enter-active,
-.slide-down-fade-enter-active {
-  transition: all 0.3s ease; }
-
-.slide-fade-leave-active,
-.slide-down-fade-leave-active {
-  transition: all 0.1s cubic-bezier(1, 0.5, 0.8, 1); }
-
-.slide-fade-enter, .slide-fade-leave-to {
-  transform: translateX(10px);
-  opacity: 0; }
-
-.slide-down-fade-enter,
-.slide-down-fade-leave-to {
-  transform: translateY(-20px);
-  opacity: 0; }
-
-.fade-enter-active {
-  transition: opacity 0.5s; }
-
-.fade-enter, .fade-leave-to {
-  opacity: 0; }
-
-table.striped > tbody > tr:nth-child(odd) {
-  background-color: #fff; }
-
-.bg-main {
-  @apply bg-white; }
-
-.highlights-none {
-  -webkit-tap-highlight-color: transparent;
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none; }
+.token.entity {
+  cursor: help;
+}
