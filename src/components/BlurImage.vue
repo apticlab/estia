@@ -1,4 +1,4 @@
-<template functional>
+<template>
   <v-lazy-image
     :src="props.src"
     :src-placeholder="props.srcPlaceholder"
