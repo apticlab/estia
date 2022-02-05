@@ -33,6 +33,7 @@ import ViewResource from '@/views/ViewResource.vue'
 import SearchInput from '@/components/SearchInput.vue';
 import NoData from '@/components/NoData.vue'
 import DatePicker from '@/components/DatePicker.vue';
+import SelectMenu from '@/components/SelectMenu.vue';
 
 export default function (Vue) {
   Vue.component('login', Login)
@@ -69,6 +70,7 @@ export default function (Vue) {
   Vue.component('search-input', SearchInput);
   Vue.component('no-data', NoData);
   Vue.component('date-picker', DatePicker);
+  Vue.component('select-menu', SelectMenu);
 }
 
 export {
