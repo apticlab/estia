@@ -64,9 +64,7 @@ export default {
       namedExports: true
     }),
     scss(),
-    commonjs({
-      include: ['../node_modules/**'],
-    }),
+    commonjs(),
     autoExternal(),
     vue({
       css: true, // Dynamically inject css as a <style> tag
