@@ -131,7 +131,7 @@
         "vue-prism-editor": "^0.6.1",
         "vue-router": "^3.5.2",
         "vue-select": "^3.11.2",
-        "vue-tailwind": "^2.4.1",
+        "vue-tailwind": "^2.5.0",
         "vue-window-size": "^0.2.5",
         "vue2-daterange-picker": "^0.6.5",
         "vue2-timepicker": "^1.1.3",
