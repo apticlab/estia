@@ -3,13 +3,13 @@ import { getToken, hasActiveRole, getActiveRole, setProfile } from './auth.js'
 import { EventBus } from './event-bus.js'
 import testApi from './test-api.js'
 
-var ENV = process.env.NODE_ENV == "development" ? "development" : "production";
+var ENV = process.env.NODE_ENV || 'development';
 var HOST = "";
 var BASE_URL = "";
 var API_URL = "";
 var LOGIN_URL = "";
 
-function setInterceptorToken () {
+function setInterceptorToken() {
   axios.interceptors.request.use(
     function (config) {
       var authToken = getToken()
@@ -120,7 +120,7 @@ async function login(username, password) {
   };
 }
 
-function list (resourceName, filter) {
+function list(resourceName, filter) {
   return new Promise(function (resolve, reject) {
     axios
       .get(API_URL + '/' + resourceName, {
@@ -137,7 +137,7 @@ function list (resourceName, filter) {
   })
 }
 
-function params (paramsName, params = {}) {
+function params(paramsName, params = {}) {
   return new Promise(function (resolve, reject) {
     axios.get(API_URL + '/params/' + paramsName, { params }).then(
       function (data) {
@@ -150,19 +150,19 @@ function params (paramsName, params = {}) {
   })
 }
 
-async function create (resourceName, resource) {
+async function create(resourceName, resource) {
   let result = await axios.post(API_URL + '/' + resourceName, resource)
 
   return result
 }
 
-async function update (resourceName, resourceId, resource) {
+async function update(resourceName, resourceId, resource) {
   let result = await axios.put(API_URL + '/' + resourceName + '/' + resourceId, resource)
 
   return result
 }
 
-function get (resourceName, id, params = {}, isBlob = false) {
+function get(resourceName, id, params = {}, isBlob = false) {
   return new Promise(function (resolve, reject) {
     let url = ''
 
@@ -188,7 +188,7 @@ function get (resourceName, id, params = {}, isBlob = false) {
   })
 }
 
-function image (resourceName, id) {
+function image(resourceName, id) {
   return new Promise(function (resolve, reject) {
     axios.get(API_URL + '/' + resourceName + '/' + id + '/').then(
       function (data) {
@@ -204,11 +204,11 @@ function image (resourceName, id) {
   })
 }
 
-function imageUrl (imageUrl) {
+function imageUrl(imageUrl) {
   return BASE_URL + imageUrl
 }
 
-function post (resourceName, params) {
+function post(resourceName, params) {
   return new Promise(function (resolve, reject) {
     axios.post(API_URL + '/' + resourceName, params).then(
       function (data) {
@@ -221,7 +221,7 @@ function post (resourceName, params) {
   })
 }
 
-function act (resourceName, resourceId, actionName, params) {
+function act(resourceName, resourceId, actionName, params) {
   return new Promise(function (resolve, reject) {
     axios.post(API_URL + '/' + resourceName + '/' + resourceId + '/act/' + actionName, params).then(
       function (data) {
@@ -234,7 +234,7 @@ function act (resourceName, resourceId, actionName, params) {
   })
 }
 
-function _delete (resourceName, id) {
+function _delete(resourceName, id) {
   return new Promise(function (resolve, reject) {
     axios.delete(API_URL + '/' + resourceName + '/' + id).then(
       function (data) {
@@ -247,7 +247,7 @@ function _delete (resourceName, id) {
   })
 }
 
-function upload (data, url) {
+function upload(data, url) {
   return new Promise(function (resolve, reject) {
     var params = {
       headers: {
@@ -266,7 +266,7 @@ function upload (data, url) {
   })
 }
 
-function download (url, filter) {
+function download(url, filter) {
   return new Promise(function (resolve, reject) {
     var params = {
       headers: {
