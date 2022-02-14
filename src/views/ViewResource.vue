@@ -191,6 +191,9 @@ export default {
 
       return cssClass;
     },
+    emitChange(options) {
+      this.$emit('change', options);
+    },
     edit() {
       this.$router.push("../edit/" + this.resource.id);
     },
