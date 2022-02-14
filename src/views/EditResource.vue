@@ -90,6 +90,7 @@
 
 <script>
 import { mapState } from "vuex";
+import _ from 'lodash';
 
 const rest_resources = {
   profile: "users",
