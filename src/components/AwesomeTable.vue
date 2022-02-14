@@ -576,6 +576,7 @@ import Popper from "@/components/Popper.vue";
 import SvgIcon from "@/components/SvgIcon.vue";
 import { isObject } from "lodash";
 import ActionsMixin from "@/mixins/actions.mixin.js";
+import _ from 'lodash';
 
 export default {
   name: "AwesomeTable",
