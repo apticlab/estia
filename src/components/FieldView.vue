@@ -69,6 +69,9 @@
           :readonly="field.readonly"
         ></resource-survey>
       </span>
+      <span v-if="field.type == 'choices'">
+        <span>{{ value }}</span>
+      </span>
       <div v-if="$viewFields[field.type]">
         <component
           :is="$viewFields[field.type]"
@@ -126,6 +129,17 @@ export default {
             "background-image":
               "url(" + this.deepPick(this.data, fieldName) + ")",
           };
+
+        case "choices":
+          let choice = this.field.choices.find(
+            (val) => this.deepPick(this.data, fieldName) == val.code
+          );
+
+          if (choice) {
+            return choice.value;
+          }
+
+          return null;
 
         case "json":
           return;
