@@ -51,6 +51,9 @@ export default {
 
     Vue.use(VueFormulate, {
       library: {
+        "v-html": {
+          component: 'v-html'
+        },
         "resource-select": {
           component: "resource-select"
         },
