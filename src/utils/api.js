@@ -37,15 +37,9 @@ function setInterceptorToken() {
 setInterceptorToken()
 
 export default function (options) {
-  console.log(ENV);
-  console.log(options);
-  console.log(process.env);
-
   if (options.apiHost) {
-    console.log("From apiHost");
     HOST = options.apiHost ? options.apiHost[ENV] : "";
   } else {
-    console.log("From Process.env");
     if (process.env.VUE_APP_API_HOST) {
       HOST = process.env.VUE_APP_API_HOST;
     }
@@ -70,8 +64,6 @@ export default function (options) {
   BASE_URL = HOST + '/';
   API_URL = HOST + '/api';
   LOGIN_URL = API_URL + "/login";
-
-  console.log('api url', HOST);
 
   if (options.test && options.test.apiTest) {
     return testApi(options.test.resources)

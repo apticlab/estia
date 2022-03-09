@@ -10,14 +10,10 @@ export default {
       return false;
     }
 
-    console.log(value);
-
     try {
       let codiceFiscale = new CodiceFiscale(value);
-      console.log("codice fiscale: ", codiceFiscale);
       return true;
     } catch (e) {
-      console.log(e);
       return false;
     }
   },

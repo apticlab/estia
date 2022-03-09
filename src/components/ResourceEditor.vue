@@ -65,8 +65,6 @@ export default {
       this.rows = null;
       this.rows = rows;
 
-      console.log(rows);
-
       this.$forceUpdate();
     },
   },

@@ -296,7 +296,6 @@ function evaluateCondition (condition, object, reference = null) {
         // !!conditionFieldValue is for ensuring conditionFieldValue is not null or undefined
         conditionIsMet =
           !!conditionFieldValue && conditionFieldValue != conditionValue
-        console.log('conditionIsMet', conditionIsMet)
         break
       case 'IN':
         var conditionValueTokens = []

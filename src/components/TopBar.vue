@@ -65,7 +65,6 @@ export default {
       this.showUserMenu = !this.showUserMenu;
     },
     doUserAction(action) {
-      console.log(action);
       this.showUserMenu = false;
 
       if (this[action.callback] != null) {

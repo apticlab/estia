@@ -74,7 +74,6 @@ export default {
     this.recursivity = [0, 0, 0, 0, 0, 0, 0];
 
     if (this.context.model) {
-      console.log(this.context.model);
       this.recursivity = this.context.model.split(",");
     }
   },

@@ -131,7 +131,6 @@ export default {
           this.fileSrc = reader.result;
           this.isLoading = false;
 
-          console.log(this.file);
           this.$emit("input", this.file);
 
           this.$forceUpdate();

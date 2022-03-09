@@ -27,7 +27,6 @@ export default {
       commit('set_user', user)
     },
     async change_active_account ({ commit }, account_id) {
-      console.log('change_active_account')
       try {
         let response = await this.$api.post('change-account', { 'account_id': account_id })
         commit('set_token', response.token)
@@ -38,7 +37,6 @@ export default {
       }
     },
     async reload_user ({ commit }) {
-      console.log('reload_user')
       try {
         let response = await axios.get('/api/me')
         commit('set_user', response.data)

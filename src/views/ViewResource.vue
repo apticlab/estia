@@ -108,7 +108,6 @@ export default {
           return !action.scopes || action.scopes.includes(this.scope);
         })
         .filter((action) => {
-          console.log(action.visible);
           return this.actionIsVisible(action);
         });
     },
