@@ -26,9 +26,12 @@ import components, {
 import { SideNav as SideNavMixin } from "./mixins";
 import Validators from "./validators";
 
+let $api = null;
+
 export default {
   install(Vue, options) {
-    Vue.prototype.$api = api(options);
+    $api = api(options);
+    Vue.prototype.$api = $api;
     Vue.prototype.EventBus = EventBus;
     Vue.prototype.$theme = theme(options);
     Vue.prototype.$actions = options.actions ? options.actions : {};
@@ -95,5 +98,6 @@ export {
   ViewResource,
   SideNavMixin,
   getProfile,
-  logout
+  logout,
+  $api
 };
