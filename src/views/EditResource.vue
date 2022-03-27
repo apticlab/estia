@@ -74,13 +74,22 @@
             </button>
           </template>
           <template v-else>
-            <p class="text-red-600 text-weigth-600">
-              {{ error }}
-            </p>
-            <button class="ml-auto btn btn-primary" @click="retry()">
-              <i class="mr-2 fas fa-redo-alt" />
-              <span>Riprova</span>
-            </button>
+            <div class="flex flex-row items-center w-full">
+              <button
+                :class="$theme.backButtonClass"
+                class="mr-3 active:outline-none focus:outline-none"
+                @click="back"
+              >
+                Indietro
+              </button>
+              <p class="text-red-600 text-weigth-600">
+                {{ error }}
+              </p>
+              <button class="ml-auto btn btn-primary" @click="retry()">
+                <i class="mr-2 fas fa-redo-alt" />
+                <span>Riprova</span>
+              </button>
+            </div>
           </template>
         </div>
       </div>
@@ -90,7 +99,7 @@
 
 <script>
 import { mapState } from "vuex";
-import _ from 'lodash';
+import _ from "lodash";
 
 const rest_resources = {
   profile: "users",
