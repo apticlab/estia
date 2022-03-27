@@ -1,10 +1,10 @@
 export default {
-  data () {
+  data() {
     return {}
   },
-  mounted () {},
+  mounted() { },
   methods: {
-    actOnRow (event) {
+    actOnRow(event) {
       let action = event.action
       let index = event.index
 
@@ -18,7 +18,7 @@ export default {
         this.$actions[action.callback](this, row)
       }
     },
-    act (action, data = null) {
+    act(action, data = null) {
       if (this[action.callback]) {
         this[action.callback](data)
       }
@@ -27,7 +27,7 @@ export default {
         this.$actions[action.callback](this, data)
       }
     },
-    isActionVisible (action, row) {
+    isActionVisible(action, row) {
       if (!action.visible) {
         return true
       }
@@ -36,7 +36,7 @@ export default {
     }
   },
   computed: {
-    visibleActions () {
+    visibleActions() {
       let actions = this.actions.filter((action) => {
         if (action.multi) {
           return false
@@ -53,7 +53,7 @@ export default {
 
       return actions
     },
-    scopedActions () {
+    scopedActions() {
       let actions = this.actions.filter((action) => {
         if (action.multi) {
           return false
@@ -69,7 +69,7 @@ export default {
 
       return actions
     },
-    multiActions () {
+    multiActions() {
       return this.actions.filter((action) => {
         let roleBasedFilter = !action.roles || action.roles.includes(this.getUserRole())
 
