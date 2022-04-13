@@ -207,7 +207,7 @@
                     :class="header.class"
                     v-if="deepPick(row, header.field, header.type)"
                   >
-                    {{ deepPick(row, header.field, header.type) | size_number }}
+                    {{ deepPick(row, header.field, header.type) }}
                     <span v-if="header.udm" :class="header.udm.class || ''">{{
                       isObject(header.udm)
                         ? deepPick(row, header.udm.code)
