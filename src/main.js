@@ -25,6 +25,7 @@ import components, {
 } from "./components";
 import { SideNav as SideNavMixin } from "./mixins";
 import Validators from "./validators";
+import _ from 'lodash';
 
 let $api = null;
 
@@ -50,7 +51,7 @@ export default {
     editFields(Vue, options);
     modalWidgets(Vue, options);
 
-    Object.keys(helpers).forEach(key => (Vue.prototype[key] = helpers[key]));
+    Object.keys(_.merge(helpers, (options.helpers || {}))).forEach(key => (Vue.prototype[key] = helpers[key]));
 
     Vue.use(VueFormulate, {
       library: {
