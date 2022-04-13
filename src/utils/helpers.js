@@ -1,5 +1,6 @@
-import _ from 'lodash'
-import moment from 'moment'
+import _ from 'lodash';
+import moment from 'moment';
+
 moment.locale('it')
 
 const helpers = {
@@ -21,15 +22,15 @@ const helpers = {
 
 export { helpers }
 
-function getDayWeekNumber (_date) {
+function getDayWeekNumber(_date) {
   return this.moment(_date).day()
 }
 
-function clone (value) {
+function clone(value) {
   return JSON.parse(JSON.stringify(value))
 }
 
-function getNestedField (resource, field) {
+function getNestedField(resource, field) {
   if (!field) {
     return ''
   }
@@ -45,7 +46,7 @@ function getNestedField (resource, field) {
   return resource
 }
 
-function getInfoFromOptions (resource, header, infoType) {
+function getInfoFromOptions(resource, header, infoType) {
   let tagId = getNestedField(resource, header.value)
   let tagField = 'name'
   let currentTag = {}
@@ -73,11 +74,11 @@ function getInfoFromOptions (resource, header, infoType) {
   }
 }
 
-function sleep (ms) {
+function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-function deepFind (obj, path) {
+function deepFind(obj, path) {
   var paths = path.split('.')
   var current = obj
   var i
@@ -96,22 +97,15 @@ function deepFind (obj, path) {
 
   return current
 }
-
-function getColor (colorString) {
-  if (!Array.isArray(colorString)) {
-    colorString = colorString || 'gray-400'
-    let elem = document.querySelector('.color-swatch.bg-' + colorString)
-    return elem != null ? getComputedStyle(elem).backgroundColor : ''
-  }
-
-  return colorString.map((color) => {
-    color = color || 'gray-400'
-    let elem = document.querySelector('.color-swatch.bg-' + color)
-    return elem != null ? getComputedStyle(elem).backgroundColor : ''
-  })
+/**
+ * @ deprecated because the new version of tailwind (v3) doesn't compute colors as they are defined inside ColorSwatch component
+ * so this function dosen't return a correct color
+ */
+function getColor(colorString, v1 = false) {
+  return colorString;
 }
 
-function createRandomArray (min, max, number) {
+function createRandomArray(min, max, number) {
   let array = []
 
   for (var i = 0; i < number; i++) {
@@ -121,7 +115,7 @@ function createRandomArray (min, max, number) {
   return array
 }
 
-function deepPick (object, nestedField) {
+function deepPick(object, nestedField) {
   if (nestedField == '.') {
     return object
   }
@@ -206,7 +200,7 @@ function evaluateCondition(condition, object, reference = null) {
 }
 */
 
-function evaluateCondition (condition, object, reference = null) {
+function evaluateCondition(condition, object, reference = null) {
   const conditionValueDefaults = {
     NULL: null,
     UNDEFINED: undefined,
@@ -362,7 +356,7 @@ function evaluateCondition (condition, object, reference = null) {
   return conditionIsMet
 }
 
-function dateFromConditionValue (dateString) {
+function dateFromConditionValue(dateString) {
   let date = null
 
   switch (dateString) {
@@ -384,13 +378,13 @@ function dateFromConditionValue (dateString) {
   return date
 }
 
-function getVisibleItemsByRole (items, user) {
+function getVisibleItemsByRole(items, user) {
   return items.filter((item) => {
     return !item.roles || item.roles.includes(user.role.code)
   })
 }
 
-function itemIsVisible (item, reference, other = null) {
+function itemIsVisible(item, reference, other = null) {
   if (!item.visible || !Array.isArray(item.visible)) {
     return true
   }
