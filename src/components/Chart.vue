@@ -13,7 +13,7 @@
   </div>
 </template>
 <script>
-//import Chart from "chart.js";
+import Chart from "chart.js";
 
 const typeHasFill = {
   bar: (fill = true) => fill,
@@ -94,7 +94,7 @@ export default {
 
     this.typeConfig = typeConfigs[this.type](this.grid);
 
-    /* this.chart = new Chart(this.ctx, {
+    this.chart = new Chart(this.ctx, {
       type: chartType[this.type] || this.type,
       data: {
         labels: this.labels,
@@ -170,7 +170,7 @@ export default {
           ],
         },
       },
-    }); */
+    });
   },
   methods: {
     loadDataSets(reload = false) {
