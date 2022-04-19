@@ -101,7 +101,7 @@
         "@braid/vue-formulate": "^2.5.3",
         "@popperjs/core": "^2.11.2",
         "axios": "^0.25.0",
-        "chart.js": "^3.7.1",
+        "chart.js": "^2.9.3",
         "codice-fiscale-js": "^2.3.14",
         "colorsys": "^1.0.22",
         "core-js": "^3.21.0",
