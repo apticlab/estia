@@ -420,51 +420,44 @@ export default {
      * condition present in the function
      */
     watchableOptions() {
-      // add the unwatch
-      this.$watch(
-        `dataForm`,
-        (newV, oldV) => {
-          let optionstoCheck = this.visible_headers.filter(
-            (header) => header.type == "dynamicRadio" || header.type == "select"
-          );
+      let optionstoCheck = this.visible_headers.filter(
+        (header) => header.type == "dynamicRadio" || header.type == "select"
+      );
 
-          optionstoCheck.forEach((header) => {
-            let result = null;
-            if (!header.options) {
-              return;
+      optionstoCheck.forEach((header) => {
+        let result = null;
+        if (!header.options) {
+          return;
+        }
+
+        Object.values(header.options)
+          .filter((option) => {
+            // se c'è una condizione da validare viene validata
+            if (!option.visible) {
+              return true;
             }
 
-            Object.values(header.options)
-              .filter((option) => {
-                // se c'è una condizione da validare viene validata
-                if (!option.visible) {
-                  return true;
-                }
+            let isOptionVisible = true;
+            option.visible.forEach((condition) => {
+              isOptionVisible =
+                isOptionVisible &&
+                this.evaluateCondition(condition, this.dataForm);
+            });
+            return isOptionVisible;
+          })
+          .forEach((option) => {
+            if (!result) {
+              result = header.type == "dynamicRadio" ? {} : [];
+            }
 
-                let isOptionVisible = true;
-                option.visible.forEach((condition) => {
-                  isOptionVisible =
-                    isOptionVisible &&
-                    this.evaluateCondition(condition, this.dataForm);
-                });
-                return isOptionVisible;
-              })
-              .forEach((option) => {
-                if (!result) {
-                  result = header.type == "dynamicRadio" ? {} : [];
-                }
-
-                if (header.type == "dynamicRadio") {
-                  result[option.value] = option.name;
-                } else if (header.type == "select") {
-                  result.push(option);
-                }
-              });
-            this.form_options[header.field] = result;
+            if (header.type == "dynamicRadio") {
+              result[option.value] = option.name;
+            } else if (header.type == "select") {
+              result.push(option);
+            }
           });
-        },
-        { deep: true }
-      );
+        this.form_options[header.field] = result;
+      });
     },
     handleBooleanClick(header) {
       let currentValue = this.deepPick(this.dataForm, header.field);
@@ -903,6 +896,7 @@ export default {
     updateOldForm(newForm) {
       this.oldForm = JSON.parse(JSON.stringify(newForm));
 
+      this.watchableOptions();
       // Update form for parent component
       this.$emit("change", this.dataForm);
     },
