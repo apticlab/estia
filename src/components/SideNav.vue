@@ -1,6 +1,17 @@
 <template>
   <div
-    class="fixed left-0 z-20 flex flex-col h-full top-14 sm:top-0 transition-all duration-200 ease-in"
+    class="
+      fixed
+      left-0
+      z-20
+      flex flex-col
+      h-full
+      top-14
+      sm:top-0
+      transition-all
+      duration-200
+      ease-in
+    "
     :class="{
       [bgColor]: true,
       [shadow]: true,
@@ -14,11 +25,19 @@
       <slot name="logo" :is_collapsed="!show_text">
         <div
           v-if="!is_mobile"
-          class="flex flex-col justify-center h-12 pt-3 text-xl font-medium text-center"
+          class="
+            flex flex-col
+            justify-center
+            h-12
+            pt-3
+            text-xl
+            font-medium
+            text-center
+          "
         />
       </slot>
     </template>
-    <div class="flex flex-col flex-grow mt-8">
+    <div class="flex flex-col w-full mt-8">
       <div class="flex flex-col flex-grow-0 pt-0 sm:pt-6">
         <div
           v-for="item in items"
@@ -40,6 +59,9 @@
         </div>
       </div>
     </div>
+    <template>
+      <slot name="general"></slot>
+    </template>
     <div
       v-if="!is_collapsed && version"
       class="py-2 mt-auto text-center text-blue"
