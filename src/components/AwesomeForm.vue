@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div :id="id">
     <loading v-if="loading" />
     <FormulateForm
       v-if="!loading"
@@ -746,6 +746,10 @@ export default {
               }
               break;
             case "fiscal_code":
+              if (!fieldValue) {
+                break;
+              }
+
               if (!this.$validators["fiscal_code"](fieldValue)) {
                 this.form_is_valid = false;
                 validationStatus.valid = false;
@@ -753,6 +757,10 @@ export default {
               }
               break;
             case "vat_number":
+              if (!fieldValue) {
+                break;
+              }
+
               if (!this.$validators["vat_number"](fieldValue)) {
                 this.form_is_valid = false;
                 validationStatus.valid = false;
