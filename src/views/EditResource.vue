@@ -3,10 +3,71 @@
     <loading v-if="loading" class="w-full my-16" />
     <div v-if="!loading" class="w-full mx-auto max-w-screen-xl">
       <div class="">
+        <div
+          class="flex flex-row items-center justify-end w-full"
+          v-if="!hideActions && commandPosition.includes('top')"
+        >
+          <div class="flex flex-row items-baseline mr-auto">
+            <button
+              v-for="action in visibleActions"
+              :key="action.label"
+              :class="'bg-' + action.color"
+              class="
+                px-4
+                ml-3 ml-auto
+                text-white
+                rounded-none
+                outline-none
+                focus:outline-none
+              "
+              @click="act(action)"
+            >
+              <span class="flex flex-row justify-center">
+                <i :class="action.icon" class="mt-1 mr-2 text-md" />
+                <span>{{ action.label }}</span>
+              </span>
+            </button>
+          </div>
+          <template v-if="!error">
+            <button
+              :class="$theme.backButtonClass"
+              class="mr-3 active:outline-none focus:outline-none"
+              @click="back"
+            >
+              Chiudi
+            </button>
+            <button
+              :disabled="!valid"
+              :class="$theme.saveButtonClass"
+              class="transition duration-300 ease-in-out"
+              @click="saveResource()"
+            >
+              {{ button_label }}
+            </button>
+          </template>
+          <template v-else>
+            <div class="flex flex-row items-center w-full">
+              <button
+                :class="$theme.backButtonClass"
+                class="mr-3 active:outline-none focus:outline-none"
+                @click="back"
+              >
+                Indietro
+              </button>
+              <p class="text-red-600 text-weigth-600">
+                {{ error }}
+              </p>
+              <button class="ml-auto btn btn-primary" @click="retry()">
+                <i class="mr-2 fas fa-redo-alt" />
+                <span>Riprova</span>
+              </button>
+            </div>
+          </template>
+        </div>
         <awesome-form
           v-if="!loading"
           :debug="debug"
-          class="py-5"
+          class="pb-5"
           :form.sync="resource"
           :is_edit="is_edit"
           :headers="form_fields"
@@ -33,7 +94,7 @@
         </div>
         <div
           class="flex flex-row items-center justify-end w-full py-5"
-          v-if="!hideActions"
+          v-if="!hideActions && commandPosition.includes('bottom')"
         >
           <div class="flex flex-row items-baseline mr-auto">
             <button
@@ -135,6 +196,12 @@ export default {
     hideActions: {
       required: false,
       default: false,
+    },
+    commandPosition: {
+      required: false,
+      default: () => {
+        return ["bottom"];
+      },
     },
   },
   data() {
