@@ -207,7 +207,7 @@
           <template v-else-if="header.type == 'boolean'">
             <label class="flex custom-label">
               <div
-                id='checkbox-container'
+                id="checkbox-container"
                 class="
                   flex
                   items-center
@@ -229,7 +229,7 @@
                   @input="(value) => updateNested(header.field, value)"
                 />
                 <svg
-                  id='checkbox-check'
+                  id="checkbox-check"
                   :class="!!deepFind(dataForm, header.field) ? '' : 'hidden'"
                   class="w-4 h-4 text-green-600 pointer-events-none"
                   viewBox="0 0 172 172"
@@ -555,7 +555,6 @@ export default {
 
         if (header.type == "boolean") {
           this.updateNested(
-            this.dataForm,
             header.field,
             header.default ? header.default : false
           );
