@@ -4,6 +4,7 @@
     <FormulateForm
       v-if="!loading"
       name="aw-form"
+      :id="id + '-form'"
       class="w-full grid grid-cols-12 gap-x-6"
       :values="dataForm"
     >
@@ -13,6 +14,7 @@
         visible_headers: {{ visible_headers.length }}
       </pre>
       <div
+        :id="'aw-' + header.code.split('.').join('-')"
         v-for="(header, index) in visible_headers"
         :key="index"
         class="relative focus-within:text-blue"
@@ -205,6 +207,7 @@
           <template v-else-if="header.type == 'boolean'">
             <label class="flex custom-label">
               <div
+                id='checkbox-container'
                 class="
                   flex
                   items-center
@@ -226,6 +229,7 @@
                   @input="(value) => updateNested(header.field, value)"
                 />
                 <svg
+                  id='checkbox-check'
                   :class="!!deepFind(dataForm, header.field) ? '' : 'hidden'"
                   class="w-4 h-4 text-green-600 pointer-events-none"
                   viewBox="0 0 172 172"
@@ -326,6 +330,10 @@ import { mapState } from "vuex";
 export default {
   name: "AwesomeForm",
   props: {
+    id: {
+      required: false,
+      default: "aw-form",
+    },
     debug: { required: false, default: false },
     isEdit: { required: false, default: false },
     form: { required: true, default: () => {} },
