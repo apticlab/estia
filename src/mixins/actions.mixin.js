@@ -62,8 +62,10 @@ export default {
         let actionScope = this.actionScope || 'list'
 
         let roleBasedFilter = !action.roles || action.roles.includes(this.getUserRole())
-        let scopeBasedFilter = !action.scopes || action.scopes.includes(actionScope)
-
+        let scopeBasedFilter = true;
+        if (!action.default) {
+          scopeBasedFilter = !action.scopes || action.scopes.includes(actionScope)
+        }
         return roleBasedFilter && scopeBasedFilter
       })
 
