@@ -126,7 +126,7 @@
             </template>
           </v-date-picker>
         </template>
-        <div v-else="">
+        <div v-else>
           <template v-if="header.type == 'form'">
             <awesome-form
               class="px-10 w-12/12"
