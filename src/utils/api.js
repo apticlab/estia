@@ -213,9 +213,10 @@ function post(resourceName, params) {
   })
 }
 
-function act(resourceName, resourceId, actionName, params) {
+function act(resourceName, resourceId, actionName, params, headers) {
   return new Promise(function (resolve, reject) {
-    axios.post(API_URL + '/' + resourceName + '/' + resourceId + '/act/' + actionName, params).then(
+    let url = API_URL + '/' + resourceName + '/' + resourceId + '/act/' + actionName
+    axios.post(url, params, headers).then(
       function (data) {
         resolve(data.data)
       },
