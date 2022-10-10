@@ -1,41 +1,142 @@
 <template>
   <div>
-    <p class="text-lg">
-      Trascina e rilascia
-      <span v-if="type == 'image'">un'immagine</span>
-      <span v-if="type == 'file'">un file</span>
-      nell'area grigia.
-      <br />
-      Oppure clicca al suo interno per caricare direttamente
-      <span v-if="type == 'image'">un'immagine</span>
-      <span v-if="type == 'file'">un file</span>
-      .
-    </p>
+    <div class="flex flex-row items-center">
+      <div
+        class="
+          bg-gray-100
+          p-4
+          flex flex-row
+          items-center
+          justify-center
+          mr-4
+          rounded-full
+        "
+      >
+        <icon name="folder-outline" size="xl" class="text-green-600" />
+      </div>
+      <h2 class="text-green-600 text-2xl font-semibold">Caricamento file</h2>
+    </div>
     <div class="flex items-center justify-center">
       <div
         ref="fileform"
         v-on:click="openFileChooser()"
-        class="mt-8 flex items-center justify-center text-lg h-56 w-full rounded border-2 border-dashed border-gray-light cursor-pointer"
+        class="
+          my-5
+          p-4
+          flex flex-col
+          items-center
+          justify-center
+          text-lg
+          w-full
+          rounded-md
+          border-4 border-dashed border-gray-400
+          cursor-pointer
+        "
         :class="{ 'drag-active': dragActive }"
       >
-        <span class="drop-files text-gray-light" v-if="!isLoading && !file">
-          Trascina qui i file o clicca
-        </span>
-        <span v-if="file && !isLoading">
-          <div class="flex items-center justify-center">
-            <i class="ti-file mr-2"></i>
-            Stai caricando il file <br />
-            {{ file.name }}
+        <template>
+          <slot name="legend" :files="files" :isLoading="isLoading">
+            <div
+              class="
+                mb-6
+                p-4
+                flex flex-row
+                items-center
+                justify-center
+                rounded-full
+              "
+            >
+              <icon
+                name="cloud-upload-outline"
+                size="3xl"
+                class="text-gray-500"
+              />
+            </div>
+            <div
+              class="
+                drop-files
+                text-gray-light
+                flex flex-col
+                justify-center
+                items-center
+              "
+              v-if="!isLoading"
+            >
+              <div
+                class="
+                  flex flex-row
+                  gap-x-4
+                  text-gray-800
+                  font-semibold
+                  text-lg
+                "
+              >
+                <span>.PDF</span>
+                <span>.PNG</span>
+                <span>.JPG</span>
+                <span>.DOC</span>
+              </div>
+              <p class="mt-4 text-gray-600">
+                Puoi anche caricare
+                {{ fileList.length > 0 ? "altri" : "i" }}file
+              </p>
+              <a class="text-blue-500 hover:text-blue-600 underline"
+                >cliccando qui</a
+              >
+            </div>
+          </slot>
+        </template>
+        <div v-if="fileList.length > 0" class="w-full">
+          <h2 class="text-gray-600 text-xl font-semibold">I tuoi file</h2>
+          <div class="grid grid-cols-2 gap-3">
+            <template v-for="(file, index) in fileList">
+              <slot name="name" :file="file" :isLoading="isLoading">
+                <div
+                  :key="'file_' + index"
+                  class="
+                    flex flex-row
+                    items-center
+                    p-2
+                    rounded-lg
+                    border-2 border-gray-200
+                  "
+                >
+                  <div
+                    class="
+                      bg-orange-200
+                      flex
+                      items-center
+                      justify-center
+                      w-12
+                      h-12
+                      rounded-lg
+                      mr-4
+                    "
+                  >
+                    <icon name="document" size="l" class="text-orange-700" />
+                  </div>
+                  <span class="text-black font-semibold">{{ file.name }}</span>
+                  <button
+                    @click.stop="removeFile(index)"
+                    class="ml-auto mr-1 p-2 cursor-pointer"
+                  >
+                    <icon
+                      name="x-outline"
+                      size="m"
+                      class="text-gray-400"
+                    ></icon>
+                  </button>
+                </div>
+              </slot>
+            </template>
           </div>
-        </span>
-        <span v-if="isLoading">
-          Caricamento...
-        </span>
+        </div>
       </div>
       <input
+        multiple
         type="file"
         :accept="extensions.join(',')"
-        style="display:none"
+        style="display: none"
         v-on:change="handleInputChange($event)"
         ref="hiddenInput"
       />
@@ -51,17 +152,16 @@ export default {
       required: false,
       default() {
         return [];
-      }
-    }
+      },
+    },
   },
   data() {
     return {
-      image: "",
-      file: "",
-      fileSrc: "",
+      fileList: [],
+      files: [],
       isLoading: false,
       dragActive: false,
-      dragAndDropCapable: false
+      dragAndDropCapable: false,
     };
   },
   mounted() {
@@ -75,12 +175,12 @@ export default {
         "dragover",
         "dragenter",
         "dragleave",
-        "drop"
+        "drop",
       ].forEach(
-        function(evt) {
+        function (evt) {
           this.$refs.fileform.addEventListener(
             evt,
-            function(e) {
+            function (e) {
               e.preventDefault();
               e.stopPropagation();
             }.bind(this),
@@ -91,21 +191,21 @@ export default {
 
       this.$refs.fileform.addEventListener(
         "dragenter",
-        function() {
+        function () {
           this.dragActive = true;
         }.bind(this)
       );
 
       this.$refs.fileform.addEventListener(
         "dragleave",
-        function() {
+        function () {
           this.dragActive = false;
         }.bind(this)
       );
 
       this.$refs.fileform.addEventListener(
         "drop",
-        function(e) {
+        function (e) {
           // Take only last file
           this.handleInputChange(e);
         }.bind(this)
@@ -113,37 +213,26 @@ export default {
     }
   },
   methods: {
-    handleInputChange: function(evt) {
+    removeFile(index) {
+      this.fileList.splice(index, 1);
+    },
+    handleInputChange: function (evt) {
       if (evt.dataTransfer) {
-        this.file = evt.dataTransfer.files[0];
+        this.fileList.push(...evt.dataTransfer.files);
       } else {
-        this.file = this.$refs.hiddenInput.files[0];
+        this.fileList.push(...this.$refs.hiddenInput.files);
       }
 
-      this.isLoading = true;
-      this.dragActive = false;
+      for (let i = 0; i < this.fileList.length; i++) {
+        this.files[i] = this.fileList[i].name;
+      }
 
-      var reader = new FileReader();
-
-      reader.addEventListener(
-        "load",
-        function() {
-          this.fileSrc = reader.result;
-          this.isLoading = false;
-
-          this.$emit("input", this.file);
-
-          this.$forceUpdate();
-        }.bind(this),
-        false
-      );
-
-      reader.readAsDataURL(this.file);
+      this.$emit("input", this.fileList);
     },
-    openFileChooser: function() {
+    openFileChooser: function () {
       this.$refs.hiddenInput.click();
     },
-    detectDragAndDropCapable: function() {
+    detectDragAndDropCapable: function () {
       var div = document.createElement("div");
 
       return (
@@ -151,23 +240,8 @@ export default {
         "FormData" in window &&
         "FileReader" in window
       );
-    }
+    },
   },
-  computed: {
-    backgroundStyle() {
-      var borderRadius = this.type == "image" ? "50%" : "15px";
-      var backgroundImage =
-        this.type == "image" ? "url(" + this.imageSrc + ")" : "none";
-      var height = this.type == "image" ? "300px" : "300px";
-      var width = this.type == "image" ? "300px" : "450px";
-
-      return {
-        "border-radius": borderRadius,
-        "background-image": backgroundImage,
-        height: height,
-        width: width
-      };
-    }
-  }
+  computed: {},
 };
 </script>
