@@ -14,7 +14,7 @@
         visible_headers: {{ visible_headers.length }}
       </pre>
       <div
-        :id="'aw-' + header.code.split('.').join('-')"
+        :id="'aw-' + getIdName(header, index)"
         v-for="(header, index) in visible_headers"
         :key="index"
         class="relative focus-within:text-blue"
@@ -421,6 +421,12 @@ export default {
   methods: {
     setDirty(field) {
       _.set(this.form_dirty_status, field, true);
+    },
+    getIdName(header) {
+      if (header.type == "fieldset") {
+        return header.label.toLowerCase().split(" ").join("-");
+      }
+      return header.code ? header.code.split(".").join("-") : "";
     },
     /**
      * This function check if option has @ symbol and if it true it checks if the function named
