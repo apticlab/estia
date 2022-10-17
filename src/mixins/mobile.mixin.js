@@ -18,13 +18,13 @@ export default {
     screen() {
       let dimension = 'mobile';
 
-      if (this.windowWidth >= 640) {
+      if (this.windowWidth >= 640 && this.windowWidth < 768) {
         dimension = 'sm';
-      } else if (this.windowWidth >= 768) {
+      } else if (this.windowWidth >= 768 && this.windowWidth < 1024) {
         dimension = 'md';
-      } else if (this.windowWidth >= 1024) {
+      } else if (this.windowWidth >= 1024 && this.windowWidth < 1280) {
         dimension = 'lg';
-      } else if (this.windowWidth >= 1280) {
+      } else if (this.windowWidth >= 1280 && this.windowWidth < 1536) {
         dimension = 'xl';
       } else if (this.windowWidth >= 1536) {
         dimension = '2xl';
