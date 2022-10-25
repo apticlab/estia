@@ -1,6 +1,6 @@
 {
     "name": "@apticlab/estia",
-    "version": "1.3.0",
+    "version": "1.4.1",
     "description": "The easiest way to build site in Vue.",
     "main": "dist/estia.umd.js",
     "module": "dist/estia.esm.js",

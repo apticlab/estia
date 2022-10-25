@@ -76,9 +76,10 @@
                 <span>.JPG</span>
                 <span>.DOC</span>
               </div>
+              <p>(massimo {{ maxFileSize }}MB)</p>
               <p class="mt-4 text-gray-600">
                 Puoi anche caricare
-                {{ fileList.length > 0 ? "altri" : "i" }}file
+                {{ files.length > 0 ? "altri" : "i" }} file
               </p>
               <a class="text-blue-500 hover:text-blue-600 underline"
                 >cliccando qui</a
@@ -86,15 +87,15 @@
             </div>
           </slot>
         </template>
-        <div v-if="fileList.length > 0" class="w-full">
+        <div v-if="files.length > 0" class="w-full">
           <h2 class="text-gray-600 text-xl font-semibold">I tuoi file</h2>
           <div class="grid grid-cols-2 gap-3">
-            <template v-for="(file, index) in fileList">
+            <template v-for="(file, index) in files">
               <slot name="name" :file="file" :isLoading="isLoading">
                 <div
                   :key="'file_' + index"
                   class="
-                    flex flex-row
+                    grid grid-cols-7
                     items-center
                     p-2
                     rounded-lg
@@ -102,23 +103,31 @@
                   "
                 >
                   <div
+                    :class="file.style.background"
                     class="
-                      bg-orange-200
                       flex
                       items-center
                       justify-center
                       w-12
                       h-12
                       rounded-lg
-                      mr-4
+                      col-span-2
                     "
                   >
-                    <icon name="document" size="l" class="text-orange-700" />
+                    <icon name="document" size="xl" :class="file.style.icon" />
                   </div>
-                  <span class="text-black font-semibold">{{ file.name }}</span>
+                  <span
+                    class="
+                      text-black
+                      font-semibold
+                      line-break-anywhere
+                      col-span-4
+                    "
+                    >{{ file.name }}</span
+                  >
                   <button
                     @click.stop="removeFile(index)"
-                    class="ml-auto mr-1 p-2 cursor-pointer"
+                    class="ml-auto mr-1 p-2 cursor-pointer col-span-1"
                   >
                     <icon
                       name="x-outline"
@@ -148,6 +157,8 @@ export default {
   name: "FileUploader",
   props: {
     type: { required: false, default: "file" },
+    maxFileSize: { required: false, default: 1 }, // in mb
+    maxFiles: { required: false, default: 1 },
     extensions: {
       required: false,
       default() {
@@ -157,7 +168,6 @@ export default {
   },
   data() {
     return {
-      fileList: [],
       files: [],
       isLoading: false,
       dragActive: false,
@@ -213,21 +223,47 @@ export default {
     }
   },
   methods: {
+    sum: (prev, curr) => {
+      return (prev += curr.size);
+    },
     removeFile(index) {
-      this.fileList.splice(index, 1);
+      this.files.splice(index, 1);
+      this.$emit("input", this.fileList);
     },
     handleInputChange: function (evt) {
+      let files = [];
       if (evt.dataTransfer) {
-        this.fileList.push(...evt.dataTransfer.files);
+        files = evt.dataTransfer.files;
       } else {
-        this.fileList.push(...this.$refs.hiddenInput.files);
+        files = this.$refs.hiddenInput.files;
       }
 
-      for (let i = 0; i < this.fileList.length; i++) {
-        this.files[i] = this.fileList[i].name;
+      let filesSizeInMB = Array.from(files).reduce(this.sum, 0) / 1000000;
+      let actualeSizeInMB = this.files.reduce(this.sum, 0) / 1000000;
+
+      this.log(filesSizeInMB, actualeSizeInMB);
+
+      if (actualeSizeInMB + filesSizeInMB > this.maxFileSize) {
+        alert(
+          "Il limite massimo per l'upload dei file è di " +
+            this.maxFileSize +
+            " MB"
+        );
+        return;
       }
 
-      this.$emit("input", this.fileList);
+      for (let i = 0; i < files.length; i++) {
+        let length = this.files.length;
+        this.files[length] = {
+          name: files[i].name,
+          style: this.getFileStyle(files[i].name),
+          size: files[i].size,
+          file: files[i],
+        };
+      }
+
+      this.$emit("input", this.files);
+      this.files = [...this.files];
     },
     openFileChooser: function () {
       this.$refs.hiddenInput.click();
@@ -241,7 +277,47 @@ export default {
         "FileReader" in window
       );
     },
+    getFileStyle(filename) {
+      let fileExtension = filename.split(".")[filename.split(".").length - 1];
+      this.log(fileExtension);
+      let style = {
+        icon: "",
+        background: "",
+      };
+
+      switch (fileExtension) {
+        case "doc":
+        case "docx":
+        case "odt":
+        case "application/msword":
+        case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+          style.icon = "text-blue-200";
+          style.background = "bg-blue-700";
+          break;
+        case "jpg":
+        case "jpeg":
+        case "png":
+        case "webp":
+          style.icon = "text-orange-200";
+          style.background = "bg-orange-500";
+          break;
+        case "pdf":
+          style.icon = "text-red-200";
+          style.background = "bg-red-500";
+          break;
+        default:
+          style.icon = "text-gray-200";
+          style.background = "bg-gray-500";
+          break;
+      }
+      return style;
+    },
   },
   computed: {},
 };
 </script>
+<style>
+.line-break-anywhere {
+  line-break: anywhere;
+}
+</style>

@@ -20,18 +20,40 @@
         class="relative focus-within:text-blue"
         :class="formFieldClass(header)"
       >
-        <label :class="getLabelClass(header)" :for="header.field">
-          {{ header.label }}
-          <span
-            v-if="
+        <slot
+          :class="getLabelClass(header)"
+          name="label"
+          :header="header"
+          :isRequired="
+            header.validator
+              ? header.validator.indexOf('required') != -1
+              : false
+          "
+        >
+          <component
+            :header="header"
+            :isRequired="
               header.validator
                 ? header.validator.indexOf('required') != -1
                 : false
             "
-            class="ml-1 font-bold text-orange-600"
-            >*</span
-          >
-        </label>
+            :class="getLabelClass(header)"
+            :is="getLabelComponentName(header.label)"
+            v-if="isLabelComponent(header.label)"
+          />
+          <label :class="getLabelClass(header)" :for="header.field" v-else>
+            {{ header.label }}
+            <span
+              v-if="
+                header.validator
+                  ? header.validator.indexOf('required') != -1
+                  : false
+              "
+              class="ml-1 font-bold text-orange-600"
+              >*</span
+            >
+          </label>
+        </slot>
         <div v-if="$editFields[header.type]" class="w-full">
           <component
             :is="$editFields[header.type]"
@@ -995,6 +1017,25 @@ export default {
           },
           { deep: true }
         );
+      }
+    },
+    isLabelComponent(label) {
+      if (!label) {
+        return false;
+      }
+
+      let firstLetter = label.split("")[0];
+
+      return firstLetter == "_";
+    },
+    getLabelComponentName(label) {
+      if (!label) {
+        return false;
+      }
+
+      let firstLetter = label.split("")[0];
+      if (firstLetter == "_") {
+        return label.substring(1, label.length);
       }
     },
   },

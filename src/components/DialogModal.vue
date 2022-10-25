@@ -145,8 +145,18 @@ export default {
       defaultCancelText: "Annulla",
       defaultConfirmText: "Conferma",
       onConfirm: {},
+      onHide: null,
       theme: {},
+      exitKeyEvent: null,
     };
+  },
+  mounted() {
+    let that = this;
+    this.exitKeyEvent = document.addEventListener("keyup", function (evt) {
+      if (evt.keyCode === 27) {
+        that.hide();
+      }
+    });
   },
   computed: {
     themeTitle() {
@@ -158,6 +168,7 @@ export default {
     Dialog.EventBus.$on("hide", this.hide);
   },
   beforeDestroy() {
+    document.removeEventListener(this.exitKeyEvent);
     Dialog.EventBus.$off("show", this.show);
     Dialog.EventBus.$off("hide", this.hide);
   },
@@ -165,6 +176,10 @@ export default {
     hide() {
       // method for closing modal
       this.log("hide");
+      if (this.onHide) {
+        this.onHide();
+      }
+
       this.visible = false;
     },
     confirm(result) {
@@ -176,6 +191,7 @@ export default {
       this.params = params;
       this.type = params.type;
       this.onConfirm = params.onConfirm;
+      this.onHide = params.onHide;
       this.theme = params.theme;
 
       // making modal visible

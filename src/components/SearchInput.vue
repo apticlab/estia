@@ -74,12 +74,15 @@ export default {
   },
   methods: {
     onInput(value) {
-      if (this.mode == "debounce" && this.inputValue) {
+      if (this.inputValue == "") {
+        this.inputValue = null;
+      }
+      if (this.mode == "debounce") {
         this.debounceInput(this.debounce);
       }
     },
     onEnter() {
-      if (this.mode == "enter" && this.inputValue) {
+      if (this.mode == "enter") {
         this.$emit("input", this.inputValue);
       }
     },

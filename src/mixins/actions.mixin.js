@@ -21,6 +21,7 @@ export default {
     act(action, data = null) {
       if (this[action.callback]) {
         this[action.callback](data)
+        return;
       }
 
       if (this.$actions[action.callback]) {

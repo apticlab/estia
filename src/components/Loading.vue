@@ -61,21 +61,21 @@ export default {
   props: {
     size: {
       type: String,
-      validator: size => {
+      validator: (size) => {
         return ["xs", "s", "m", "l", "xl", "2xl"].includes(size);
       },
-      default: "m"
+      default: "m",
     },
     containerClass: {
       type: String,
       required: false,
-      default: "flex flex-col items-center justify-center flex-grow"
+      default: "flex flex-col items-center justify-center flex-grow",
     },
     fill: {
       type: String,
       required: false,
-      default: 'fill-gray-800'
-    }
+      default: "#ccc",
+    },
   },
   data() {
     return {
@@ -86,9 +86,12 @@ export default {
         m: "64",
         l: "72",
         xl: "96",
-        "2xl": "144"
-      }
+        "2xl": "144",
+      },
     };
-  }
+  },
+  mounted() {
+    this.gradientColor = this.fill;
+  },
 };
 </script>

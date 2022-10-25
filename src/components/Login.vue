@@ -96,6 +96,7 @@
             :submitText="submitText"
             :submitDisabled="submitDisabled"
             :submit="login"
+            :loading="isLoading"
           >
             <button
               :disabled="submitDisabled"
@@ -107,8 +108,7 @@
                 text-white
                 rounded-none
                 outline-none
-                sm:w-32
-                sm:ml-auto
+                sm:w-32 sm:ml-auto
                 text-normal
               "
               :class="{
