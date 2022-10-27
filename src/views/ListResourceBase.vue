@@ -1,40 +1,50 @@
 <template>
   <div class="flex flex-col flex-grow">
     <div v-if="!isLoading" class="w-full">
-      <template v-if='false'>
+      <template>
         <div class="flex flex-row items-baseline py-5">
           <slot name="title" />
-          <div class="flex flex-row ml-auto">
-            <button
-              v-for="(action, index) in multiActions"
-              :key="'lrb_action_' + index"
-              :class="[
-                action.color + ' ' + multiActionClass,
-                multiActions.length > 1 ? 'ml-4' : '',
-              ]"
-              class="outline-none focus:outline-none"
-              @click="act(action)"
-            >
-              <span class="flex flex-row items-center">
-                <icon
-                  :name="action.icon"
-                  color="text-white"
-                  size="m"
-                  class="mr-1"
-                />
-                <span>{{ action.label }}</span>
-              </span>
-            </button>
-          </div>
+          <slot
+            name="actions"
+            :actions="multiActions"
+            :actionClass="multiActionClass"
+          >
+            <div class="flex flex-row ml-auto">
+              <button
+                v-for="(action, index) in multiActions"
+                :key="'lrb_action_' + index"
+                :class="[
+                  action.color + ' ' + multiActionClass,
+                  multiActions.length > 1 ? 'ml-4' : '',
+                ]"
+                class="outline-none focus:outline-none"
+                @click="act(action)"
+              >
+                <span class="flex flex-row items-center">
+                  <icon
+                    :name="action.icon"
+                    color="text-white"
+                    size="m"
+                    class="mr-1"
+                  />
+                  <span>{{ action.label }}</span>
+                </span>
+              </button>
+            </div>
+          </slot>
         </div>
-        <div class="flex flex-row items-center my-3">
-          <search-input
-            v-model="searchQuery"
-            placeholder="Cerca"
-            class="flex-grow"
-            @input="search"
-          />
-        </div>
+        <template>
+          <slot name="search-input">
+            <div class="flex flex-row items-center my-3">
+              <search-input
+                v-model="searchQuery"
+                placeholder="Cerca"
+                class="flex-grow"
+                @input="search"
+              />
+            </div>
+          </slot>
+        </template>
       </template>
       <div class="flex flex-row items-center my-3">
         <slot name="filters" :filter-data="filterData" />
@@ -58,14 +68,14 @@
             v-for="(row, index) in rows"
             :key="'row_' + index"
             class="
-            relative
-            grid grid-cols-12
-            bg-white
-            rounded-[10px]
-            shadow
-            my-5
-            mx-2
-            p-4
+              relative
+              grid grid-cols-12
+              bg-white
+              rounded-[10px]
+              shadow
+              my-5
+              mx-2
+              p-4
             "
             @click="actOnRow"
           >
@@ -73,14 +83,14 @@
               <popper trigger="click">
                 <div
                   class="
-                  popper
-                  shadow-md
-                  bg-white
-                  text-gray-700
-                  rounded
-                  py-1
-                  px-2
-                  w-3/6
+                    popper
+                    shadow-md
+                    bg-white
+                    text-gray-700
+                    rounded
+                    py-1
+                    px-2
+                    w-3/6
                   "
                 >
                   <p
@@ -88,10 +98,10 @@
                     :key="'action_' + i"
                     @click="act(action, row)"
                     class="
-                    text-xl text-black
-                    py-2
-                    pr-10
-                    border-b border-gray-300
+                      text-xl text-black
+                      py-2
+                      pr-10
+                      border-b border-gray-300
                     "
                   >
                     {{ action.label }}
@@ -126,40 +136,40 @@
                 <label class="font-semibold text-green-500">{{
                   header.label
                 }}</label>
-              <p>{{ deepPick(row, header.field) }}</p>
-            </template>
-            <template v-if="header.type == 'pill'">
-              <div class="flex flex-row items-center h-full">
-                <span
-                  class="px-3 py-1 text-xs rounded-lg"
-                  :class="[
-                    getPillBgColor(deepPick(row, header.field.color)),
-                    deepPick(row, header.field.text_color) || 'text-white',
-                  ]"
-                >{{ deepPick(row, header.field.text) }}</span
-              >
-              </div>
-            </template>
+                <p>{{ deepPick(row, header.field) }}</p>
+              </template>
+              <template v-if="header.type == 'pill'">
+                <div class="flex flex-row items-center h-full">
+                  <span
+                    class="px-3 py-1 text-xs rounded-lg"
+                    :class="[
+                      getPillBgColor(deepPick(row, header.field.color)),
+                      deepPick(row, header.field.text_color) || 'text-white',
+                    ]"
+                    >{{ deepPick(row, header.field.text) }}</span
+                  >
+                </div>
+              </template>
+            </div>
           </div>
+        </template>
+        <div v-if="pagination" class="flex flex-row w-full my-3">
+          <t-pagination
+            class="mx-auto"
+            :total-items="pagination.totalItems"
+            :per-page="pagination.perPage"
+            :num-pages="pagination.numPages"
+            :limit="5"
+            :classes="paginationClasses"
+            :value="currentPage"
+            @change="changePage"
+          />
         </div>
-      </template>
-      <div v-if="pagination" class="flex flex-row w-full my-3">
-        <t-pagination
-          class="mx-auto"
-          :total-items="pagination.totalItems"
-          :per-page="pagination.perPage"
-          :num-pages="pagination.numPages"
-          :limit="5"
-          :classes="paginationClasses"
-          :value="currentPage"
-          @change="changePage"
-        />
       </div>
+      <loading v-if="dataLoading" class="flex-grow w-full h-64" />
     </div>
-    <loading v-if="dataLoading" class="flex-grow w-full h-64" />
+    <loading v-if="isLoading" class="flex-grow w-full h-64" />
   </div>
-  <loading v-if="isLoading" class="flex-grow w-full h-64" />
-</div>
 </template>
 <script>
 import ActionsMixin from "@/mixins/actions.mixin.js";
@@ -231,8 +241,10 @@ export default {
   },
   computed: {},
   async mounted() {
-    this.resourceName = this.propsResourceName ||
-      this.$route.params.resource || this.$route.meta.resource;
+    this.resourceName =
+      this.propsResourceName ||
+      this.$route.params.resource ||
+      this.$route.meta.resource;
 
     if (!this.resourceName) {
       return;
