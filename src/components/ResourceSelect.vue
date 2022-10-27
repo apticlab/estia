@@ -76,15 +76,17 @@ export default {
       optionsArray: null,
     };
   },
+  mounted() {},
   beforeMount() {},
   methods: {
     onChange($event) {
-      let newValue = this.options.find((o) => o.id == $event.target.value);
+      let eventValue = $event.target.value;
+      let newValue = this.options.find((o) => o.id == eventValue);
 
-      this.log(this.code);
+      this.log(this.code, eventValue, newValue);
 
       if (this.context) {
-        if(this.select.project) {
+        if (this.select.project) {
           this.context.model = newValue[this.select.project];
         } else {
           this.context.model = newValue;
