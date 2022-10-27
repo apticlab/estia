@@ -30,6 +30,7 @@
       @input="onInput"
       v-on:keyup.enter="onEnter"
       v-model="inputValue"
+      :focus="focus"
     />
     <span
       class="text-xs text-gray-400 cursor-pointer"
@@ -48,6 +49,10 @@ export default {
   props: {
     value: {
       type: String,
+      required: false,
+    },
+    focus: {
+      type: Boolean,
       required: false,
     },
     placeholder: {
@@ -98,5 +103,14 @@ export default {
     },
   },
   computed: {},
+  watch: {
+    focus(newv) {
+      if (newv) {
+        this.$refs.input.focus();
+      } else {
+        this.$refs.input.blur();
+      }
+    },
+  },
 };
 </script>
