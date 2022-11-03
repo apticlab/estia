@@ -191,6 +191,11 @@ export default {
       type: String,
       default: "bg-gray-500 text-white",
     },
+    query: {
+      required: false,
+      type: String,
+      default: null,
+    },
     rowClass: {
       required: false,
       type: String,
@@ -334,6 +339,12 @@ export default {
 
         await this.loadData();
       }
+    },
+  },
+  watch: {
+    query(newV, oldV) {
+      this.searchQuery = newV;
+      this.search();
     },
   },
 };
