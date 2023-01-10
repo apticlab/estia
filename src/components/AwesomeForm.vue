@@ -41,18 +41,27 @@
             :is="getLabelComponentName(header.label)"
             v-if="isLabelComponent(header.label)"
           />
-          <label :class="getLabelClass(header)" :for="header.field" v-else>
-            {{ header.label }}
-            <span
-              v-if="
-                header.validator
-                  ? header.validator.indexOf('required') != -1
-                  : false
-              "
-              class="ml-1 font-bold text-orange-600"
-              >*</span
-            >
-          </label>
+          <div class="flex flex-row items-center" v-else>
+            <label :class="getLabelClass(header)" :for="header.field">
+              {{ isObject(header.label) ? header.label.value : header.label }}
+              <span
+                v-if="
+                  header.validator
+                    ? header.validator.indexOf('required') != -1
+                    : false
+                "
+                class="ml-1 font-bold text-orange-600"
+                >*</span
+              >
+            </label>
+            <icon
+              v-if="header.label.help"
+              name="information-circle"
+              size="l"
+              class="text-gray-400 ml-2 cursor-pointer"
+              :title="header.label.help.value"
+            />
+          </div>
         </slot>
         <div v-if="$editFields[header.type]" class="w-full">
           <component
@@ -643,9 +652,13 @@ export default {
                   fieldValueIsEmpty = _.isEmpty(fieldValue);
                   break;
                 default:
-                  fieldValueIsEmpty = ["", undefined, null, NaN].includes(
-                    fieldValue
-                  );
+                  fieldValueIsEmpty = [
+                    "",
+                    undefined,
+                    null,
+                    NaN,
+                    false,
+                  ].includes(fieldValue);
                   break;
               }
 
@@ -1023,6 +1036,10 @@ export default {
       if (!label) {
         return false;
       }
+      
+      if (_.isObject(label)) {
+        return false;
+      }
 
       let firstLetter = label.split("")[0];
 
@@ -1037,6 +1054,9 @@ export default {
       if (firstLetter == "_") {
         return label.substring(1, label.length);
       }
+    },
+    isObject(value) {
+      return _.isObject(value);
     },
   },
   computed: {
