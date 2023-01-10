@@ -168,7 +168,7 @@ export default {
     Dialog.EventBus.$on("hide", this.hide);
   },
   beforeDestroy() {
-    document.removeEventListener(this.exitKeyEvent);
+    document.removeEventListener("keyup", this.exitKeyEvent);
     Dialog.EventBus.$off("show", this.show);
     Dialog.EventBus.$off("hide", this.hide);
   },
