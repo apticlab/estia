@@ -30,19 +30,19 @@
           </div>
           <template v-if="!error">
             <button
-              :class="$theme.backButtonClass"
-              class="mr-3 active:outline-none focus:outline-none"
-              @click="back"
-            >
-              Chiudi
-            </button>
-            <button
-              :disabled="!valid"
+              :disabled="!valid || saving"
               :class="$theme.saveButtonClass"
-              class="transition duration-300 ease-in-out"
+              class="transition duration-300 ease-in-out flex flex-row"
               @click="saveResource()"
             >
-              {{ button_label }}
+              <span v-if="saving">
+                <loading size="xs" class="flex !flex-row">
+                  <template v-slot:message>
+                    <p class="ml-3">Salvataggio in corso</p></template
+                  >
+                </loading>
+              </span>
+              <span v-else>{{ button_label }}</span>
             </button>
           </template>
           <template v-else>
@@ -126,12 +126,19 @@
               Chiudi
             </button>
             <button
-              :disabled="!valid"
+              :disabled="!valid || saving"
               :class="$theme.saveButtonClass"
-              class="transition duration-300 ease-in-out"
+              class="transition duration-300 ease-in-out flex flex-row"
               @click="saveResource()"
             >
-              {{ button_label }}
+              <span v-if="saving">
+                <loading size="xs" class="flex !flex-row">
+                  <template v-slot:message>
+                    <p class="ml-3">Salvataggio in corso</p></template
+                  >
+                </loading>
+              </span>
+              <span v-else>{{ button_label }}</span>
             </button>
           </template>
           <template v-else>
@@ -210,6 +217,7 @@ export default {
       changedResource: {},
       error: null,
       loading: true,
+      saving: false,
       resource: {},
       resource_rest_name: null,
       resource_name: null,
@@ -255,6 +263,7 @@ export default {
   },
   methods: {
     async saveResource() {
+      this.saving = true;
       this.resourceErrors = null;
       let resource_name = this.resource_rest_name || this.resource_name;
 
@@ -276,9 +285,8 @@ export default {
         }
 
         this.$router.back();
+        this.saving = false;
       } catch (err) {
-        console.log(err);
-
         if (err.errors) {
           this.resourceErrors = [];
 
@@ -289,6 +297,8 @@ export default {
 
           return;
         }
+
+        this.saving = false;
 
         switch (err.message) {
           case "The given data was invalid.":
