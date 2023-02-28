@@ -7,15 +7,17 @@ export default {
     actOnRow(event) {
       let action = event.action
       let index = event.index
-
+      
       if (this[action.callback]) {
         let row = this.rows[index]
-        this[action.callback](row)
+        this[action.callback](row);
+        return;
       }
 
       if (this.$actions[action.callback]) {
         let row = this.rows[index]
-        this.$actions[action.callback](this, row)
+        this.$actions[action.callback](this, row);
+        return;
       }
     },
     act(action, data = null) {
