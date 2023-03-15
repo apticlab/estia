@@ -12,14 +12,7 @@
               v-for="action in visibleActions"
               :key="action.label"
               :class="'bg-' + action.color"
-              class="
-                px-4
-                ml-3 ml-auto
-                text-white
-                rounded-none
-                outline-none
-                focus:outline-none
-              "
+              class="px-4 ml-3 ml-auto text-white rounded-none outline-none focus:outline-none"
               @click="act(action)"
             >
               <span class="flex flex-row justify-center">
@@ -101,14 +94,7 @@
               v-for="action in visibleActions"
               :key="action.label"
               :class="'bg-' + action.color"
-              class="
-                px-4
-                ml-3 ml-auto
-                text-white
-                rounded-none
-                outline-none
-                focus:outline-none
-              "
+              class="px-4 ml-3 ml-auto text-white rounded-none outline-none focus:outline-none"
               @click="act(action)"
             >
               <span class="flex flex-row justify-center">
@@ -210,6 +196,10 @@ export default {
         return ["bottom"];
       },
     },
+    event: {
+      required: false,
+      default: false,
+    },
   },
   data() {
     return {
@@ -279,7 +269,7 @@ export default {
           await this.$api.create(resource_name, resource);
         }
 
-        if (!this.routerBased) {
+        if (this.event) {
           this.$emit("save", true);
           return;
         }

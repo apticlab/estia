@@ -4,14 +4,7 @@
       <icon
         name="x"
         size="l"
-        class="
-          absolute
-          top-[10px]
-          right-[10px]
-          text-white
-          z-[60]
-          cursor-pointer
-        "
+        class="absolute top-[10px] right-[10px] text-white z-[60] cursor-pointer"
         @click="hide()"
       />
       <div
@@ -59,14 +52,7 @@
                 ? 'h-full w-full'
                 : 'h-auto my-10 overflow-y-auto sm:w-8/12'
             "
-            class="
-              flex flex-col
-              p-5
-              bg-white
-              rounded-none
-              shadow-2xl
-              sm:rounded-lg
-            "
+            class="flex flex-col p-5 bg-white rounded-none shadow-2xl sm:rounded-lg"
           >
             <div class="flex-grow p-4">
               <div class="flex flex-col items-baseline mb-4">
@@ -81,6 +67,7 @@
                   :prop-resource-name="params.resource"
                   :prop-resource-id="params.resourceId"
                   :prop-resource-value="params.values"
+                  :event="true"
                   class="w-full h-auto"
                   @save="confirm()"
                   @close="hide()"
@@ -89,15 +76,7 @@
             </div>
             <div
               v-if="!type"
-              class="
-                flex flex-row
-                items-center
-                justify-between
-                px-4
-                py-3
-                bg-gray-100
-                sm:justify-end
-              "
+              class="flex flex-row items-center justify-between px-4 py-3 bg-gray-100 sm:justify-end"
             >
               <button
                 class="px-3 py-2 ml-0 mr-3 text-blue sm:ml-auto no-outline"
@@ -106,15 +85,7 @@
                 {{ params.cancelText || defaultCancelText }}
               </button>
               <button
-                class="
-                  px-3
-                  py-2
-                  text-white
-                  rounded-none
-                  bg-blue
-                  tx-bold
-                  focus:outline-none
-                "
+                class="px-3 py-2 text-white rounded-none bg-blue tx-bold focus:outline-none"
                 @click="confirm(true)"
               >
                 {{ params.confirmText || defaultConfirmText }}
