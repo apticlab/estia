@@ -9,7 +9,7 @@
   </component>
 </template>
 <script>
-import Popper from "popper.js";
+import { popper as Popper } from "@popperjs/core";
 
 function on(element, event, handler) {
   if (element && event && handler) {
@@ -31,36 +31,36 @@ export default {
   props: {
     toggler: {
       type: Boolean,
-      default: false
+      default: false,
     },
     tagName: {
       type: String,
-      default: "span"
+      default: "span",
     },
     trigger: {
       type: String,
       default: "hover",
-      validator: value =>
+      validator: (value) =>
         [
           "clickToOpen",
           "click", // Same as clickToToggle, provided for backwards compatibility.
           "clickToToggle",
           "hover",
           "toggler",
-          "focus"
-        ].indexOf(value) > -1
+          "focus",
+        ].indexOf(value) > -1,
     },
     delayOnMouseOver: {
       type: Number,
-      default: 10
+      default: 10,
     },
     delayOnMouseOut: {
       type: Number,
-      default: 10
+      default: 10,
     },
     disabled: {
       type: Boolean,
-      default: false
+      default: false,
     },
     content: String,
     enterActiveClass: String,
@@ -69,41 +69,41 @@ export default {
     reference: {},
     forceShow: {
       type: Boolean,
-      default: false
+      default: false,
     },
     dataValue: {
-      default: null
+      default: null,
     },
     appendToBody: {
       type: Boolean,
-      default: false
+      default: false,
     },
     visibleArrow: {
       type: Boolean,
-      default: true
+      default: true,
     },
     transition: {
       type: String,
-      default: ""
+      default: "",
     },
     stopPropagation: {
       type: Boolean,
-      default: false
+      default: false,
     },
     preventDefault: {
       type: Boolean,
-      default: false
+      default: false,
     },
     options: {
       type: Object,
       default() {
         return {};
-      }
+      },
     },
     rootClass: {
       type: String,
-      default: ""
-    }
+      default: "",
+    },
   },
 
   data() {
@@ -115,9 +115,9 @@ export default {
       popperOptions: {
         placement: "bottom",
         computeStyle: {
-          gpuAcceleration: false
-        }
-      }
+          gpuAcceleration: false,
+        },
+      },
     };
   },
 
@@ -141,7 +141,7 @@ export default {
       handler(value) {
         this[value ? "doShow" : "doClose"]();
       },
-      immediate: true
+      immediate: true,
     },
 
     toggler(value) {
@@ -154,7 +154,7 @@ export default {
       if (value) {
         this.showPopper = false;
       }
-    }
+    },
   },
 
   created() {
@@ -267,7 +267,8 @@ export default {
               {},
               this.popperOptions.modifiers.preventOverflow
             );
-            this.popperOptions.modifiers.preventOverflow.boundariesElement = boundariesElement;
+            this.popperOptions.modifiers.preventOverflow.boundariesElement =
+              boundariesElement;
           }
         }
 
@@ -357,8 +358,8 @@ export default {
       }
 
       return false;
-    }
-  }
+    },
+  },
 };
 </script>
 <style>
