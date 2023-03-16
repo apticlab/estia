@@ -41,7 +41,7 @@
             :is="getLabelComponentName(header.label)"
             v-if="isLabelComponent(header.label)"
           />
-          <div class="flex flex-row items-center" v-else>
+          <div class="flex flex-row items-center" v-else-if="header.label">
             <label :class="getLabelClass(header)" :for="header.field">
               {{ isObject(header.label) ? header.label.value : header.label }}
               <span
@@ -63,6 +63,7 @@
             />
           </div>
         </slot>
+
         <div v-if="$editFields[header.type]" class="w-full">
           <component
             :is="$editFields[header.type]"
@@ -71,6 +72,7 @@
             :header="header"
             :form-data="dataForm"
             :value="deepPick(dataForm, header.field)"
+            :labelClass="getLabelClass(header)"
             @change="($event) => updateNested(header.field, $event)"
           />
         </div>
@@ -102,17 +104,7 @@
               @click="handleBooleanClick(header)"
             >
               <div
-                class="
-                  flex
-                  items-center
-                  justify-center
-                  w-6
-                  h-6
-                  p-1
-                  mr-2
-                  bg-white
-                  shadow
-                "
+                class="flex items-center justify-center w-6 h-6 p-1 mr-2 bg-white shadow"
               >
                 <svg
                   :class="!!deepPick(dataForm, header.field) ? '' : 'hidden'"
@@ -222,14 +214,7 @@
                 @input="(value) => updateNested(header.field, value)"
               />
               <div
-                class="
-                  flex
-                  items-center
-                  bg-gray-200
-                  border border-l-0 border-gray-300
-                  rounded rounded-l-none
-                  border-l-none
-                "
+                class="flex items-center bg-gray-200 border border-l-0 border-gray-300 rounded rounded-l-none border-l-none"
               >
                 <span class="px-3 text-gray-600">{{ header.udm }}</span>
               </div>
@@ -239,17 +224,7 @@
             <label class="flex custom-label">
               <div
                 id="checkbox-container"
-                class="
-                  flex
-                  items-center
-                  justify-center
-                  w-6
-                  h-6
-                  p-1
-                  mr-2
-                  bg-white
-                  shadow
-                "
+                class="flex items-center justify-center w-6 h-6 p-1 mr-2 bg-white shadow"
               >
                 <FormulateInput
                   :id="header.field"
@@ -836,6 +811,12 @@ export default {
               }
               break;
             default:
+              let { valid, message } = this.$validators[ruleCode](fieldValue);
+              if (!valid) {
+                this.form_is_valid = false;
+                validationStatus.valid = false;
+                validationStatus.errors.push(message);
+              }
               break;
           }
         });
@@ -999,8 +980,13 @@ export default {
         formFieldClass +=
           " border border-rounded-sm border-dotted border-gray-light";
       } else {
-        formFieldClass +=
-          " mb-3 col-span-" + (header.colSpan || header.col_span || minColSpan);
+        let colSpan = header.colSpan || header.col_span || minColSpan;
+
+        if (colSpan) {
+          formFieldClass += ` col-span-${colSpan}`;
+        }
+
+        formFieldClass += " mb-3 " + header.class;
         formFieldClass += " row-span-" + (header.rowSpan || 1);
       }
 
@@ -1036,7 +1022,7 @@ export default {
       if (!label) {
         return false;
       }
-      
+
       if (_.isObject(label)) {
         return false;
       }
