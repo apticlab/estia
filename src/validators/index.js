@@ -29,5 +29,5 @@ export default {
   },
   max(value, max) {
     return value < max
-  }
+  },
 };

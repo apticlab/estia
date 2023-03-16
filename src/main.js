@@ -39,7 +39,7 @@ export default {
     Vue.prototype.$moment = moment;
     Vue.prototype.$roleLookup = options.roleLookup;
     Vue.prototype.$icon = options.icon || "heroicons";
-    Vue.prototype.$validators = Validators;
+    Vue.prototype.$validators = _.merge(Validators, options.validators);
 
     components(Vue);
     mixins(Vue);
