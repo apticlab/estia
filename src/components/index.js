@@ -21,7 +21,6 @@ import RecursivityPicker from '@/components/RecursivityPicker.vue'
 import RecursivityView from '@/components/RecursivityView.vue'
 import EditResource from '@/views/EditResource.vue'
 import ListResourceBase from '@/views/ListResourceBase.vue'
-import ResourceJson from '@/components/ResourceJson.vue'
 import FileUploader from '@/components/FileUploader.vue'
 import Login from '@/components/Login.vue'
 import Popper from '@/components/Popper.vue'
@@ -58,7 +57,6 @@ export default function (Vue) {
   Vue.component('recursivity-picker', RecursivityPicker)
   Vue.component('recursivity-view', RecursivityView)
   Vue.component('resource-edit', EditResource)
-  Vue.component('resource-json', ResourceJson)
   Vue.component('resource-image-uploader', ImageUploader)
   Vue.component('file-uploader', FileUploader)
   Vue.component('side-nav', SideNav)
