@@ -1,14 +1,14 @@
-FROM node:12-alpine
+FROM node:16-alpine
 
-RUN apk add --no-cache git
+RUN apk add --no-cache g++ make python2
 
 WORKDIR /app
 
-EXPOSE 8080
-
-#COPY ./package.json *yarn* ./
-#RUN yarn install
+COPY ./package.json *yarn* ./
+RUN yarn install
 
 COPY . /app
 
-CMD ["sh", "-c", "yarn install; yarn serve"]
+USER node
+
+CMD ["sh", "-c", "yarn build"]

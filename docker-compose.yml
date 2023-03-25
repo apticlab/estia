@@ -8,8 +8,6 @@ services:
       - ./:/app
     networks:
       - default
-    ports:
-      - 8080:80
 
 networks:
   default:
