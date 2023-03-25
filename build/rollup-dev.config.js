@@ -34,10 +34,7 @@ export default {
         'popper.js': 'popper.js',
         vuex: 'vuex',
         'vue2-timepicker': 'vue2-timepicker',
-        'vue-prism-editor': 'vue-prism-editor',
-        'survey-vue': 'survey-vue',
         jquery: 'jquery',
-        'surveyjs-widgets': 'surveyjs-widgets'
       },
       sourcemap: false
     }

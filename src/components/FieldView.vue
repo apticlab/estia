@@ -63,12 +63,6 @@
         ></resource-editor>
       </span>
       <span v-if="field.type == 'fieldset'"></span>
-      <span v-if="field.type == 'survey'">
-        <resource-survey
-          :context="{ model: value, type: 'survey' }"
-          :readonly="field.readonly"
-        ></resource-survey>
-      </span>
       <span v-if="field.type == 'choices'">
         <span>{{ value }}</span>
       </span>
