@@ -7,8 +7,11 @@
  ```
  git rebase master
  ```
+2. Builda la nuova versione facendo partire il container di docker che si occuperà in autonomia di tutto il processo di build `docker-compose up -d --build`. Questo comando creerà i nuovi file di build.
 
-1. Mergiare le commit della modifica effettuata nel master usando l'opzione `--squash`
+3. Commita i nuovi file di build con `git commit -m "new build files"`
+
+4. Mergiare le commit della modifica effettuata nel master usando l'opzione `--squash`
 
  ```
  git checkout master
@@ -23,7 +26,4 @@
   ```
   npm version {patch|minor|major} --force
   ```
-
-  Grazie al comando `preversion` contenuto nel `package.json`, questo comando assicura che venga fatto il build e vengano aggiunti i nuovi file allo stege di git.
-
   Questo comando crea inoltre un tag su git con la nuova versione.
