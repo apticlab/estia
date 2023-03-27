@@ -16,13 +16,18 @@ function setInterceptorToken() {
       if (authToken == null) {
         // Send to login!
       } else {
-        config.headers.common['Authorization'] = 'Bearer ' + authToken
-        axios.defaults.headers.common['Authorization'] = 'Bearer ' + authToken
+        config.headers = {
+          'Authorization': 'Bearer ' + authToken
+        }
+
+        axios.defaults.headers = {
+          'Authorization': 'Bearer ' + authToken
+        }
 
         if (hasActiveRole()) {
-          axios.defaults.headers.common['activerole'] = getActiveRole()
+          axios.defaults.headers['activerole'] = getActiveRole()
         } else {
-          delete axios.defaults.headers.common['activerole']
+          delete axios.defaults.headers['activerole']
         }
       }
 
@@ -102,8 +107,7 @@ async function login(username, password) {
 
   localStorage.setItem("token", data.token);
 
-  axios.defaults.headers.common["Authorization"] =
-    "Bearer " + data.token;
+  axios.defaults.headers["Authorization"] = "Bearer " + data.token;
 
   setProfile(data.user);
 

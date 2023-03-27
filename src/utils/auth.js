@@ -96,8 +96,8 @@ function logout() {
   localStorage.removeItem("user");
   localStorage.removeItem("activeRole");
 
-  axios.defaults.headers.common["Authorization"] = null;
-  delete axios.defaults.headers.common["activerole"];
+  axios.defaults.headers["Authorization"] = null;
+  delete axios.defaults.headers["activerole"];
 }
 
 

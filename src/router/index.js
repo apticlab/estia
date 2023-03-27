@@ -91,7 +91,7 @@ export default function (options) {
           next(false)
         }
       } else {
-      // If no roles are provided, simply let the user in
+        // If no roles are provided, simply let the user in
         next()
       }
     } else {
@@ -136,12 +136,23 @@ export default function (options) {
 
   router.addRoutes(routes)
 
-  axios.interceptors.response.use(undefined, function (err) {
+  /*  axios.interceptors.response.use(undefined, function (err) {
+     if (err.response.status === 401) {
+       router.push('/login')
+       return Promise.reject(err)
+     }
+ 
+     return Promise.reject(err)
+   }) */
+
+  axios.interceptors.response.use(function (response) {
+    return response;
+  }, function (err) {
     if (err.response.status === 401) {
       router.push('/login')
       return Promise.reject(err)
     }
 
     return Promise.reject(err)
-  })
+  });
 }
