@@ -1,6 +1,5 @@
 <template>
   <div
-    :style="{ 'background-image': bgImage }"
     :class="{
       [bgColor]: true,
     }"
