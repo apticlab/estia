@@ -39,14 +39,14 @@
     </template>
     <div class="flex flex-col w-full mt-8">
       <div class="flex flex-col flex-grow-0 pt-0 sm:pt-6">
-        <div
+        <router-link
           v-for="item in items"
           :key="item.meta.label"
           class="nav-link"
           :class="{
             selected: linkIsCurrentLink(item),
           }"
-          @click="navigateTo(item)"
+          :to="item.path"
         >
           <slot
             name="nav-item"
@@ -56,7 +56,7 @@
           >
             {{ item.meta.label }}
           </slot>
-        </div>
+        </router-link>
       </div>
     </div>
     <template>
