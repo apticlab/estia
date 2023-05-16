@@ -93,6 +93,12 @@
             @input="($event) => updateNested(header.field, $event.target.value)"
           />
           <input
+            v-if="header.type == 'password'"
+            type="password"
+            :value="deepPick(dataForm, header.field)"
+            @input="($event) => updateNested(header.field, $event.target.value)"
+          />
+          <input
             v-if="header.type == 'number'"
             type="number"
             :value="deepPick(dataForm, header.field)"
