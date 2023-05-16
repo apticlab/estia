@@ -60,13 +60,7 @@
                 >
                   <img
                     :src="deepPick(row, header.fields.image)"
-                    class="
-                      w-12
-                      h-12
-                      mr-4
-                      bg-gray-400 bg-no-repeat bg-auto
-                      rounded-full
-                    "
+                    class="w-12 h-12 mr-4 bg-gray-400 bg-no-repeat bg-auto rounded-full"
                   />
                   <div class="flex flex-col">
                     <div class="flex flex-row items-center mb-1">
@@ -109,13 +103,7 @@
                 >
                   <img
                     :src="getImage(row, header.field)"
-                    class="
-                      object-cover
-                      w-10
-                      h-10
-                      bg-gray-400 bg-no-repeat bg-auto
-                      rounded-lg
-                    "
+                    class="object-cover w-10 h-10 bg-gray-400 bg-no-repeat bg-auto rounded-lg"
                   />
                 </div>
 
@@ -154,12 +142,12 @@
                   v-if="header.type == 'date'"
                   class="flex flex-row items-center"
                 >
-                  <span v-if='deepPick(row, header.field)' class>{{
+                  <span v-if="deepPick(row, header.field)" class>{{
                     deepPick(row, header.field) | date(header.dateFormat)
                   }}</span>
-                <span v-else class="text-gray-400 italic">
-                  {{ header.on_empty }}
-                </span>
+                  <span v-else class="text-gray-400 italic">
+                    {{ header.on_empty }}
+                  </span>
                 </div>
 
                 <div
@@ -292,13 +280,7 @@
 
                 <div
                   v-if="header.type == 'friendship'"
-                  class="
-                    flex flex-row
-                    justify-center
-                    h-full
-                    w-full
-                    items-center
-                  "
+                  class="flex flex-row justify-center h-full w-full items-center"
                 >
                   <span
                     class="rounded-full h-5 w-5"
@@ -312,13 +294,7 @@
 
                 <div
                   v-if="header.type == 'boolean'"
-                  class="
-                    flex flex-row
-                    justify-center
-                    h-full
-                    w-full
-                    items-center
-                  "
+                  class="flex flex-row justify-center h-full w-full items-center"
                 >
                   <span
                     class="rounded-full h-5 w-5"
@@ -378,14 +354,7 @@
                   class="h-full flex flex-col items-end"
                 >
                   <div
-                    class="
-                      flex-grow flex flex-row
-                      justify-center
-                      items-center
-                      transition-all
-                      duration-75
-                      ease-in
-                    "
+                    class="flex-grow flex flex-row justify-center items-center transition-all duration-75 ease-in"
                   />
                 </div>
               </div>
@@ -406,46 +375,32 @@
                     trigger="hover"
                   >
                     <div
-                      class="
-                        popper
-                        shadow-md
-                        bg-white
-                        text-gray-700
-                        rounded
-                        py-1
-                        px-2
-                      "
+                      class="popper shadow-md bg-white text-gray-700 rounded py-1 px-2"
                     >
                       {{ action.label }}
                     </div>
-                    <icon
+                    <span
                       slot="reference"
-                      :name="action.icon"
-                      :class="action.class"
-                      :size="action.size || $theme.aw_table.actionDefaultSize"
-                      :color="
-                        action.color || $theme.aw_table.actionDefaultColor
-                      "
-                      class="mr-1 focus:outline-none p-1"
-                      :stop-propagation="true"
-                      @click="actOnRow(action, index)"
-                    />
+                    >
+                      <icon
+                        slot="reference"
+                        :name="action.icon"
+                        :class="action.class"
+                        :size="action.size || $theme.aw_table.actionDefaultSize"
+                        :color="
+                          action.color || $theme.aw_table.actionDefaultColor
+                        "
+                        class="mr-1 focus:outline-none p-1"
+                        :stop-propagation="true"
+                        @click="actOnRow(action, index)"
+                      />
+                    </span>
                   </popper>
                 </template>
               </div>
               <div v-else class="flex flex-row items-center justify-center">
                 <div
-                  class="
-                    rounded-full
-                    h-6
-                    w-6
-                    flex flex-row
-                    items-center
-                    justify-center
-                    hover:bg-gray-700
-                    text-white
-                    border-2 border-gray-700
-                  "
+                  class="rounded-full h-6 w-6 flex flex-row items-center justify-center hover:bg-gray-700 text-white border-2 border-gray-700"
                   :class="isSelected(row) ? 'bg-gray-700 tx-white' : 'bg-white'"
                   @click="selectRow(row)"
                 >
@@ -469,29 +424,14 @@
                   <div class="ml-auto">
                     <button
                       v-show="mode == 'edit'"
-                      class="
-                        btn
-                        bg-transparent
-                        text-gray-600
-                        mr-3
-                        active:outline-none
-                        focus:outline-none
-                        hover:text-gray-800
-                      "
+                      class="btn bg-transparent text-gray-600 mr-3 active:outline-none focus:outline-none hover:text-gray-800"
                       @click="cancelCreation()"
                     >
                       Annulla
                     </button>
                     <button
                       :disabled="!resourceToEditValid"
-                      class="
-                        bg-blue
-                        text-white
-                        disabled:bg-gray-light
-                        disabled:text-gray
-                        disabled:cursor-not-allowed
-                        focus:outline-none
-                      "
+                      class="bg-blue text-white disabled:bg-gray-light disabled:text-gray disabled:cursor-not-allowed focus:outline-none"
                       @click="createNew()"
                     >
                       {{ mode == "edit" ? "Salva" : "Aggiungi" }}
@@ -517,29 +457,14 @@
               <div class="flex flex-row w-full mt-5">
                 <div class="ml-auto">
                   <button
-                    class="
-                      btn
-                      bg-transparent
-                      text-gray-600
-                      mr-3
-                      active:outline-none
-                      focus:outline-none
-                      hover:text-gray-800
-                    "
+                    class="btn bg-transparent text-gray-600 mr-3 active:outline-none focus:outline-none hover:text-gray-800"
                     @click="cancelCreation()"
                   >
                     Annulla
                   </button>
                   <button
                     :disabled="!resourceToEditValid"
-                    class="
-                      bg-blue
-                      text-white
-                      disabled:bg-gray-light
-                      disabled:text-gray
-                      disabled:cursor-not-allowed
-                      focus:outline-none
-                    "
+                    class="bg-blue text-white disabled:bg-gray-light disabled:text-gray disabled:cursor-not-allowed focus:outline-none"
                     @click="createNew()"
                   >
                     {{ mode == "edit" ? "Salva" : "Aggiungi" }}
@@ -553,14 +478,7 @@
           <td :colspan="headers.length + 2">
             <slot name="no-data">
               <div
-                class="
-                  text-center text-gray
-                  font-bold
-                  text-md
-                  font-semibold
-                  bg-white
-                  py-5
-                "
+                class="text-center text-gray text-md font-semibold bg-white py-5"
               >
                 Nessuna riga da mostrare
               </div>
@@ -576,7 +494,7 @@ import Popper from "@/components/Popper.vue";
 import SvgIcon from "@/components/SvgIcon.vue";
 import { isObject } from "lodash";
 import ActionsMixin from "@/mixins/actions.mixin.js";
-import _ from 'lodash';
+import _ from "lodash";
 
 export default {
   name: "AwesomeTable",
