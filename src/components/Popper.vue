@@ -8,9 +8,8 @@
     <slot name="reference" />
   </component>
 </template>
+  
 <script>
-import { popper as Popper } from "@popperjs/core";
-
 function on(element, event, handler) {
   if (element && event && handler) {
     document.addEventListener
@@ -26,6 +25,8 @@ function off(element, event, handler) {
       : element.detachEvent("on" + event, handler);
   }
 }
+
+import { createPopper } from "@popperjs/core";
 
 export default {
   props: {
@@ -125,14 +126,8 @@ export default {
     showPopper(value) {
       if (value) {
         this.$emit("show", this);
-        if (this.popperJS) {
-          this.popperJS.enableEventListeners();
-        }
         this.updatePopper();
       } else {
-        if (this.popperJS) {
-          this.popperJS.disableEventListeners();
-        }
         this.$emit("hide", this);
       }
     },
@@ -277,11 +272,13 @@ export default {
           this.$nextTick(this.updatePopper);
         };
 
-        this.popperJS = new Popper(
+        this.popperJS = new createPopper(
           this.referenceElm,
           this.popper,
           this.popperOptions
         );
+
+        this.log(this.popperJS);
       });
     },
 
@@ -362,7 +359,9 @@ export default {
   },
 };
 </script>
-<style>
+
+
+  <style>
 .popper {
   width: auto;
   display: inline-block;
