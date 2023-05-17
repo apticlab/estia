@@ -1,14 +1,10 @@
-FROM node:16-alpine
+FROM node:16.13.0
 
-RUN apk add --no-cache g++ make python2
+RUN apt update
+RUN apt install git python build-essential -y
+RUN npm install -g npm@9.6.6
 
 WORKDIR /app
-
-COPY ./package.json *yarn* ./
-RUN yarn install
-
 COPY . /app
 
-USER node
-
-CMD ["sh", "-c", "yarn build"]
+CMD [ "sh", "-c", "yarn install; yarn build" ]

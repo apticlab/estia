@@ -8,6 +8,5 @@ services:
       - ./:/app
     networks:
       - default
-
 networks:
   default:
