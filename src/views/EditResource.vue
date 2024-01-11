@@ -2,7 +2,7 @@
   <div class="flex flex-col items-center overflow-hidden rounded align-center">
     <loading v-if="loading" class="w-full my-16" />
     <div v-if="!loading" class="w-full mx-auto max-w-screen-xl">
-      <div class="">
+      <div :class="[commandPosition.includes('float') ? 'pb-20' : '']">
         <div
           class="flex flex-row items-center justify-end w-full"
           v-if="!hideActions && commandPosition.includes('top')"
@@ -85,67 +85,72 @@
             </li>
           </ol>
         </div>
-        <div
-          class="flex flex-row items-center justify-end w-full py-5"
-          v-if="!hideActions && commandPosition.includes('bottom')"
-        >
-          <div class="flex flex-row items-baseline mr-auto">
-            <button
-              v-for="action in visibleActions"
-              :key="action.label"
-              :class="'bg-' + action.color"
-              class="px-4 ml-3 ml-auto text-white rounded-none outline-none focus:outline-none"
-              @click="act(action)"
-            >
-              <span class="flex flex-row justify-center">
-                <i :class="action.icon" class="mt-1 mr-2 text-md" />
-                <span>{{ action.label }}</span>
-              </span>
-            </button>
-          </div>
-          <template v-if="!error">
+      </div>
+      <div
+        class="flex flex-row items-center justify-end w-full py-5"
+        :class="[
+          commandPosition.includes('float')
+            ? 'fixed bottom-0 left-0 right-0  px-10 bg-gray-100'
+            : '',
+        ]"
+        v-if="!hideActions && (commandPosition.includes('float') || commandPosition.includes('bottom'))"
+      >
+        <div class="flex flex-row items-baseline mr-auto">
+          <button
+            v-for="action in visibleActions"
+            :key="action.label"
+            :class="'bg-' + action.color"
+            class="px-4 ml-3 ml-auto text-white rounded-none outline-none focus:outline-none"
+            @click="act(action)"
+          >
+            <span class="flex flex-row justify-center">
+              <i :class="action.icon" class="mt-1 mr-2 text-md" />
+              <span>{{ action.label }}</span>
+            </span>
+          </button>
+        </div>
+        <template v-if="!error">
+          <button
+            :class="$theme.backButtonClass"
+            class="mr-3 active:outline-none focus:outline-none"
+            @click="back"
+          >
+            Chiudi
+          </button>
+          <button
+            :disabled="!valid || saving"
+            :class="$theme.saveButtonClass"
+            class="transition duration-300 ease-in-out flex flex-row"
+            @click="saveResource()"
+          >
+            <span v-if="saving">
+              <loading size="xs" class="flex !flex-row">
+                <template v-slot:message>
+                  <p class="ml-3">Salvataggio in corso</p></template
+                >
+              </loading>
+            </span>
+            <span v-else>{{ button_label }}</span>
+          </button>
+        </template>
+        <template v-else>
+          <div class="flex flex-row items-center w-full">
             <button
               :class="$theme.backButtonClass"
               class="mr-3 active:outline-none focus:outline-none"
               @click="back"
             >
-              Chiudi
+              Indietro
             </button>
-            <button
-              :disabled="!valid || saving"
-              :class="$theme.saveButtonClass"
-              class="transition duration-300 ease-in-out flex flex-row"
-              @click="saveResource()"
-            >
-              <span v-if="saving">
-                <loading size="xs" class="flex !flex-row">
-                  <template v-slot:message>
-                    <p class="ml-3">Salvataggio in corso</p></template
-                  >
-                </loading>
-              </span>
-              <span v-else>{{ button_label }}</span>
+            <p class="text-red-600 text-weigth-600">
+              {{ error }}
+            </p>
+            <button class="ml-auto btn btn-primary" @click="retry()">
+              <i class="mr-2 fas fa-redo-alt" />
+              <span>Riprova</span>
             </button>
-          </template>
-          <template v-else>
-            <div class="flex flex-row items-center w-full">
-              <button
-                :class="$theme.backButtonClass"
-                class="mr-3 active:outline-none focus:outline-none"
-                @click="back"
-              >
-                Indietro
-              </button>
-              <p class="text-red-600 text-weigth-600">
-                {{ error }}
-              </p>
-              <button class="ml-auto btn btn-primary" @click="retry()">
-                <i class="mr-2 fas fa-redo-alt" />
-                <span>Riprova</span>
-              </button>
-            </div>
-          </template>
-        </div>
+          </div>
+        </template>
       </div>
     </div>
   </div>
