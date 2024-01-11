@@ -100,5 +100,6 @@ export {
   SideNavMixin,
   getProfile,
   logout,
-  $api
+  $api,
+  EventBus as $bus
 };
