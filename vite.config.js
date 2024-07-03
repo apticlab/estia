@@ -10,6 +10,7 @@ export default defineConfig({
         },
     },
     build: {
+        sourcemap: true,
         lib: {
             entry: 'src/index.js', // Adjust the entry point to your plugin's main file
             name: 'estia', // The global variable name of your plugin
