@@ -159,6 +159,7 @@ async function update(resourceName, resourceId, resource) {
 }
 
 function get(resourceName, id, params = {}, isBlob = false) {
+  console.log('get', resourceName, id, params, isBlob);
   return new Promise(function (resolve, reject) {
     let url = ''
 

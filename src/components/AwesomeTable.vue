@@ -51,7 +51,7 @@
               class="px-4 py-4"
             >
               <div
-                class="flex flex-row items-center h-full text-gray-dark"
+                class="flex flex-row items-center h-full text-gray-800"
                 :class="getRowClass(header)"
               >
                 <div
@@ -69,7 +69,7 @@
                         :href="
                           ig_usr_url + '/' + deepPick(row, header.fields.title)
                         "
-                        class="mr-2 text-base text-blue-500 hover:text-blue-600"
+                        class="mr-2 text-base text-blue-600-500 hover:text-blue-600-600"
                         >{{ deepPick(row, header.fields.title) }}</a
                       >
                       <span
@@ -87,7 +87,7 @@
                           name="friendship-badge"
                           width="w-4"
                           height="h-4"
-                          class="bg-blue-400"
+                          class="bg-blue-600-400"
                         />
                       </span>
                     </div>
@@ -112,7 +112,7 @@
                   class="flex flex-row items-end"
                 >
                   <a
-                    class="px-4 py-2 text-white bg-blue-500 btn rounded-md"
+                    class="px-4 py-2 text-white bg-blue-600-500 btn rounded-md"
                     target="_blank"
                     :href="
                       'https://www.instagram.com/p/' +
@@ -181,7 +181,7 @@
                   <a
                     target="_blank"
                     :href="ig_usr_url + '/' + deepPick(row, 'user.username')"
-                    class="mr-2 text-base text-blue-500 hover:text-blue-600"
+                    class="mr-2 text-base text-blue-600-500 hover:text-blue-600-600"
                     :class="header.class"
                     >{{ deepPick(row, "user.username") }}</a
                   >
@@ -212,7 +212,7 @@
                   class="flex flex-row items-end"
                 >
                   <span
-                    class="font-medium text-blue-700 underline cursor-pointer"
+                    class="font-medium text-blue-600-700 underline cursor-pointer"
                     >#{{ deepPick(row, header.field) }}</span
                   >
                 </div>
@@ -411,7 +411,7 @@
           </tr>
           <tr v-if="editIndex == index" :key="'0_' + index">
             <td :colspan="headers.length + 2">
-              <div v-if="!readonly && fields" class="bg-blue-light p-5 my-2">
+              <div v-if="!readonly && fields" class="bg-blue-600-light p-5 my-2">
                 <awesome-form
                   :form.sync="resourceToEdit"
                   :is_edit="true"
@@ -431,7 +431,7 @@
                     </button>
                     <button
                       :disabled="!resourceToEditValid"
-                      class="bg-blue text-white disabled:bg-gray-light disabled:text-gray disabled:cursor-not-allowed focus:outline-none"
+                      class="bg-blue-600 text-white disabled:bg-gray-light disabled:text-gray disabled:cursor-not-allowed focus:outline-none"
                       @click="createNew()"
                     >
                       {{ mode == "edit" ? "Salva" : "Aggiungi" }}
@@ -445,7 +445,7 @@
         </template>
         <tr v-if="editIndex == 'add'">
           <td :colspan="headers.length + 2">
-            <div v-if="!readonly && fields" class="bg-blue-light p-5 my-2">
+            <div v-if="!readonly && fields" class="bg-blue-600-light p-5 my-2">
               <awesome-form
                 :form.sync="resourceToEdit"
                 :is_edit="false"
@@ -464,7 +464,7 @@
                   </button>
                   <button
                     :disabled="!resourceToEditValid"
-                    class="bg-blue text-white disabled:bg-gray-light disabled:text-gray disabled:cursor-not-allowed focus:outline-none"
+                    class="bg-blue-600 text-white disabled:bg-gray-light disabled:text-gray disabled:cursor-not-allowed focus:outline-none"
                     @click="createNew()"
                   >
                     {{ mode == "edit" ? "Salva" : "Aggiungi" }}

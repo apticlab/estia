@@ -10,10 +10,10 @@
       <div class="">
         <div
           :class="{
-            'bg-blue': recursivity[day.index] == 1,
+            'bg-blue-600': recursivity[day.index] == 1,
             'bg-white': recursivity[day.index] == 0
           }"
-          class="w-5 h-5 border-2 border-blue cursor-pointer"
+          class="w-5 h-5 border-2 border-blue-300 cursor-pointer"
         ></div>
       </div>
     </div>

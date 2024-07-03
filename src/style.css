@@ -1,0 +1,195 @@
+@import "./assets/css/calendar.css";
+
+@tailwind base;
+@tailwind components;
+
+.form-control {
+  @apply border-2 border-gray-200 px-2 py-3 bg-white text-gray-800 block w-full outline-none;
+}
+
+.form-control:focus {
+  @apply outline-none;
+}
+
+.form-control .vs__dropdown-toggle,
+.form-control .vs__selected-options,
+.form-control .vs__selected-options input {
+  padding: 0;
+  margin: 0;
+  border: none;
+}
+
+pre[class*="language-"] {
+  min-height: 150px;
+  font-family: Menlo, Monaco, "Courier New", monospace;
+  direction: ltr;
+  text-align: left;
+  word-spacing: normal;
+  white-space: pre-wrap;
+  word-wrap: normal;
+
+  -moz-tab-size: 4;
+  -o-tab-size: 4;
+  tab-size: 4;
+
+  -webkit-hyphens: none;
+  -moz-hyphens: none;
+  -ms-hyphens: none;
+  hyphens: none;
+
+  @apply border-2 border-gray-200 bg-white text-gray-800;
+}
+
+pre[class*="language-"]:active,
+pre[class*="language-"]:focus {
+  @apply outline-none border-blue-300;
+}
+
+body,
+html {
+  font-family: Muli, sans-serif;
+}
+
+canvas {
+  padding: 0;
+  margin: 0;
+}
+
+.nav-link.selected {
+  @apply text-white bg-blue-600;
+}
+
+.nav-link.selected > div {
+  @apply border-transparent;
+}
+
+.nav-link.selected span {
+  @apply text-white;
+}
+
+.nav-link.selected i {
+  @apply text-yellow-600;
+}
+
+input,
+textarea {
+  /* @apply rounded bg-green-100 text-base text-gray-600 px-3 py-3 outline-none border-b border-solid border-green-200; */
+  @apply border-2 border-gray-200 px-2 py-3 bg-white text-gray-800 block w-full outline-none;
+}
+
+input:focus {
+  @apply border-blue-300;
+}
+
+button {
+  @apply rounded px-4 py-2;
+}
+
+button.disabled,
+button:disabled {
+  @apply cursor-not-allowed text-gray-800;
+}
+
+.progress-step.selected > span {
+  @apply text-blue-600 text-lg;
+}
+
+.progress-step.selected > div {
+  @apply bg-blue-600 text-white;
+}
+
+.card {
+  @apply rounded bg-white px-4 py-3 shadow;
+}
+
+/* width */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+/* button */
+::-webkit-scrollbar-button {
+  background: #efefef;
+  display: none;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #999;
+  border-radius: 6px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #666;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #666;
+  border-radius: 50%;
+}
+
+/* The track NOT covered by the handle. */
+::-webkit-scrollbar-track-piece {
+  background: #efefef;
+}
+
+/* Corner */
+::-webkit-scrollbar-corner {
+  background: #999;
+}
+
+/* Resizer */
+::-webkit-resizer {
+  background: #111;
+}
+
+@tailwind utilities;
+
+/* Enter and leave animations can use different */
+/* durations and timing functions.              */
+.slide-fade-enter-active,
+.slide-down-fade-enter-active {
+  transition: all 0.3s ease;
+}
+.slide-fade-leave-active,
+.slide-down-fade-leave-active {
+  transition: all 0.1s cubic-bezier(1, 0.5, 0.8, 1);
+}
+.slide-fade-enter, .slide-fade-leave-to
+/* .slide-fade-leave-active below version 2.1.8 */ {
+  transform: translateX(10px);
+  opacity: 0;
+}
+
+.slide-down-fade-enter,
+.slide-down-fade-leave-to {
+  transform: translateY(-20px);
+  opacity: 0;
+}
+
+.fade-enter-active {
+  transition: opacity 0.5s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
+}
+
+table.striped > tbody > tr:nth-child(odd) {
+  background-color: #fff;
+}
+
+.bg-main {
+  @apply bg-white;
+}
+
+.highlights-none {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}

@@ -46,7 +46,7 @@
       </template>
       <div
         v-if="!is_collapsed && version"
-        class="py-2 mt-auto text-center text-blue"
+        class="py-2 mt-auto text-center text-blue-600"
       >
         <span>{{ version }}</span>
       </div>

@@ -20,10 +20,10 @@ const defaultTheme = {
     element: "w-8 h-8 mx-1",
     disabledElement: "w-8 h-8 mx-1",
     ellipsisElement: "w-8 h-8 mx-1",
-    activeButton: "bg-blue-500 w-full h-full text-white rounded-full ",
+    activeButton: "bg-blue-600-500 w-full h-full text-white rounded-full ",
     disabledButton:
-    "opacity-25 w-full h-full cursor-not-allowed rounded-full",
-    button: "hover:bg-blue-100 w-full h-full text-blue-500 rounded-full ",
+      "opacity-25 w-full h-full cursor-not-allowed rounded-full",
+    button: "hover:bg-blue-600-100 w-full h-full text-blue-600-500 rounded-full ",
     ellipsis: "text-gray-500"
   },
   aw_table: {

@@ -31,7 +31,7 @@
             <slot name="username" :credentials="credentials">
               <label
                 for="username"
-                class="mb-1 ml-2 text-xs text-gray-600 text-blue-dark"
+                class="mb-1 ml-2 text-xs text-gray-600 text-blue-600-dark"
                 >Username</label
               >
               <input
@@ -48,7 +48,7 @@
             <slot name="password" :credentials="credentials">
               <label
                 for="password"
-                class="mb-1 ml-2 text-xs text-gray-600 text-blue-dark"
+                class="mb-1 ml-2 text-xs text-gray-600 text-blue-600-dark"
                 >Password</label
               >
               <input
@@ -80,7 +80,7 @@
                     italic
                     underline
                     cursor-pointer
-                    text-blue
+                    text-blue-600
                   "
                 >
                   Password dimenticata?
@@ -111,8 +111,8 @@
                 text-normal
               "
               :class="{
-                'bg-blue-light cursor-not-allowed': submitDisabled,
-                'bg-blue cursor-pointer': !submitDisabled,
+                'bg-blue-600-light cursor-not-allowed': submitDisabled,
+                'bg-blue-600 cursor-pointer': !submitDisabled,
               }"
             >
               {{ submitText }}

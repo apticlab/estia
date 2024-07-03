@@ -4,7 +4,7 @@
     v-if="show_banner && action"
   >
     <div
-      class="relative px-4 shadow-lg bg-blue-dark py-6 rounded-none sm:rounded-md text-white flex flex-row items-center"
+      class="relative px-4 shadow-lg bg-blue-600-dark py-6 rounded-none sm:rounded-md text-white flex flex-row items-center"
     >
       <button class="close absolute p-0" type="button" data-dismiss="alert" @click="hide()">&times;</button>
       <template v-if="action === actions.INSTALL">
@@ -14,7 +14,7 @@
         </div>
         <button
           type="button"
-          class="button h-10 text-blue-dark px-5 rounded-full bg-white"
+          class="button h-10 text-blue-600-dark px-5 rounded-full bg-white"
           @click="install()"
         >
           <span>Installa</span>
@@ -28,7 +28,7 @@
         </div>
         <button
           type="button"
-          class="button h-10 text-blue-dark px-5 rounded-full bg-white"
+          class="button h-10 text-blue-600-dark px-5 rounded-full bg-white"
           @click="update()"
         >
           <span>Aggiorna</span>

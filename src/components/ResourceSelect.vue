@@ -19,8 +19,8 @@
           ml-auto
           font-bold
           cursor-pointer
-          text-blue
-          hover:text-blue-dark
+          text-blue-600
+          hover:text-blue-600-dark
         "
       >
         <i class="mr-2 ti-plus"></i>

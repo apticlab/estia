@@ -25,12 +25,12 @@
       <span v-if="field.type == 'customer'">
         <span
           @click="goToCustomerDetail(field, data)"
-          class="text-blue-700 cursor-pointer hover:underline"
+          class="text-blue-600-700 cursor-pointer hover:underline"
           >{{ value }}</span
         >
       </span>
       <span v-if="field.type == 'email'">
-        <a :href="'mailto:' + value" class="text-blue-700 hover:underline">
+        <a :href="'mailto:' + value" class="text-blue-600-700 hover:underline">
           {{ value }}
         </a>
       </span>

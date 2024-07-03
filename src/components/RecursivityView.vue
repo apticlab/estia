@@ -8,8 +8,8 @@
       <div class="">
         <div
           :class="{
-            'bg-blue text-white border-blue': recursivity[day.index] == 1,
-            'bg-gray-light text-gray-dark border-gray-light':
+            'bg-blue-600 text-white border-blue-300': recursivity[day.index] == 1,
+            'bg-gray-light text-gray-800 border-gray-200':
               recursivity[day.index] == 0
           }"
           class="w-5 h-5 border-2 cursor-pointer mr-1 rounded-full flex items-center justify-center text-sm"

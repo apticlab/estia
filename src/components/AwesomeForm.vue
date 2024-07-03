@@ -17,7 +17,7 @@
         :id="'aw-' + getIdName(header, index)"
         v-for="(header, index) in visible_headers"
         :key="index"
-        class="relative focus-within:text-blue"
+        class="relative focus-within:text-blue-600"
         :class="formFieldClass(header)"
       >
         <slot
@@ -984,7 +984,7 @@ export default {
 
       if (header.type == "form") {
         formFieldClass +=
-          " border border-rounded-sm border-dotted border-gray-light";
+          " border border-rounded-sm border-dotted border-gray-200";
       } else {
         let colSpan = header.colSpan || header.col_span || minColSpan;
 
