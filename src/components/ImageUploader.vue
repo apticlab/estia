@@ -21,7 +21,7 @@
       ref="hiddenInput"
     />
     <div
-      class="text-blue flex flex-row items-center justify-center mt-5 cursor-pointer"
+      class="text-blue-600 flex flex-row items-center justify-center mt-5 cursor-pointer"
       v-on:click="handleImageUpload()"
     >
       <i class="ti-upload mr-2"></i>

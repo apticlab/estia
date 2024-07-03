@@ -66,10 +66,10 @@
                     </span>
                   </div>
                   <div v-if="event.memo_resource.value == 'customer'">
-                    <i class="fas fa-user text-blue-500 mr-2"></i>
+                    <i class="fas fa-user text-blue-600-500 mr-2"></i>
                     <span
                       @click="goToResource(event)"
-                      class="text-blue-600 hover:underline cursor-pointer"
+                      class="text-blue-600-600 hover:underline cursor-pointer"
                     >
                       {{ event.customer.full_name }}
                     </span>

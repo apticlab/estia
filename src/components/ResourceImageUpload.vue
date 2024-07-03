@@ -10,7 +10,7 @@
             <i class="ti-image text-gray"></i>
           </div>
         </div>
-        <div class="text-blue flex flex-row items-center justify-center mt-5 cursor-pointer">
+        <div class="text-blue-600 flex flex-row items-center justify-center mt-5 cursor-pointer">
           <i class="ti-upload mr-2"></i>
           Carica immagine
         </div>

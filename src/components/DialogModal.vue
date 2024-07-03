@@ -79,13 +79,13 @@
               class="flex flex-row items-center justify-between px-4 py-3 bg-gray-100 sm:justify-end"
             >
               <button
-                class="px-3 py-2 ml-0 mr-3 text-blue sm:ml-auto no-outline"
+                class="px-3 py-2 ml-0 mr-3 text-blue-600 sm:ml-auto no-outline"
                 @click="confirm(false)"
               >
                 {{ params.cancelText || defaultCancelText }}
               </button>
               <button
-                class="px-3 py-2 text-white rounded-none bg-blue tx-bold focus:outline-none"
+                class="px-3 py-2 text-white rounded-none bg-blue-600 tx-bold focus:outline-none"
                 @click="confirm(true)"
               >
                 {{ params.confirmText || defaultConfirmText }}

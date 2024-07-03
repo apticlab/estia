@@ -3,7 +3,7 @@
     "version": "1.8.6",
     "description": "The easiest way to build site in Vue.",
     "main": "dist/estia.umd.js",
-    "module": "dist/estia.esm.js",
+    "module": "dist/estia.es.js",
     "unpkg": "dist/estia.min.js",
     "publishConfig": {
         "access": "public"
@@ -12,17 +12,10 @@
         "./sfc": "src/estia.js"
     },
     "scripts": {
-        "watch": "rollup --config build/rollup.config.js --format es --file dist/estia.esm.js -w",
-        "build:dev": "rollup --config build/rollup-dev.config.js --format es --file dist/estia.esm.js -w",
-        "build": "npm run build:esm & npm run build:umd && wait && echo \"Build complete:\nesm: $(gzip -c dist/estia.esm.js | wc -c)b gzip\numd: $(gzip -c dist/estia.umd.js | wc -c)b gzip\"",
-        "build:esm": "rollup --config build/rollup.config.js --format es --file dist/estia.esm.js",
-        "build:umd": "rollup --config build/rollup.config.js --format umd --file dist/estia.umd.js",
-        "build:iife": "rollup --config build/rollup.iife.config.js --format iife --file dist/estia.min.js",
-        "build:css": "node-sass themes/snow/snow.scss dist/snow.css && postcss --use autoprefixer -b '> 2%' < dist/snow.css | postcss --no-map --use cssnano > dist/snow.min.css",
-        "build:size": "gzip -c dist/estia.esm.js | wc -c",
+        "watch": "vite build --watch",
         "postversion": "npm publish",
-        "dev": "vue-cli-service serve --port=7872 examples/simple-app/src/main.js",
-        "dev:build": "vue-cli-service serve src/main.js"
+        "dev": "vite",
+        "build": "vite build"
     },
     "repository": {
         "type": "git",
@@ -36,7 +29,9 @@
         "vuex",
         "validate",
         "table",
-        "api"
+        "api",
+        "vite",
+        "tailwindcss"
     ],
     "author": "Isacco Rossi <ir.isacco.rossi@gmail.com>; Giacomo Alberini <giacomoalbe@gmail.com>",
     "license": "MIT",
@@ -45,21 +40,8 @@
     },
     "homepage": "https://github.com/apticlab/estia",
     "devDependencies": {
-        "@babel/core": "^7.11.16",
-        "@babel/plugin-transform-modules-commonjs": "^7.9.6",
-        "@babel/preset-env": "^7.9.6",
-        "@rollup/plugin-alias": "^3.1.9",
-        "@rollup/plugin-buble": "^0.21.3",
-        "@rollup/plugin-commonjs": "^21.0.1",
-        "@rollup/plugin-node-resolve": "^13.1.3",
-        "@vue/cli-plugin-babel": "^4.5.15",
-        "@vue/cli-plugin-eslint": "^5.0.8",
-        "@vue/cli-service": "^4.5.15",
-        "@vue/component-compiler-utils": "^3.3.0",
-        "@vue/test-utils": "^1.0.2",
-        "acorn": "^8.5.0",
-        "autoprefixer": "^10",
-        "babel-core": "^7.0.0-bridge.0",
+        "@vitejs/plugin-vue2": "^2.3.1",
+        "autoprefixer": "^10.4.19",
         "babel-eslint": "^10.1.0",
         "cssnano": "^5.1.15",
         "eslint": "^8.56.0",
@@ -69,24 +51,14 @@
         "eslint-plugin-promise": "^6.0.0",
         "eslint-plugin-standard": "^5.0.0",
         "eslint-plugin-vue": "^8.4.1",
-        "flush-promises": "^1.0.2",
         "node-sass": "^8.0.0",
-        "postcss": "^8.4.6",
-        "resolve": "^1.20.0",
-        "rollup": "^2.67.0",
-        "rollup-plugin-auto-external": "^2.0.0",
-        "rollup-plugin-internal": "^1.0.4",
-        "rollup-plugin-json": "^4.0.0",
-        "rollup-plugin-multi-input": "^1.3.1",
-        "rollup-plugin-scss": "^3.0.0",
-        "rollup-plugin-terser": "^7.0.2",
-        "rollup-plugin-vue": "^5.1.7",
+        "postcss": "^8.4.39",
         "sass-loader": "^13.2.1",
+        "tailwindcss": "^3.4.4",
+        "vite": "^5.3.3",
         "vue": "^2.7.16",
         "vue-runtime-helpers": "^1.1.2",
-        "vue-svgicon": "^3.2.9",
-        "vue-template-compiler": "^2.7.14",
-        "watch": "^1.0.2"
+        "vue-svgicon": "^3.2.9"
     },
     "dependencies": {
         "@braid/vue-formulate": "^2.5.3",
@@ -103,19 +75,17 @@
         "lodash": "4.17.21",
         "moment": "^2.29.1",
         "nanoid": "^3.1.23",
-        "tailwindcss": "3.0.18",
         "v-calendar": "^2.3.1",
         "v-lazy-image": "^1.4.0",
         "vue": "^2.7.16",
         "vue-i18n": "^8.24.5",
         "vue-router": "^3.5.2",
         "vue-select": "^3.11.2",
-        "vue-tailwind": "^2.5.0",
+        "vue-tailwind": "^2.5.1",
         "vue-window-size": "^0.2.5",
         "vue2-daterange-picker": "^0.6.5",
         "vue2-timepicker": "^1.1.3",
         "vuejs-datepicker": "^1.6.2",
-        "vuex": "^3.6.2",
-        "xlsx": "^0.17.0"
+        "vuex": "^3.6.2"
     }
 }

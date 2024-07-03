@@ -3,28 +3,31 @@ import VueTailwind from "vue-tailwind";
 import TPagination from "vue-tailwind/dist/t-pagination";
 import moment from "moment";
 
-import { helpers } from "./utils/helpers";
-import { EventBus } from "./utils/event-bus.js";
-import api from "./utils/api";
-import { getProfile, logout } from "./utils/auth";
+// Import styles
+import style from "./style.css";
+import timepickerstyle from "vue2-timepicker/dist/VueTimepicker.css";
 
-import theme from "./theme";
-import mixins from "./mixins";
-import plugins from "./plugins";
-import filters from "./filters";
-import resources from "./resources";
-import router from "./router";
-import store from "./store";
-import viewFields from "./view-fields";
-import editFields from "./edit-fields";
-import modalWidgets from "./modal-widgets";
+import { helpers } from "./utils/helpers.js";
+import { EventBus } from "./utils/event-bus.js";
+import api from "./utils/api.js";
+import { getProfile, logout } from "./utils/auth.js";
+import theme from "./theme/index.js";
+import mixins from "./mixins/index.js";
+import plugins from "./plugins/index.js";
+import filters from "./filters/index.js";
+import resources from "./resources/index.js";
+import router from "./router/index.js";
+import store from "./store/index.js";
+import viewFields from "./view-fields/index.js";
+import editFields from "./edit-fields/index.js";
+import modalWidgets from "./modal-widgets/index.js";
 import components, {
   RouterView,
   ViewResource,
   EditResource
-} from "./components";
-import { SideNav as SideNavMixin } from "./mixins";
-import Validators from "./validators";
+} from "./components/index.js";
+import { SideNav as SideNavMixin } from "./mixins/index.js";
+import Validators from "./validators/index.js";
 import _ from 'lodash';
 
 let $api = null;

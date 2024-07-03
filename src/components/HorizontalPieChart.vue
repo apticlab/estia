@@ -1,5 +1,5 @@
 <template>
-  <div class="rounded-full overflow-hidden w-full bg-blue-400">
+  <div class="rounded-full overflow-hidden w-full bg-blue-600-400">
     <div class="bg-green-400 py-2" :style="{ width: innerWidth + '%' }"></div>
   </div>
 </template>

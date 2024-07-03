@@ -81,7 +81,7 @@
                 Puoi anche caricare
                 {{ files.length > 0 ? "altri" : "i" }} file
               </p>
-              <a class="text-blue-500 hover:text-blue-600 underline"
+              <a class="text-blue-600-500 hover:text-blue-600-600 underline"
                 >cliccando qui</a
               >
             </div>
@@ -291,8 +291,8 @@ export default {
         case "odt":
         case "application/msword":
         case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-          style.icon = "text-blue-200";
-          style.background = "bg-blue-700";
+          style.icon = "text-blue-600-200";
+          style.background = "bg-blue-600-700";
           break;
         case "jpg":
         case "jpeg":

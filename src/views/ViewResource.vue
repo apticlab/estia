@@ -44,10 +44,10 @@
         <div
           v-for="(header, index) in visibleHeaders"
           :key="index"
-          class="focus-within:text-blue"
+          class="focus-within:text-blue-600"
           :class="
             header.type == 'form'
-              ? 'border border-rounded-sm border-dotted border-gray-light'
+              ? 'border border-rounded-sm border-dotted border-gray-200'
               : 'mb-5 flex flex-col col-span-' +
                 (header.colSpan || 12) +
                 ' row-span-' +
@@ -55,7 +55,7 @@
           "
         >
           <label
-            class="font-semibold mb-2 text-blue"
+            class="font-semibold mb-2 text-blue-600"
             :class="labelClass(header)"
             :for="header.code"
           >
@@ -180,7 +180,7 @@ export default {
           break;
 
         case "fieldset":
-          cssClass = "text-gray-dark text-xl font-bold my-5";
+          cssClass = "text-gray-800 text-xl font-bold my-5";
           break;
 
         default:

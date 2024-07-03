@@ -22,7 +22,7 @@
             is-inline
           >
             <div slot-scope="header" slot="header-title">
-              <span class="text-blue">{{ header.title | capitalize }}</span>
+              <span class="text-blue-600">{{ header.title | capitalize }}</span>
             </div>
             <div
               @click="setDate(day)"
@@ -32,7 +32,7 @@
               class="flex flex-col h-full z-10 overflow-hidden p-2"
             >
               <span
-                :class="[selectedDate.id == day.id ? 'text-blue' : 'text-gray', is_mobile ? 'text-center' : 'text-right']"
+                :class="[selectedDate.id == day.id ? 'text-blue-600' : 'text-gray', is_mobile ? 'text-center' : 'text-right']"
                 class="day-label text-normal"
               >{{ day.day }}</span>
               <div v-if='!is_mobile' class="flex flex-col flex-grow overflow-y-auto overflow-x-hidden">
@@ -50,7 +50,7 @@
               </div>
               <div
                 :class="[
-                selectedDate.id == day.id ? 'h-2 bg-blue' : ' h-05 bg-gray',
+                selectedDate.id == day.id ? 'h-2 bg-blue-600' : ' h-05 bg-gray',
                 is_mobile ? 'mx-0' : 'mx-3'
                 ]"
                 class="w-full rounded-md mt-2"
@@ -113,7 +113,7 @@ export default {
         key: null,
         customData: {
           title: null,
-          class: "bg-blue-light text-blue rounded-md"
+          class: "bg-blue-600-light text-blue-600 rounded-md"
         },
         dates: null
       },
@@ -235,7 +235,7 @@ export default {
   --highlight-height: 0px;
   border-radius: 0;
   & .vc-header {
-    @apply bg-white text-blue-dark;
+    @apply bg-white text-blue-600-dark;
     padding: 10px 0;
   }
   & .vc-weeks {

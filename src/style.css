@@ -1,12 +1,10 @@
+@import "./assets/css/calendar.css";
+
 @tailwind base;
-
-@import "./calendar.css";
-@import "~vue2-timepicker/dist/VueTimepicker.css";
-
 @tailwind components;
 
 .form-control {
-  @apply border-2 border-gray-light px-2 py-3 bg-white text-gray-dark block w-full outline-none;
+  @apply border-2 border-gray-200 px-2 py-3 bg-white text-gray-800 block w-full outline-none;
 }
 
 .form-control:focus {
@@ -39,12 +37,12 @@ pre[class*="language-"] {
   -ms-hyphens: none;
   hyphens: none;
 
-  @apply border-2 border-gray-light bg-white text-gray-dark;
+  @apply border-2 border-gray-200 bg-white text-gray-800;
 }
 
 pre[class*="language-"]:active,
 pre[class*="language-"]:focus {
-  @apply outline-none border-blue;
+  @apply outline-none border-blue-300;
 }
 
 body,
@@ -58,7 +56,7 @@ canvas {
 }
 
 .nav-link.selected {
-  @apply text-white bg-blue;
+  @apply text-white bg-blue-600;
 }
 
 .nav-link.selected > div {
@@ -70,17 +68,17 @@ canvas {
 }
 
 .nav-link.selected i {
-  @apply text-yellow;
+  @apply text-yellow-600;
 }
 
 input,
 textarea {
   /* @apply rounded bg-green-100 text-base text-gray-600 px-3 py-3 outline-none border-b border-solid border-green-200; */
-  @apply border-2 border-gray-light px-2 py-3 bg-white text-gray-dark block w-full outline-none;
+  @apply border-2 border-gray-200 px-2 py-3 bg-white text-gray-800 block w-full outline-none;
 }
 
 input:focus {
-  @apply border-blue;
+  @apply border-blue-300;
 }
 
 button {
@@ -89,15 +87,15 @@ button {
 
 button.disabled,
 button:disabled {
-  @apply cursor-not-allowed text-gray-dark;
+  @apply cursor-not-allowed text-gray-800;
 }
 
 .progress-step.selected > span {
-  @apply text-blue text-lg;
+  @apply text-blue-600 text-lg;
 }
 
 .progress-step.selected > div {
-  @apply bg-blue text-white;
+  @apply bg-blue-600 text-white;
 }
 
 .card {
