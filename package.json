@@ -1,8 +1,9 @@
 {
     "name": "@apticlab/estia",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "description": "The easiest way to build site in Vue.",
     "main": "dist/estia.umd.js",
+    "type": "module",
     "module": "dist/estia.es.js",
     "unpkg": "dist/estia.min.js",
     "publishConfig": {
@@ -81,7 +82,6 @@
         "vue-i18n": "^8.24.5",
         "vue-router": "^3.5.2",
         "vue-select": "^3.11.2",
-        "vue-tailwind": "^2.5.1",
         "vue-window-size": "^0.2.5",
         "vue2-daterange-picker": "^0.6.5",
         "vue2-timepicker": "^1.1.3",

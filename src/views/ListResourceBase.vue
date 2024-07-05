@@ -153,9 +153,9 @@
             </div>
           </div>
         </template>
-        <div v-if="pagination" class="flex flex-row w-full my-3">
           <t-pagination
-            class="mx-auto"
+           v-if="pagination"
+            class="flex flex-row w-full my-3 gap-x-2"
             :total-items="pagination.totalItems"
             :per-page="pagination.perPage"
             :num-pages="pagination.numPages"
@@ -164,7 +164,6 @@
             :value="currentPage"
             @change="changePage"
           />
-        </div>
       </div>
       <loading v-if="dataLoading" class="flex-grow w-full h-64" />
     </div>
@@ -174,10 +173,14 @@
 <script>
 import ActionsMixin from "@/mixins/actions.mixin.js";
 import _ from "lodash";
+import Pagination from '@/components/Pagination.vue';
 
 export default {
   name: "ListResourceBase",
   mixins: [ActionsMixin],
+  components: {
+    't-pagination': Pagination,
+  },
   props: {
     tableClass: {
       required: false,

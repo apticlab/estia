@@ -1,348 +1,184 @@
 <template>
-  <div>
-    <div class="flex flex-col items-center my-12">
-      <div class="flex text-gray-700">
-        <div
-          class="h-12 w-12 mr-1 flex justify-center items-center rounded-full bg-gray-200 cursor-pointer"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="100%"
-            height="100%"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="feather feather-chevron-left w-6 h-6"
-          >
-            <polyline points="15 18 9 12 15 6" />
-          </svg>
-        </div>
-        <div class="flex h-12 font-medium rounded-full bg-gray-200">
-          <div
-            class="w-12 md:flex justify-center items-center hidden  cursor-pointer leading-5 transition duration-150 ease-in  rounded-full  "
-          >
-            1
-          </div>
-          <div
-            class="w-12 md:flex justify-center items-center hidden  cursor-pointer leading-5 transition duration-150 ease-in  rounded-full bg-teal-600 text-white "
-          >
-            2
-          </div>
-          <div
-            class="w-12 md:flex justify-center items-center hidden  cursor-pointer leading-5 transition duration-150 ease-in  rounded-full  "
-          >
-            3
-          </div>
-          <div
-            class="w-12 md:flex justify-center items-center hidden  cursor-pointer leading-5 transition duration-150 ease-in  rounded-full  "
-          >
-            ...
-          </div>
-          <div
-            class="w-12 md:flex justify-center items-center hidden  cursor-pointer leading-5 transition duration-150 ease-in  rounded-full  "
-          >
-            13
-          </div>
-          <div
-            class="w-12 md:flex justify-center items-center hidden  cursor-pointer leading-5 transition duration-150 ease-in  rounded-full  "
-          >
-            14
-          </div>
-          <div
-            class="w-12 md:flex justify-center items-center hidden  cursor-pointer leading-5 transition duration-150 ease-in  rounded-full  "
-          >
-            15
-          </div>
-          <div
-            class="w-12 h-12 md:hidden flex justify-center items-center cursor-pointer leading-5 transition duration-150 ease-in rounded-full bg-teal-600 text-white"
-          >
-            2
-          </div>
-        </div>
-        <div
-          class="h-12 w-12 ml-1 flex justify-center items-center rounded-full bg-gray-200 cursor-pointer"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="100%"
-            height="100%"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="feather feather-chevron-right w-6 h-6"
-          >
-            <polyline points="9 18 15 12 9 6" />
-          </svg>
-        </div>
-      </div>
-    </div>
+  <div v-if="visible" class="flex flex-row justify-between items-center">
+    <p class="mb-0 p-helper">
+      Risultati da <strong>{{ from }}</strong> a <strong>{{ to }}</strong> di <strong>{{ totalItems }}</strong></p>
+    <div class="pagination">
+      <button class="pagination-item" type="button" @click="onClickFirstPage" :disabled="isInFirstPage"
+        :class="{ 'cursor-default': isInFirstPage }" aria-label="Go to first page">
+        Inizio
+      </button>
 
-    <div class="flex flex-col items-center my-12">
-      <div class="flex text-gray-700">
-        <div
-          class="h-12 w-12 mr-1 flex justify-center items-center rounded-full bg-gray-200 cursor-pointer"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="100%"
-            height="100%"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="feather feather-chevron-left w-6 h-6"
-          >
-            <polyline points="15 18 9 12 15 6" />
-          </svg>
-        </div>
-        <div class="flex h-12 font-medium rounded-full bg-gray-200">
-          <div
-            class="w-12 md:flex justify-center items-center hidden  cursor-pointer leading-5 transition duration-150 ease-in  rounded-full  "
-          >
-            1
-          </div>
-          <div
-            class="w-12 md:flex justify-center items-center hidden  cursor-pointer leading-5 transition duration-150 ease-in  rounded-full  "
-          >
-            ...
-          </div>
-          <div
-            class="w-12 md:flex justify-center items-center hidden  cursor-pointer leading-5 transition duration-150 ease-in  rounded-full  "
-          >
-            2
-          </div>
-          <div
-            class="w-12 md:flex justify-center items-center hidden  cursor-pointer leading-5 transition duration-150 ease-in  rounded-full bg-teal-600 text-white "
-          >
-            3
-          </div>
-          <div
-            class="w-12 md:flex justify-center items-center hidden  cursor-pointer leading-5 transition duration-150 ease-in  rounded-full  "
-          >
-            4
-          </div>
-          <div
-            class="w-12 md:flex justify-center items-center hidden  cursor-pointer leading-5 transition duration-150 ease-in  rounded-full  "
-          >
-            ...
-          </div>
-          <div
-            class="w-12 md:flex justify-center items-center hidden  cursor-pointer leading-5 transition duration-150 ease-in  rounded-full  "
-          >
-            15
-          </div>
-          <div
-            class="w-12 h-12 md:hidden flex justify-center items-center cursor-pointer leading-5 transition duration-150 ease-in rounded-full bg-teal-600 text-white"
-          >
-            3
-          </div>
-        </div>
-        <div
-          class="h-12 w-12 ml-1 flex justify-center items-center rounded-full bg-gray-200 cursor-pointer"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="100%"
-            height="100%"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="feather feather-chevron-right w-6 h-6"
-          >
-            <polyline points="9 18 15 12 9 6" />
-          </svg>
-        </div>
-      </div>
-    </div>
+      <button class="pagination-item" type="button" @click="onClickPreviousPage" :disabled="isInFirstPage"
+        :class="{ 'cursor-default': isInFirstPage }" aria-label="Go to previous page">
+        <icon name="chevron-left-outline" size="s" />
+      </button>
 
-    <div class="text-2xl text-center">
-      Small
-    </div>
+      <button :key="'paginiation_' + index" v-for="(page, index) in pages" class="pagination-item" type="button"
+        @click="onClickPage(page.name)" :disabled="page.isDisabled" :class="{
+          active: isPageActive(page.name),
+          'cursor-default': page.isDisabled,
+        }" :aria-label="`Go to page number ${page.name}`">
+        {{ page.name }}
+      </button>
 
-    <div class="flex flex-col items-center my-12">
-      <div class="flex text-gray-700">
-        <div
-          class="h-8 w-8 mr-1 flex justify-center items-center rounded-full bg-gray-200 cursor-pointer"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="100%"
-            height="100%"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="feather feather-chevron-left w-4 h-4"
-          >
-            <polyline points="15 18 9 12 15 6" />
-          </svg>
-        </div>
-        <div class="flex h-8 font-medium rounded-full bg-gray-200">
-          <div
-            class="w-8 md:flex justify-center items-center hidden  cursor-pointer leading-5 transition duration-150 ease-in  rounded-full  "
-          >
-            1
-          </div>
-          <div
-            class="w-8 md:flex justify-center items-center hidden  cursor-pointer leading-5 transition duration-150 ease-in  rounded-full  "
-          >
-            ...
-          </div>
-          <div
-            class="w-8 md:flex justify-center items-center hidden  cursor-pointer leading-5 transition duration-150 ease-in  rounded-full  "
-          >
-            3
-          </div>
-          <div
-            class="w-8 md:flex justify-center items-center hidden  cursor-pointer leading-5 transition duration-150 ease-in  rounded-full bg-pink-600 text-white "
-          >
-            4
-          </div>
-          <div
-            class="w-8 md:flex justify-center items-center hidden  cursor-pointer leading-5 transition duration-150 ease-in  rounded-full  "
-          >
-            5
-          </div>
-          <div
-            class="w-8 md:flex justify-center items-center hidden  cursor-pointer leading-5 transition duration-150 ease-in  rounded-full  "
-          >
-            ...
-          </div>
-          <div
-            class="w-8 md:flex justify-center items-center hidden  cursor-pointer leading-5 transition duration-150 ease-in  rounded-full  "
-          >
-            15
-          </div>
-          <div
-            class="w-8 h-8 md:hidden flex justify-center items-center cursor-pointer leading-5 transition duration-150 ease-in rounded-full bg-pink-600 text-white"
-          >
-            4
-          </div>
-        </div>
-        <div
-          class="h-8 w-8 ml-1 flex justify-center items-center rounded-full bg-gray-200 cursor-pointer"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="100%"
-            height="100%"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="feather feather-chevron-right w-4 h-4"
-          >
-            <polyline points="9 18 15 12 9 6" />
-          </svg>
-        </div>
-      </div>
-    </div>
+      <button class="pagination-item" type="button" @click="onClickNextPage" :disabled="isInLastPage"
+        :class="{ 'cursor-default': isInLastPage }" aria-label="Go to next page">
+        <icon name="chevron-right-outline" size="s" />
+      </button>
 
-    <div class="flex flex-col items-center my-12">
-      <div class="flex text-gray-700">
-        <div
-          class="h-8 w-8 mr-1 flex justify-center items-center  cursor-pointer"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="100%"
-            height="100%"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="feather feather-chevron-left w-4 h-4"
-          >
-            <polyline points="15 18 9 12 15 6" />
-          </svg>
-        </div>
-        <div class="flex h-8 font-medium ">
-          <div
-            class="w-8 md:flex justify-center items-center hidden  cursor-pointer leading-5 transition duration-150 ease-in  border-t-2 border-transparent"
-          >
-            1
-          </div>
-          <div
-            class="w-8 md:flex justify-center items-center hidden  cursor-pointer leading-5 transition duration-150 ease-in  border-t-2 border-orange-600  "
-          >
-            2
-          </div>
-          <div
-            class="w-8 md:flex justify-center items-center hidden  cursor-pointer leading-5 transition duration-150 ease-in  border-t-2 border-transparent"
-          >
-            3
-          </div>
-          <div
-            class="w-8 md:flex justify-center items-center hidden  cursor-pointer leading-5 transition duration-150 ease-in  border-t-2 border-transparent"
-          >
-            ...
-          </div>
-          <div
-            class="w-8 md:flex justify-center items-center hidden  cursor-pointer leading-5 transition duration-150 ease-in  border-t-2 border-transparent"
-          >
-            13
-          </div>
-          <div
-            class="w-8 md:flex justify-center items-center hidden  cursor-pointer leading-5 transition duration-150 ease-in  border-t-2 border-transparent"
-          >
-            14
-          </div>
-          <div
-            class="w-8 md:flex justify-center items-center hidden  cursor-pointer leading-5 transition duration-150 ease-in  border-t-2 border-transparent"
-          >
-            15
-          </div>
-          <div
-            class="w-8 h-8 md:hidden flex justify-center items-center cursor-pointer leading-5 transition duration-150 ease-in border-t-2 border-orange-600"
-          >
-            2
-          </div>
-        </div>
-        <div
-          class="h-8 w-8 ml-1 flex justify-center items-center  cursor-pointer"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="100%"
-            height="100%"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="feather feather-chevron-right w-4 h-4"
-          >
-            <polyline points="9 18 15 12 9 6" />
-          </svg>
-        </div>
-      </div>
+      <button class="pagination-item" type="button" @click="onClickLastPage" :class="{ 'cursor-default': isInLastPage }"
+        :disabled="isInLastPage" aria-label="Go to last page">
+        Fine
+      </button>
     </div>
   </div>
 </template>
+
 <script>
 export default {
-  name: 'Pagination',
-  data () {
-    return {}
+  name: "pagination",
+  template: "#pagination",
+  props: {
+    limit: {
+      type: Number,
+      required: false,
+      default: 5,
+    },
+    totalItems: {
+      type: Number,
+      required: true,
+    },
+    perPage: {
+      type: Number,
+      required: true,
+    },
+    value: {
+      type: Number,
+      required: true,
+    },
+    classes: {
+      type: Object,
+      required: false,
+      default: () => { },
+    },
   },
-  methods: {}
-}
+  data() {
+    return {
+      visibleButtons: 0,
+    };
+  },
+  beforeMount() {
+    if(!this.numPages) {
+      this.numPages = Math.ceil(this.totalItems / this.perPage);
+    }
+
+    if (this.numPages < this.limit) {
+      this.visibleButtons = this.numPages;
+    } else {
+      this.visibleButtons = this.limit;
+    }
+  },
+  computed: {
+    visible() {
+      return (
+        this.numPages &&
+        this.totalItems &&
+        this.perPage &&
+        this.value &&
+        this.totalItems > this.perPage
+      );
+    },
+    startPage() {
+      if (this.value === 1) {
+        return 1;
+      }
+
+      if (this.value === this.numPages) {
+        return this.numPages - this.visibleButtons + 1;
+      }
+
+      return this.value - 1;
+    },
+    endPage() {
+      return Math.min(
+        this.startPage + this.visibleButtons - 1,
+        this.numPages
+      );
+    },
+    pages() {
+      const range = [];
+
+      for (
+        let i = this.startPage;
+        i <=
+        Math.min(this.startPage + this.visibleButtons - 1, this.numPages);
+        i++
+      ) {
+        range.push({
+          name: i,
+          isDisabled: i === this.value,
+        });
+      }
+
+      return range;
+    },
+    isInFirstPage() {
+      return this.value === 1;
+    },
+    isInLastPage() {
+      return this.value >= this.numPages;
+    },
+    from() {
+      return this.perPage * (this.value - 1) + 1
+    },
+    to() {
+      return this.totalItems < this.perPage ? this.totalItems : this.perPage * this.value
+    }
+  },
+  methods: {
+    onClickFirstPage() {
+      this.$emit("change", 1);
+    },
+    onClickPreviousPage() {
+      this.$emit("change", this.value - 1);
+    },
+    onClickPage(page) {
+      this.$emit("change", page);
+    },
+    onClickNextPage() {
+      this.$emit("change", this.value + 1);
+    },
+    onClickLastPage() {
+      this.$emit("change", this.numPages);
+    },
+    isPageActive(page) {
+      return this.value === page;
+    },
+  },
+};
 </script>
+<style>
+.pagination {
+  @apply isolate inline-flex -space-x-px rounded-md shadow-sm my-2;
+}
+
+.pagination-item {
+  @apply relative inline-flex items-center px-4 py-2 text-xs font-semibold text-gray-800 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 rounded-none;
+}
+
+.pagination-item.active {
+  @apply bg-green-500 text-white ring-green-500;
+}
+
+.pagination-item button {
+  @apply bg-transparent;
+}
+
+.pagination>.pagination-item:first-child {
+  @apply rounded-tl-md rounded-bl-md;
+}
+
+.pagination>.pagination-item:last-child {
+  @apply rounded-tr-md rounded-br-md;
+}
+</style>
