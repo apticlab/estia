@@ -20,6 +20,7 @@
           <th
             v-for="(header, index) in visibleHeaders"
             :key="index"
+            :style="header.style"
             :class="[getHeaderClass(header)]"
             class="px-4 py-3 font-semibold text-md"
           >
