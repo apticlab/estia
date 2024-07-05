@@ -3,6 +3,7 @@
     "version": "2.0.0",
     "description": "The easiest way to build site in Vue.",
     "main": "dist/estia.umd.js",
+    "type": "module",
     "module": "dist/estia.es.js",
     "unpkg": "dist/estia.min.js",
     "publishConfig": {
