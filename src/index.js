@@ -1,6 +1,4 @@
 import VueFormulate from "@braid/vue-formulate";
-import VueTailwind from "vue-tailwind";
-import TPagination from "vue-tailwind/dist/t-pagination";
 import moment from "moment";
 
 // Import styles
@@ -79,12 +77,6 @@ export default {
         date: {
           component: "date-picker"
         }
-      }
-    });
-
-    Vue.use(VueTailwind, {
-      "t-pagination": {
-        component: TPagination
       }
     });
 
