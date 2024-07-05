@@ -10,6 +10,7 @@ export default defineConfig({
         },
     },
     build: {
+        cssCodeSplit: true,
         sourcemap: true,
         lib: {
             entry: 'src/index.js', // Adjust the entry point to your plugin's main file
