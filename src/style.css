@@ -87,7 +87,7 @@ button {
 
 button.disabled,
 button:disabled {
-  @apply cursor-not-allowed text-gray-800;
+  @apply cursor-not-allowed;
 }
 
 .progress-step.selected > span {

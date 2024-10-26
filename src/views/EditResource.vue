@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col items-center overflow-hidden rounded align-center">
     <loading v-if="loading" class="w-full my-16" />
-    <div v-if="!loading" class="w-full mx-auto max-w-screen-xl">
+    <div v-if="!loading" class="w-full mx-auto max-w-screen-xl relative">
       <div :class="[commandPosition.includes('float') ? 'pb-20' : '']">
         <div
           class="flex flex-row items-center justify-end w-full"
@@ -90,7 +90,7 @@
         class="flex flex-row items-center justify-end w-full py-5"
         :class="[
           commandPosition.includes('float')
-            ? 'fixed bottom-0 left-0 right-0  px-10 bg-gray-100'
+            ? 'fixed pl-64 bottom-0 left-0 right-0  px-10 bg-gray-100'
             : '',
         ]"
         v-if="!hideActions && (commandPosition.includes('float') || commandPosition.includes('bottom'))"

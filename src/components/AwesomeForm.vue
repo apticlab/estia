@@ -155,7 +155,7 @@
             </template>
           </v-date-picker>
         </template>
-        <div v-else>
+        <div v-else-if="header.type !== 'fieldset'">
           <template v-if="header.type == 'form'">
             <awesome-form
               class="px-10 w-12/12"
@@ -292,7 +292,7 @@
             @input="(value) => updateNested(header.field, value)"
           />
         </div>
-        <div class="ml-2 mt-2 mr-auto error-container">
+        <div class="ml-2 mt-2 mr-auto error-container" v-if="header.type !== 'fieldset'">
           <slot
             name="errors"
             :status="deepPick(form_validation_status, header.field)"
@@ -974,6 +974,10 @@ export default {
 
       let layout = header.layout || this.layout;
 
+      if(header.type) {
+        formFieldClass += " " + header.type;
+      }
+
       if (layout == "vertical") {
         formFieldClass += " grid grid-cols-3 flex flex-row items-center";
         minColSpan = 12;
@@ -992,7 +996,7 @@ export default {
           formFieldClass += ` col-span-${colSpan}`;
         }
 
-        formFieldClass += " mb-3 " + header.class;
+        formFieldClass += " mb-3 " + (header.class ?? '');
         formFieldClass += " row-span-" + (header.rowSpan || 1);
       }
 
