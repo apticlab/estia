@@ -1,3 +1,3 @@
-export default function (Vue, options) {
-  Vue.prototype.$viewFields = options.viewFields ? options.viewFields : {};
+export default function (app, options) {
+  app.config.globalProperties.$viewFields = options.viewFields ? options.viewFields : {};
 }

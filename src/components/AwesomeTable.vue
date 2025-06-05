@@ -25,7 +25,7 @@
             class="px-4 py-3 font-semibold text-md"
           >
             <div class="flex flex-row" :class="getHeaderClass(header)">
-              {{ header.label | translate }}
+              {{ $filters.translate(header.label) }}
             </div>
           </th>
           <th
@@ -119,7 +119,7 @@
                       'https://www.instagram.com/p/' +
                       deepPick(row, header.fields.url_link)
                     "
-                    >{{ deepPick(row, header.fields.url_name) | translate }}</a
+                    >{{ $filters.translate(deepPick(row, header.fields.url_name)) }}</a>
                   >
                 </div>
 
@@ -134,18 +134,18 @@
                   v-if="header.type == 'timeago'"
                   class="flex flex-row items-center"
                 >
-                  <span class>{{
-                    deepPick(row, header.field) | time_ago
-                  }}</span>
+                  <span class>
+                    {{ $filters.time_ago(deepPick(row, header.field)) }}
+                  </span>
                 </div>
 
                 <div
                   v-if="header.type == 'date'"
                   class="flex flex-row items-center"
                 >
-                  <span v-if="deepPick(row, header.field)" class>{{
-                    deepPick(row, header.field) | date(header.dateFormat)
-                  }}</span>
+                  <span v-if="deepPick(row, header.field)" class>
+                    {{ $filters.date(deepPick(row, header.field), header.dateFormat) }}
+                  </span>
                   <span v-else class="text-gray-400 italic">
                     {{ header.on_empty }}
                   </span>
@@ -168,8 +168,10 @@
                     :title="deepPick(row, header.field, header.type)"
                   >
                     {{
-                      deepPick(row, header.field, header.type)
-                        | truncate(header.truncate)
+                      $filters.truncate(
+                        deepPick(row, header.field, header.type),
+                        header.truncate
+                      )
                     }}
                   </span>
                   <span v-else>{{ header.on_empty }}</span>
@@ -257,7 +259,7 @@
 
                 <template v-if="header.type == 'count'">
                   <div class>
-                    {{ deepPick(row, header.field) | count }}
+                    {{ $filters.count(deepPick(row, header.field)) }}
                   </div>
                 </template>
 
@@ -333,7 +335,7 @@
                   v-if="header.type == 'percentage'"
                   class="h-full w-full flex flex-col items-center"
                 >
-                  {{ deepPick(row, header.field) | percentage }}
+                  {{ $filters.percentage(deepPick(row, header.field)) }}
                 </div>
                 <div
                   v-if="header.type == 'horizontalpiechart'"
@@ -380,11 +382,8 @@
                     >
                       {{ action.label }}
                     </div>
-                    <span
-                      slot="reference"
-                    >
+                    <template #reference>
                       <icon
-                        slot="reference"
                         :name="action.icon"
                         :class="action.class"
                         :size="action.size || $theme.aw_table.actionDefaultSize"
@@ -395,7 +394,7 @@
                         :stop-propagation="true"
                         @click="actOnRow(action, index)"
                       />
-                    </span>
+                    </template>
                   </popper>
                 </template>
               </div>
@@ -698,6 +697,7 @@ export default {
       this.editIndex = null;
 
       this.$emit("row-added", rows);
+      this.$emit("update:rows", rows);
     },
     edit(index) {
       this.mode = "edit";
@@ -730,6 +730,7 @@ export default {
       }
 
       this.$emit("row-deleted", this.rows);
+      this.$emit("update:rows", this.rows);
     },
     getPillBgColor(color) {
       if (!color) {

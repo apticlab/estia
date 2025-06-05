@@ -9,7 +9,9 @@
         <span class="text-indigo-300 font-medium">
           {{ story.user.username }}
         </span>
-        <small class="text-gray-200"> {{ story.created_at | moment }} </small>
+        <small class="text-gray-200">
+          {{ $filters.time_ago(story.created_at) }}
+        </small>
       </div>
     </div>
     <div class="rounded-lg mt-4 h-72">

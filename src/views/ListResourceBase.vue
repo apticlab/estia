@@ -107,14 +107,15 @@
                     {{ action.label }}
                   </p>
                 </div>
-                <icon
-                  slot="reference"
-                  name="dots-vertical"
-                  size="l"
-                  color="text-gray-500"
-                  class="mr-1 focus:outline-none p-1"
-                  :stop-propagation="true"
-                />
+                <template #reference>
+                  <icon
+                    name="dots-vertical"
+                    size="l"
+                    color="text-gray-500"
+                    class="mr-1 focus:outline-none p-1"
+                    :stop-propagation="true"
+                  />
+                </template>
               </popper>
             </div>
             <div

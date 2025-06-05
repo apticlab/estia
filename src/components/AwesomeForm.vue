@@ -411,7 +411,7 @@ export default {
     // change it entirely to trigger some refresh
     try {
       let dataForm = JSON.parse(JSON.stringify(this.form));
-      this.$set(this, "dataForm", dataForm || {});
+      this.dataForm = dataForm || {};
     } catch (e) {
       this.dataForm = {};
     }
@@ -492,11 +492,7 @@ export default {
     updateFormulate(formulateForm) {
       // Merge data from Formulate and from our own nested two way bindings
       Object.keys(formulateForm).forEach((fieldName) => {
-        this.$set(
-          this.dataForm,
-          fieldName,
-          this.deepPick(formulateForm, fieldName)
-        );
+        _.set(this.dataForm, fieldName, this.deepPick(formulateForm, fieldName));
       });
 
       this.updateOldForm(this.dataForm);
@@ -1017,11 +1013,7 @@ export default {
         this.$watch(
           `dataForm.${varToWatch}`,
           (newV, oldV) => {
-            this.$set(
-              this.dataForm,
-              header.field,
-              header.depends_on.computed(newV)
-            );
+            _.set(this.dataForm, header.field, header.depends_on.computed(newV));
             this.updateHeaders = new Date().getTime();
           },
           { deep: true }

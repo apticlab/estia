@@ -21,16 +21,15 @@
             :min-date="new Date()"
             is-inline
           >
-            <div slot-scope="header" slot="header-title">
-              <span class="text-blue-600">{{ header.title | capitalize }}</span>
-            </div>
-            <div
-              @click="setDate(day)"
-              slot="day-content"
-              slot-scope="{ day, attributes }"
-              :class="is_mobile ? 'justify-center' : 'h-32'"
-              class="flex flex-col h-full z-10 overflow-hidden p-2"
-            >
+            <template #header-title="{ header }">
+              <span class="text-blue-600">{{ $filters.capitalize(header.title) }}</span>
+            </template>
+            <template #day-content="{ day, attributes }">
+              <div
+                @click="setDate(day)"
+                :class="is_mobile ? 'justify-center' : 'h-32'"
+                class="flex flex-col h-full z-10 overflow-hidden p-2"
+              >
               <span
                 :class="[selectedDate.id == day.id ? 'text-blue-600' : 'text-gray', is_mobile ? 'text-center' : 'text-right']"
                 class="day-label text-normal"
@@ -43,9 +42,7 @@
                   class="text leading-tight rounded-sm p-1 mt-0 mb-1 ml-auto"
                   :class="attr.customData ? attr.customData.class : ''"
                 >
-                  {{
-                  attr.customData ? attr.customData.title : "" | leftpad(6)
-                  }}
+                  {{ $filters.leftpad(attr.customData ? attr.customData.title : '', 6) }}
                 </p>
               </div>
               <div
@@ -55,7 +52,8 @@
                 ]"
                 class="w-full rounded-md mt-2"
               ></div>
-            </div>
+              </div>
+            </template>
           </v-date-picker>
           <div class="bg-gray-50 flex-grow flex flex-col mt-4">
             <transition name="slide-fade" mode="in-out">

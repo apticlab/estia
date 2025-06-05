@@ -15,12 +15,12 @@
       <span v-if="field.type == 'textarea'">{{ value }}</span>
       <span v-if="field.type == 'select'">{{ value }}</span>
 
-      <span v-if="field.type == 'balance'">{{ value | round }} €</span>
+      <span v-if="field.type == 'balance'">{{ $filters.round(value) }} €</span>
       <span v-if="field.type == 'date'">
-        {{ value | date(field.dateFormat) }}
+        {{ $filters.date(value, field.dateFormat) }}
       </span>
       <span v-if="field.type == 'number'"
-        >{{ value | round(2, field.udm) }} {{ field.udm }}</span
+        >{{ $filters.round(value, 2) }} {{ field.udm }}</span
       >
       <span v-if="field.type == 'customer'">
         <span

@@ -4,10 +4,10 @@ import VCalendar from "v-calendar";
 import VueWindowSize from "vue-window-size";
 import { VLazyImagePlugin } from "v-lazy-image";
 
-export default function(Vue) {
-  Vue.use(Dialog);
-  Vue.use(Alert);
-  Vue.use(VCalendar);
-  Vue.use(VLazyImagePlugin);
-  Vue.use(VueWindowSize);
+export default function(app) {
+  app.use(Dialog);
+  app.use(Alert);
+  app.use(VCalendar);
+  app.use(VLazyImagePlugin);
+  app.use(VueWindowSize);
 }

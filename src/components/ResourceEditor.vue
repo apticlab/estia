@@ -5,10 +5,10 @@
       :headers="headers"
       :actions="actions"
       :fields="fields"
-      :rows.sync="rows"
+      v-model:rows="rows"
       :readonly="readonly"
-      v-on:row-added="reloadRows($event)"
-      v-on:row-deleted="reloadRows($event)"
+      @row-added="reloadRows($event)"
+      @row-deleted="reloadRows($event)"
     ></awesome-table>
   </div>
 </template>
