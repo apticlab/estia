@@ -1,6 +1,9 @@
 import filters from "./filters.js";
 
-export default function(Vue, userFilters) {
-  Object.keys(filters).forEach(key => Vue.filter(key, filters[key]));
-  Object.keys(userFilters).forEach(key => Vue.filter(key, userFilters[key]));
+export default function(app, userFilters) {
+  const all = { ...filters, ...userFilters };
+  app.config.globalProperties.$filters = {
+    ...(app.config.globalProperties.$filters || {}),
+    ...all,
+  };
 }

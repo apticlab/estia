@@ -103,7 +103,7 @@ export default {
     };
   },
   async mounted() {
-    EventBus.$on("reload-memo-calendar", this.reloadMemos);
+    EventBus.on("reload-memo-calendar", this.reloadMemos);
     await this.reloadMemos();
   },
   methods: {

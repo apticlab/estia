@@ -106,10 +106,10 @@ export default {
     },
   },
   beforeMount() {
-    AwAlert.EventBus.$on("show", this.show);
+    this.$bus.on("show", this.show);
   },
-  beforeDestroy() {
-    AwAlert.EventBus.$off("show", this.show);
+  beforeUnmount() {
+    this.$bus.off("show", this.show);
   },
   computed: {
     icon() {

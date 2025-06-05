@@ -190,7 +190,7 @@ export default {
     }
   },
 
-  destroyed() {
+  unmounted() {
     this.destroyPopper();
   },
 

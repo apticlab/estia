@@ -19,11 +19,11 @@ export default {
     };
   },
   beforeMount() {
-    this.EventBus.$on("err-boundary", (err) => {
+    this.$bus.on("err-boundary", (err) => {
       this.reloadError(err);
     });
   },
-  beforeDestroy() {},
+  beforeUnmount() {},
   errorCaptured(err) {
     this.reloadError(err);
     return true;

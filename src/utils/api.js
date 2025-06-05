@@ -1,6 +1,5 @@
 import axios from 'axios'
 import { getToken, hasActiveRole, getActiveRole, setProfile } from './auth.js'
-import { EventBus } from './event-bus.js'
 import testApi from './test-api.js'
 
 var ENV = process.env.NODE_ENV || 'development';

@@ -1,4 +1,3 @@
-import { EventBus } from '@/utils/event-bus.js'
 import axios from 'axios';
 
 export default {

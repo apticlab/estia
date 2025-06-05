@@ -31,30 +31,30 @@ import _ from 'lodash';
 let $api = null;
 
 export default {
-  install(Vue, options) {
+  install(app, options) {
     $api = api(options);
-    Vue.prototype.$api = $api;
-    Vue.prototype.EventBus = EventBus;
-    Vue.prototype.$theme = theme(options);
-    Vue.prototype.$actions = options.actions ? options.actions : {};
-    Vue.prototype.$moment = moment;
-    Vue.prototype.$roleLookup = options.roleLookup;
-    Vue.prototype.$icon = options.icon || "heroicons";
-    Vue.prototype.$validators = _.merge(Validators, options.validators);
+    app.config.globalProperties.$api = $api;
+    app.config.globalProperties.$bus = EventBus;
+    app.config.globalProperties.$theme = theme(options);
+    app.config.globalProperties.$actions = options.actions ? options.actions : {};
+    app.config.globalProperties.$moment = moment;
+    app.config.globalProperties.$roleLookup = options.roleLookup;
+    app.config.globalProperties.$icon = options.icon || "heroicons";
+    app.config.globalProperties.$validators = _.merge(Validators, options.validators);
 
-    components(Vue);
-    mixins(Vue);
-    plugins(Vue);
-    filters(Vue, options.filters || {});
-    resources(Vue, options.resources || {});
-    store(Vue, options.store);
-    viewFields(Vue, options);
-    editFields(Vue, options);
-    modalWidgets(Vue, options);
+    components(app);
+    mixins(app);
+    plugins(app);
+    filters(app, options.filters || {});
+    resources(app, options.resources || {});
+    store(app, options.store);
+    viewFields(app, options);
+    editFields(app, options);
+    modalWidgets(app, options);
 
-    Object.keys(_.merge(helpers, (options.helpers || {}))).forEach(key => (Vue.prototype[key] = helpers[key]));
+    Object.keys(_.merge(helpers, (options.helpers || {}))).forEach(key => (app.config.globalProperties[key] = helpers[key]));
 
-    Vue.use(VueFormulate, {
+    app.use(VueFormulate, {
       library: {
         "v-html": {
           component: 'v-html'
@@ -83,7 +83,7 @@ export default {
     // Add default routes and router configuration
     if (options.router) {
       router(options);
-      Vue.prototype.$routes = options.innerRoutes || [];
+      app.config.globalProperties.$routes = options.innerRoutes || [];
     }
   }
 };

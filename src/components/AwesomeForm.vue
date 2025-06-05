@@ -427,7 +427,7 @@ export default {
 
     this.loading = false;
   },
-  beforeDestroy() {
+  beforeUnmount() {
     // this.event_bus.$off('aw:form:update', this.forceUpdate);
   },
   methods: {

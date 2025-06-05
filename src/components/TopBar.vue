@@ -56,7 +56,7 @@ export default {
   }),
   beforeMount() {
     this.reloadUser();
-    this.EventBus.$on("reload-user", this.reloadUser);
+    this.$bus.on("reload-user", this.reloadUser);
     this.listenForSideNavCollapseEvent();
   },
   methods: {

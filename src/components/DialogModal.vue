@@ -135,13 +135,13 @@ export default {
     },
   },
   beforeMount() {
-    Dialog.EventBus.$on("show", this.show);
-    Dialog.EventBus.$on("hide", this.hide);
+    this.$bus.on("show", this.show);
+    this.$bus.on("hide", this.hide);
   },
-  beforeDestroy() {
+  beforeUnmount() {
     document.removeEventListener("keyup", this.exitKeyEvent);
-    Dialog.EventBus.$off("show", this.show);
-    Dialog.EventBus.$off("hide", this.hide);
+    this.$bus.off("show", this.show);
+    this.$bus.off("hide", this.hide);
   },
   methods: {
     hide() {

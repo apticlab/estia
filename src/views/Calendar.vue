@@ -141,7 +141,7 @@ export default {
     };
   },
   async mounted() {
-    EventBus.$on("reload-event-calendar", this.processEvents);
+    EventBus.on("reload-event-calendar", this.processEvents);
     this.isLoading = true;
     await this.loadMission();
     await this.processEvents(this.events);
