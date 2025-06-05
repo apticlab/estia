@@ -24,13 +24,10 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: "ig-story",
-  props: {
-    story: { required: true, default: null }
-  }
-};
+<script setup>
+defineProps({
+  story: { required: true, default: null }
+})
 </script>
 
 <style></style>
