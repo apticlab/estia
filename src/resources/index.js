@@ -1,7 +1,7 @@
-export default function (Vue, resources, options = null) {
-  Vue.prototype.resources = {}
+export default function (app, resources, options = null) {
+  app.config.globalProperties.resources = {}
 
   Object.keys(resources).forEach(resource => {
-    Vue.prototype.resources[resource] = resources[resource]
+    app.config.globalProperties.resources[resource] = resources[resource]
   })
 }

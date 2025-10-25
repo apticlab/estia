@@ -6,8 +6,8 @@ const baseModalWidgets = {
   'confirm': Confirm
 }
 
-export default function (Vue, options) {
-  Vue.prototype.$modalWidgets = {
+export default function (app, options) {
+  app.config.globalProperties.$modalWidgets = {
     ...baseModalWidgets,
     ...options.modalWidgets ? options.modalWidgets : {}
   }

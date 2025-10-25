@@ -1,4 +1,3 @@
-import DateRangePicker from 'vue2-daterange-picker'
 import ImageUploader from '@/components/ImageUploader.vue'
 import Loading from '@/components/Loading.vue'
 import Chart from '@/components/Chart.vue'
@@ -15,7 +14,6 @@ import ResourceSelect from '@/components/ResourceSelect.vue'
 import ResourceEditor from '@/components/ResourceEditor.vue'
 import FieldView from '@/components/FieldView.vue'
 import FieldEdit from '@/components/FieldEdit.vue'
-import VueTimepicker from 'vue2-timepicker'
 import TabView from '@/views/TabView.vue'
 import RecursivityPicker from '@/components/RecursivityPicker.vue'
 import RecursivityView from '@/components/RecursivityView.vue'
@@ -34,41 +32,39 @@ import DatePicker from '@/components/DatePicker.vue';
 import SelectMenu from '@/components/SelectMenu.vue';
 import VHtml from '@/components/Vhtml.vue';
 
-export default function (Vue) {
-  Vue.component('login', Login)
-  Vue.component('loading', Loading)
-  Vue.component('chart', Chart)
-  Vue.component('awesome-table', AwesomeTable)
-  Vue.component('color-swatch', ColorSwatch)
-  Vue.component('avatar', Avatar)
-  Vue.component('horizontal-pie-chart', HorizontalPieChart)
-  Vue.component('aw-datepicker', DateRangePicker)
-  Vue.component('blr-image', BlurImage)
-  Vue.component('svg-icon', SvgIcon)
-  Vue.component('page-error', PageError)
-  Vue.component('error-boundary', ErrorBoundary)
-  Vue.component('awesome-form', AwesomeForm)
-  Vue.component('resource-select', ResourceSelect)
-  Vue.component('field-view', FieldView)
-  Vue.component('resource-editor', ResourceEditor)
-  Vue.component('field-edit', FieldEdit)
-  Vue.component('vue-timepicker', VueTimepicker)
-  Vue.component('tab-view', TabView)
-  Vue.component('recursivity-picker', RecursivityPicker)
-  Vue.component('recursivity-view', RecursivityView)
-  Vue.component('resource-edit', EditResource)
-  Vue.component('resource-image-uploader', ImageUploader)
-  Vue.component('file-uploader', FileUploader)
-  Vue.component('side-nav', SideNav)
-  Vue.component('top-bar', TopBar)
-  Vue.component('popper', Popper)
-  Vue.component('list-resource-base', ListResourceBase)
-  Vue.component('view-resource', ViewResource)
-  Vue.component('search-input', SearchInput);
-  Vue.component('no-data', NoData);
-  Vue.component('date-picker', DatePicker);
-  Vue.component('select-menu', SelectMenu);
-  Vue.component('v-html', VHtml);
+export default function (app) {
+  app.component('login', Login)
+  app.component('loading', Loading)
+  app.component('chart', Chart)
+  app.component('awesome-table', AwesomeTable)
+  app.component('color-swatch', ColorSwatch)
+  app.component('avatar', Avatar)
+  app.component('horizontal-pie-chart', HorizontalPieChart)
+  app.component('blr-image', BlurImage)
+  app.component('svg-icon', SvgIcon)
+  app.component('page-error', PageError)
+  app.component('error-boundary', ErrorBoundary)
+  app.component('awesome-form', AwesomeForm)
+  app.component('resource-select', ResourceSelect)
+  app.component('field-view', FieldView)
+  app.component('resource-editor', ResourceEditor)
+  app.component('field-edit', FieldEdit)
+  app.component('tab-view', TabView)
+  app.component('recursivity-picker', RecursivityPicker)
+  app.component('recursivity-view', RecursivityView)
+  app.component('resource-edit', EditResource)
+  app.component('resource-image-uploader', ImageUploader)
+  app.component('file-uploader', FileUploader)
+  app.component('side-nav', SideNav)
+  app.component('top-bar', TopBar)
+  app.component('popper', Popper)
+  app.component('list-resource-base', ListResourceBase)
+  app.component('view-resource', ViewResource)
+  app.component('search-input', SearchInput);
+  app.component('no-data', NoData);
+  app.component('date-picker', DatePicker);
+  app.component('select-menu', SelectMenu);
+  app.component('v-html', VHtml);
 }
 
 export {

@@ -1,12 +1,10 @@
-import Vue from "vue";
-import VueI18n from "vue-i18n";
+import { createI18n } from "vue-i18n";
 import locales from "./locales";
 
-Vue.use(VueI18n);
-
-const translations = new VueI18n({
+const i18n = createI18n({
+  legacy: false,
   locale: "it",
   messages: locales
 });
 
-export default translations;
+export default i18n;

@@ -134,7 +134,10 @@ export default function (options) {
     ...outerRoutes
   ]
 
-  router.addRoutes(routes)
+  // In Vue Router 4, addRoutes is replaced with addRoute for individual routes
+  routes.forEach(route => {
+    router.addRoute(route)
+  })
 
   /*  axios.interceptors.response.use(undefined, function (err) {
      if (err.response.status === 401) {

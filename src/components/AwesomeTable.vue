@@ -39,9 +39,8 @@
         </tr>
       </thead>
       <tbody>
-        <template v-for="(row, index) in rows">
+        <template v-for="(row, index) in rows" :key="index">
           <tr
-            :key="index"
             class="cursor-pointer"
             :class="rowClass"
             @click="handleRowClick(row, index)"
