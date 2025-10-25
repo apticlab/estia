@@ -12809,7 +12809,7 @@ function QE() {
   return e == null || e == null || e == {} || e == [] ? null : e;
 }
 function Mw(e) {
-  localStorage.setItem("user", JSON.stringify(e)), Lp.$emit("reload-user");
+  localStorage.setItem("user", JSON.stringify(e)), Lp.emit("reload-user");
 }
 function gw() {
   localStorage.removeItem("token"), localStorage.removeItem("user"), localStorage.removeItem("activeRole"), Ke.defaults.headers.Authorization = null, delete Ke.defaults.headers.activerole;
@@ -13118,14 +13118,14 @@ const qw = {
       this.show_text = !1;
     },
     collapseSideBar() {
-      this.is_collapsed ? (this.log("show-text", this.is_mobile), this.is_mobile ? (this.show_text = !this.show_text, this.EventBus.$emit("side-bar:show-text", this.show_text)) : setTimeout(() => {
-        this.show_text = !this.show_text, this.EventBus.$emit("side-bar:show-text", this.show_text);
-      }, 200)) : (this.show_text = !this.show_text, this.EventBus.$emit("side-bar:show-text", this.show_text)), this.is_collapsed = !this.is_collapsed, localStorage.setItem("is_collapsed", this.is_collapsed), this.EventBus.$emit("side-bar:collapse", this.is_collapsed);
+      this.is_collapsed ? (this.log("show-text", this.is_mobile), this.is_mobile ? (this.show_text = !this.show_text, this.EventBus.emit("side-bar:show-text", this.show_text)) : setTimeout(() => {
+        this.show_text = !this.show_text, this.EventBus.emit("side-bar:show-text", this.show_text);
+      }, 200)) : (this.show_text = !this.show_text, this.EventBus.emit("side-bar:show-text", this.show_text)), this.is_collapsed = !this.is_collapsed, localStorage.setItem("is_collapsed", this.is_collapsed), this.EventBus.emit("side-bar:collapse", this.is_collapsed);
     },
     listenForSideNavCollapseEvent() {
-      this.EventBus.$on("side-bar:collapse", (e) => {
+      this.EventBus.on("side-bar:collapse", (e) => {
         this.is_collapsed = e;
-      }), this.EventBus.$on("side-bar:show-text", (e) => {
+      }), this.EventBus.on("side-bar:show-text", (e) => {
         this.show_text = e;
       });
     },
@@ -14178,11 +14178,11 @@ const UZ = /* @__PURE__ */ et(MZ, [["render", FZ]]), wZ = {
       return this.theme.title || this.$theme.modal.title;
     }
   },
-  beforeMount() {
-    xa.EventBus.$on("show", this.show), xa.EventBus.$on("hide", this.hide);
+  mounted() {
+    xa.EventBus.on("show", this.show), xa.EventBus.on("hide", this.hide);
   },
-  beforeDestroy() {
-    document.removeEventListener("keyup", this.exitKeyEvent), xa.EventBus.$off("show", this.show), xa.EventBus.$off("hide", this.hide);
+  beforeUnmount() {
+    document.removeEventListener("keyup", this.exitKeyEvent), xa.EventBus.off("show", this.show), xa.EventBus.off("hide", this.hide);
   },
   methods: {
     hide() {
@@ -14293,7 +14293,7 @@ function WZ(e, t, n, r, s, i) {
     _: 1
   });
 }
-const jZ = /* @__PURE__ */ et(wZ, [["render", WZ], ["__scopeId", "data-v-9f29b023"]]), xa = {
+const jZ = /* @__PURE__ */ et(wZ, [["render", WZ], ["__scopeId", "data-v-b017031e"]]), xa = {
   // every plugin for Vue.js needs install method
   // this method will run after app.use(<your-plugin-here>) is executed
   install(e, t) {
@@ -14336,11 +14336,11 @@ const jZ = /* @__PURE__ */ et(wZ, [["render", WZ], ["__scopeId", "data-v-9f29b02
       this.$refs.backdrop == e.target && this.hide();
     }
   },
-  beforeMount() {
-    Qi.EventBus.$on("show", this.show);
+  mounted() {
+    Qi.EventBus.on("show", this.show);
   },
-  beforeDestroy() {
-    Qi.EventBus.$off("show", this.show);
+  beforeUnmount() {
+    Qi.EventBus.off("show", this.show);
   },
   computed: {
     icon() {
@@ -34392,12 +34392,12 @@ const wce = /* @__PURE__ */ et(yce, [["render", Uce]]), Zce = {
       err: !1
     };
   },
-  beforeMount() {
-    this.EventBus.$on("err-boundary", (e) => {
+  mounted() {
+    this.EventBus.on("err-boundary", (e) => {
       this.reloadError(e);
     });
   },
-  beforeDestroy() {
+  beforeUnmount() {
   },
   errorCaptured(e) {
     return this.reloadError(e), !0;
@@ -36947,8 +36947,8 @@ const QIe = /* @__PURE__ */ et(kIe, [["render", qIe]]), KIe = {
       }
     ]
   }),
-  beforeMount() {
-    this.reloadUser(), this.EventBus.$on("reload-user", this.reloadUser), this.listenForSideNavCollapseEvent();
+  mounted() {
+    this.reloadUser(), this.EventBus.on("reload-user", this.reloadUser), this.listenForSideNavCollapseEvent();
   },
   methods: {
     ...TZ("user", ["set_user", "set_token"]),

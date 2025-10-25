@@ -1,5 +1,4 @@
 import axios from "axios";
-import Vue from 'vue';
 import { EventBus } from "./event-bus.js";
 
 export {
@@ -84,7 +83,7 @@ function getProfile() {
 
 function setProfile(user) {
   localStorage.setItem("user", JSON.stringify(user));
-  EventBus.$emit("reload-user");
+  EventBus.emit("reload-user");
 }
 
 function getUserRole(role) {

@@ -105,11 +105,11 @@ export default {
       }
     },
   },
-  beforeMount() {
-    AwAlert.EventBus.$on("show", this.show);
+  mounted() {
+    AwAlert.EventBus.on("show", this.show);
   },
-  beforeDestroy() {
-    AwAlert.EventBus.$off("show", this.show);
+  beforeUnmount() {
+    AwAlert.EventBus.off("show", this.show);
   },
   computed: {
     icon() {

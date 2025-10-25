@@ -54,9 +54,9 @@ export default {
       }
     ]
   }),
-  beforeMount() {
+  mounted() {
     this.reloadUser();
-    this.EventBus.$on("reload-user", this.reloadUser);
+    this.EventBus.on("reload-user", this.reloadUser);
     this.listenForSideNavCollapseEvent();
   },
   methods: {

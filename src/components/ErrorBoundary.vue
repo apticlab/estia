@@ -18,12 +18,12 @@ export default {
       err: false,
     };
   },
-  beforeMount() {
-    this.EventBus.$on("err-boundary", (err) => {
+  mounted() {
+    this.EventBus.on("err-boundary", (err) => {
       this.reloadError(err);
     });
   },
-  beforeDestroy() {},
+  beforeUnmount() {},
   errorCaptured(err) {
     this.reloadError(err);
     return true;

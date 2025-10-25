@@ -134,14 +134,14 @@ export default {
       return this.theme.title || this.$theme.modal.title;
     },
   },
-  beforeMount() {
-    Dialog.EventBus.$on("show", this.show);
-    Dialog.EventBus.$on("hide", this.hide);
+  mounted() {
+    Dialog.EventBus.on("show", this.show);
+    Dialog.EventBus.on("hide", this.hide);
   },
-  beforeDestroy() {
+  beforeUnmount() {
     document.removeEventListener("keyup", this.exitKeyEvent);
-    Dialog.EventBus.$off("show", this.show);
-    Dialog.EventBus.$off("hide", this.hide);
+    Dialog.EventBus.off("show", this.show);
+    Dialog.EventBus.off("hide", this.hide);
   },
   methods: {
     hide() {

@@ -29,29 +29,29 @@ export default {
 
         if (this.is_mobile) {
           this.show_text = !this.show_text
-          this.EventBus.$emit('side-bar:show-text', this.show_text)
+          this.EventBus.emit('side-bar:show-text', this.show_text)
         } else {
           // in modalità desktop il tempo del timeout deve essere
           // minore di 100ms rispetto alla durata dell'animazione
           setTimeout(() => {
             this.show_text = !this.show_text
-            this.EventBus.$emit('side-bar:show-text', this.show_text)
+            this.EventBus.emit('side-bar:show-text', this.show_text)
           }, 200)
         }
       } else {
         this.show_text = !this.show_text
-        this.EventBus.$emit('side-bar:show-text', this.show_text)
+        this.EventBus.emit('side-bar:show-text', this.show_text)
       }
 
       this.is_collapsed = !this.is_collapsed
       localStorage.setItem('is_collapsed', this.is_collapsed)
-      this.EventBus.$emit('side-bar:collapse', this.is_collapsed)
+      this.EventBus.emit('side-bar:collapse', this.is_collapsed)
     },
     listenForSideNavCollapseEvent () {
-      this.EventBus.$on('side-bar:collapse', (value) => {
+      this.EventBus.on('side-bar:collapse', (value) => {
         this.is_collapsed = value
       })
-      this.EventBus.$on('side-bar:show-text', (value) => {
+      this.EventBus.on('side-bar:show-text', (value) => {
         this.show_text = value
       })
     },
