@@ -34,7 +34,7 @@ export default {
       }
     }
   },
-  mounted () {
+  created () {
     this.format_path_for_breadcrumbs(this.$route.fullPath)
     this.listenForSideNavCollapseEvent()
   },

@@ -25326,7 +25326,7 @@ const bae = /* @__PURE__ */ et(yae, [["render", Vae]]), Fae = {
       }
     }
   },
-  mounted() {
+  created() {
     this.format_path_for_breadcrumbs(this.$route.fullPath), this.listenForSideNavCollapseEvent();
   },
   methods: {
@@ -36176,7 +36176,8 @@ const KEe = /* @__PURE__ */ et(DEe, [["render", QEe]]), XEe = {
   },
   data() {
     return {
-      visibleButtons: 0
+      visibleButtons: 0,
+      numPages: 0
     };
   },
   created() {
@@ -36847,7 +36848,7 @@ const HIe = /* @__PURE__ */ et(GIe, [["render", xIe]]), kIe = {
       return this.$route.matched.filter((e) => e.meta && e.meta.sectionName).map((e) => e.meta.sectionName);
     }
   },
-  mounted() {
+  created() {
     this.listenForSideNavCollapseEvent();
   },
   methods: {

@@ -65,6 +65,7 @@ export default {
   data() {
     return {
       visibleButtons: 0,
+      numPages: 0,
     };
   },
   created() {

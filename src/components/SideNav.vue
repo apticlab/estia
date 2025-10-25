@@ -113,7 +113,7 @@ export default {
         .map((l) => l.meta.sectionName);
     },
   },
-  mounted() {
+  created() {
     this.listenForSideNavCollapseEvent();
   },
   methods: {
