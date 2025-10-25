@@ -67,7 +67,7 @@ export default {
       visibleButtons: 0,
     };
   },
-  beforeMount() {
+  created() {
     if(!this.numPages) {
       this.numPages = Math.ceil(this.totalItems / this.perPage);
     }

@@ -40,7 +40,7 @@ export default {
       currentTab: null
     };
   },
-  beforeMount() {
+  created() {
     this.fetchTabs();
   },
   mounted() {

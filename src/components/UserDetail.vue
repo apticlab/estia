@@ -185,7 +185,7 @@ export default {
       loggedUser: {}
     };
   },
-  beforeMount() {
+  created() {
     this.loggedUser = getProfile();
   },
   methods: {

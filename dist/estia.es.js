@@ -13108,8 +13108,6 @@ const qw = {
     };
   },
   created() {
-  },
-  beforeMount() {
     this.getSideBarCollapseState();
   },
   methods: {
@@ -25328,7 +25326,7 @@ const bae = /* @__PURE__ */ et(yae, [["render", Vae]]), Fae = {
       }
     }
   },
-  beforeMount() {
+  mounted() {
     this.format_path_for_breadcrumbs(this.$route.fullPath), this.listenForSideNavCollapseEvent();
   },
   methods: {
@@ -34503,7 +34501,7 @@ const Hce = /* @__PURE__ */ et(Zce, [["render", xce]]), kce = {
     }
     await this.fetchOptions(), this.updateOldForm(this.dataForm), this.validatedataForm(), this.watchableOptions(), this.loading = !1;
   },
-  beforeDestroy() {
+  beforeUnmount() {
   },
   methods: {
     setDirty(e) {
@@ -35149,8 +35147,6 @@ const I0e = /* @__PURE__ */ et(kce, [["render", E0e]]), f0e = {
   },
   mounted() {
   },
-  beforeMount() {
-  },
   methods: {
     onChange(e) {
       let t = e.target.value, n = this.options.find((r) => r.id == t);
@@ -35613,7 +35609,7 @@ const OEe = /* @__PURE__ */ et(K0e, [["render", lEe]]), uEe = {
       currentTab: null
     };
   },
-  beforeMount() {
+  created() {
     this.fetchTabs();
   },
   mounted() {
@@ -36183,7 +36179,7 @@ const KEe = /* @__PURE__ */ et(DEe, [["render", QEe]]), XEe = {
       visibleButtons: 0
     };
   },
-  beforeMount() {
+  created() {
     this.numPages || (this.numPages = Math.ceil(this.totalItems / this.perPage)), this.numPages < this.limit ? this.visibleButtons = this.numPages : this.visibleButtons = this.limit;
   },
   computed: {
@@ -36851,10 +36847,8 @@ const HIe = /* @__PURE__ */ et(GIe, [["render", xIe]]), kIe = {
       return this.$route.matched.filter((e) => e.meta && e.meta.sectionName).map((e) => e.meta.sectionName);
     }
   },
-  beforeMount() {
-    this.listenForSideNavCollapseEvent();
-  },
   mounted() {
+    this.listenForSideNavCollapseEvent();
   },
   methods: {
     doUserAction(e) {

@@ -77,7 +77,6 @@ export default {
     };
   },
   mounted() {},
-  beforeMount() {},
   methods: {
     onChange($event) {
       let eventValue = $event.target.value;

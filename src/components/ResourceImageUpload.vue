@@ -34,7 +34,6 @@ export default {
   data() {
     return {};
   },
-  beforeMount() {},
   mounted() {},
   methods: {
     triggerFileChooser() {

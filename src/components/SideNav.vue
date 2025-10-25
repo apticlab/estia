@@ -113,10 +113,9 @@ export default {
         .map((l) => l.meta.sectionName);
     },
   },
-  beforeMount() {
+  mounted() {
     this.listenForSideNavCollapseEvent();
   },
-  mounted() {},
   methods: {
     doUserAction(action) {
       this.$router.push(action.path);

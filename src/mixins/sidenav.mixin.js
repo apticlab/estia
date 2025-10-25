@@ -5,8 +5,7 @@ export default {
       show_text: true
     }
   },
-  created () {},
-  beforeMount () {
+  created () {
     this.getSideBarCollapseState()
   },
   methods: {
