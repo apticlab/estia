@@ -41,7 +41,7 @@
     },
     "homepage": "https://github.com/apticlab/estia",
     "devDependencies": {
-        "@vitejs/plugin-vue": "^5.0.0",
+        "@vitejs/plugin-vue": "^6.0.1",
         "@vue/eslint-config-standard": "^8.0.1",
         "autoprefixer": "^10.4.19",
         "cssnano": "^5.1.15",
@@ -51,7 +51,7 @@
         "sass": "^1.77.0",
         "sass-loader": "^13.2.1",
         "tailwindcss": "^3.4.4",
-        "vite": "^5.3.3"
+        "vite": "^7.1.12"
     },
     "dependencies": {
         "@formkit/vue": "^1.6.0",
@@ -63,7 +63,7 @@
         "eslint-utils": "^3.0.0",
         "is-plain-object": "^5.0.0",
         "is-url": "1.2.4",
-        "jspdf": "^2.3.1",
+        "jspdf": "^3.0.3",
         "jsvat": "^2.5.3",
         "lodash": "4.17.21",
         "mitt": "^3.0.1",
