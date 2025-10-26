@@ -1,7 +1,7 @@
-FROM node:16.13.0
+FROM node:22
 
 RUN apt update
-RUN apt install git python build-essential -y
+RUN apt install git build-essential -y
 RUN npm install -g npm@9.6.6
 
 WORKDIR /app
