@@ -6,7 +6,6 @@ import ColorSwatch from '@/components/ColorSwatch.vue'
 import Avatar from '@/components/Avatar.vue'
 import HorizontalPieChart from '@/components/HorizontalPieChart.vue'
 import BlurImage from '@/components/BlurImage.vue'
-import SvgIcon from '@/components/SvgIcon.vue'
 import PageError from '@/components/PageError.vue'
 import ErrorBoundary from '@/components/ErrorBoundary.vue'
 import AwesomeForm from '@/components/AwesomeForm.vue'
@@ -41,7 +40,6 @@ export default function (app) {
   app.component('avatar', Avatar)
   app.component('horizontal-pie-chart', HorizontalPieChart)
   app.component('blr-image', BlurImage)
-  app.component('svg-icon', SvgIcon)
   app.component('page-error', PageError)
   app.component('error-boundary', ErrorBoundary)
   app.component('awesome-form', AwesomeForm)
