@@ -521,7 +521,7 @@ export default {
     /**
      * deprecated
      listenForAwEvents() {
-     this.event_bus.$on("aw:form:update", this.forceUpdate());
+     this.event_bus.on("aw:form:update", this.forceUpdate());
      }, */
     parseDate(header) {
       let parsedDate = this.moment(

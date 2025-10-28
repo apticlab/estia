@@ -39,7 +39,7 @@ export default {
     }
   },
   mounted: function () {
-    this.EventBus.$on('modal-status-change', (data) => {
+    this.EventBus.on('modal-status-change', (data) => {
       let status = data.status
 
       switch (status) {
@@ -62,7 +62,7 @@ export default {
       }
     })
 
-    this.EventBus.$on('modal-toggle', (config) => {
+    this.EventBus.on('modal-toggle', (config) => {
       this.isLoading = config.loading ? config.loading : false
 
       this.initModal()
