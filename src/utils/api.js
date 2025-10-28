@@ -1,7 +1,6 @@
 import axios from 'axios'
 import { getToken, hasActiveRole, getActiveRole, setProfile } from './auth.js'
 import { EventBus } from './event-bus.js'
-import testApi from './test-api.js'
 
 var ENV = process.env.NODE_ENV || 'development';
 var HOST = "";
@@ -45,8 +44,8 @@ export default function (options) {
   if (options.apiHost) {
     HOST = options.apiHost ? options.apiHost[ENV] : "";
   } else {
-    if (process.env.VUE_APP_API_HOST) {
-      HOST = process.env.VUE_APP_API_HOST;
+    if (import.meta.env.VITE_APP_API_HOST) {
+      HOST = import.meta.env.VITE_APP_API_HOST;
     }
   }
 
@@ -69,10 +68,6 @@ export default function (options) {
   BASE_URL = HOST + '/';
   API_URL = HOST + '/api';
   LOGIN_URL = API_URL + "/login";
-
-  if (options.test && options.test.apiTest) {
-    return testApi(options.test.resources)
-  }
 
   return api
 }
