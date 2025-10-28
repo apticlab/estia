@@ -15,7 +15,7 @@ export {
   getActiveRole
 };
 
-const HOST = process.env.VUE_APP_API_HOST  || "";
+const HOST = import.meta.env.VITE_APP_API_HOST || "";
 
 const API_URL = HOST + "/api";
 const LOGIN_URL = API_URL + "/login";
@@ -101,16 +101,16 @@ function logout() {
 
 
 function resetPassword(email) {
-  return new Promise(function(resolve, reject) {
+  return new Promise(function (resolve, reject) {
     axios
       .post(LOGIN_URL + "/resetpassword", {
         email: email
       })
       .then(
-        function(response) {
+        function (response) {
           resolve(response.data);
         },
-        function(err) {
+        function (err) {
           reject(err.response.data);
         }
       );

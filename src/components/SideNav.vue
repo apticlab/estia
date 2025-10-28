@@ -103,7 +103,7 @@ export default {
         });
     },
     version() {
-      return this.APPLICATION_VERSION;
+      return import.meta.env.VITE_APP_VERSION;
     },
     routesNames() {
       return this.$route.matched
