@@ -24,42 +24,41 @@
     <slot class="text-grey-800" name="message"></slot>
   </div>
 </template>
-<script>
-export default {
-  props: {
-    size: {
-      type: String,
-      validator: (size) => {
-        return ["xs", "s", "m", "l", "xl", "2xl"].includes(size);
-      },
-      default: "m",
+
+<script setup>
+import { ref, onMounted } from 'vue';
+
+const props = defineProps({
+  size: {
+    type: String,
+    validator: (size) => {
+      return ["xs", "s", "m", "l", "xl", "2xl"].includes(size);
     },
-    containerClass: {
-      type: String,
-      required: false,
-      default: "flex flex-col items-center justify-center flex-grow",
-    },
-    fill: {
-      type: String,
-      required: false,
-      default: "#ccc",
-    },
+    default: "m",
   },
-  data() {
-    return {
-      gradientColor: "#ccc",
-      sizes: {
-        xs: "24",
-        s: "48",
-        m: "64",
-        l: "72",
-        xl: "96",
-        "2xl": "144",
-      },
-    };
+  containerClass: {
+    type: String,
+    required: false,
+    default: "flex flex-col items-center justify-center flex-grow",
   },
-  mounted() {
-    this.gradientColor = this.fill;
+  fill: {
+    type: String,
+    required: false,
+    default: "#ccc",
   },
+});
+
+const gradientColor = ref("#ccc");
+const sizes = {
+  xs: "24",
+  s: "48",
+  m: "64",
+  l: "72",
+  xl: "96",
+  "2xl": "144",
 };
+
+onMounted(() => {
+  gradientColor.value = props.fill;
+});
 </script>

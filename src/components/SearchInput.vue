@@ -41,76 +41,77 @@
     </span>
   </div>
 </template>
-<script>
+
+<script setup>
+import { ref, watch, onMounted } from 'vue';
 import _ from "lodash";
 
-export default {
-  name: "SearchInput",
-  props: {
-    value: {
-      type: String,
-      required: false,
-    },
-    focus: {
-      type: Boolean,
-      required: false,
-    },
-    placeholder: {
-      type: String,
-      required: false,
-      default: "Cerca",
-    },
-    mode: {
-      type: String,
-      required: false,
-      default: "enter",
-      validator: (mode) => {
-        return ["enter", "debounce"].includes(mode);
-      },
+const props = defineProps({
+  value: {
+    type: String,
+    required: false,
+  },
+  focus: {
+    type: Boolean,
+    required: false,
+  },
+  placeholder: {
+    type: String,
+    required: false,
+    default: "Cerca",
+  },
+  mode: {
+    type: String,
+    required: false,
+    default: "enter",
+    validator: (mode) => {
+      return ["enter", "debounce"].includes(mode);
     },
   },
-  data() {
-    return {
-      inputValue: null,
-    };
-  },
-  async mounted() {
-    this.inputValue = this.value;
-  },
-  methods: {
-    onInput(value) {
-      if (this.inputValue == "") {
-        this.inputValue = null;
-      }
-      if (this.mode == "debounce") {
-        this.debounceInput(this.debounce);
-      }
-    },
-    onEnter() {
-      if (this.mode == "enter") {
-        this.$emit("input", this.inputValue);
-      }
-    },
-    debounceInput: _.debounce(function () {
-      this.$emit("input", this.inputValue);
-    }, 350),
-    clearInput() {
-      this.inputValue = null;
-      this.$emit("input", this.inputValue);
-    },
-    focusInput() {
-      this.$refs.input.focus();
-    },
-  },
-  computed: {},
-  watch: {
-    focus(newv) {
-      if (newv) {
-        this.$refs.input.focus();
-      } else {
-        this.$refs.input.blur();
-      }
-    },
-  },
+});
+
+const emit = defineEmits(['input']);
+
+const inputValue = ref(null);
+const input = ref(null);
+
+const debounceInput = _.debounce(() => {
+  emit("input", inputValue.value);
+}, 350);
+
+const onInput = () => {
+  if (inputValue.value == "") {
+    inputValue.value = null;
+  }
+  if (props.mode == "debounce") {
+    debounceInput();
+  }
 };
+
+const onEnter = () => {
+  if (props.mode == "enter") {
+    emit("input", inputValue.value);
+  }
+};
+
+const clearInput = () => {
+  inputValue.value = null;
+  emit("input", inputValue.value);
+};
+
+const focusInput = () => {
+  input.value.focus();
+};
+
+watch(() => props.focus, (newv) => {
+  if (newv) {
+    input.value.focus();
+  } else {
+    input.value.blur();
+  }
+});
+
+onMounted(() => {
+  inputValue.value = props.value;
+});
 </script>

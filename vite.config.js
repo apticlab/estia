@@ -18,12 +18,13 @@ export default defineConfig({
             fileName: (format) => `estia.${format}.js`, // Output file name
         },
         rollupOptions: {
-            external: ['vue', 'vuex', 'vue-i18n'], // Keep host app Vue stack external
+            external: ['vue', 'vuex', 'vue-i18n', 'vue-router'], // Keep host app Vue stack external
             output: {
                 globals: {
                     vue: 'Vue',
                     'vuex': 'Vuex',
                     'vue-i18n': 'VueI18n',
+                    'vue-router': 'VueRouter',
                 },
             },
         },
