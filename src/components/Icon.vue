@@ -1,6 +1,6 @@
 <template>
   <!-- <component v-if="iconComponent" v-bind="$attrs" :is="iconComponent" :weight="weight" /> -->
-   <div class="size-10 bg-gray-300" />
+   <div class="size-5 bg-gray-300" />
 </template>
 <script setup>
 import { computed, defineAsyncComponent, ref, markRaw, onMounted } from 'vue';
