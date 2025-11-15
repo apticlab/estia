@@ -1,7 +1,5 @@
 <template>
-  <div
-    @click="focusInput()"
-    class="
+  <div @click="focusInput()" class="
       px-2
       h-11
       text-sm
@@ -11,41 +9,31 @@
       items-center
       bg-white
       cursor-text
-    "
-  >
+    ">
     <icon name="search" color="text-gray-300" size="m" class="mr-3"></icon>
-    <input
-      ref="input"
-      class="
+    <input ref="input" class="
         m-0
         p-0
         bg-transparent
         border-none
         focus:outline-none
         active:outline-none
-      "
-      style="height: initial"
-      type="text"
-      :placeholder="placeholder"
-      @input="onInput"
-      v-on:keyup.enter="onEnter"
-      v-model="inputValue"
-      :focus="focus"
-    />
-    <span
-      class="text-xs text-gray-400 cursor-pointer"
-      v-show="inputValue"
-      @click="clearInput()"
-    >
+      " style="height: initial" type="text" :placeholder="placeholder" @input="onInput" v-on:keyup.enter="onEnter"
+      v-model="inputValue" :focus="focus" />
+    <span class="text-xs text-gray-400 cursor-pointer" v-show="inputValue" @click="clearInput()">
       Cancella
     </span>
   </div>
 </template>
 <script>
 import _ from "lodash";
+import Icon from "@/components/Icon.vue";
 
 export default {
   name: "SearchInput",
+  components: {
+    icon: Icon,
+  },
   props: {
     value: {
       type: String,
