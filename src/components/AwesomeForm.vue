@@ -1,6 +1,6 @@
 <template>
   <div :id="id">
-    <loading v-if="loading" />
+   <loading v-if="loading" />
     <FormKit type="form" v-if="!loading" name="aw-form" :id="id + '-form'" class="w-full grid grid-cols-12 gap-x-6"
       :values="dataForm">
       <pre v-if="debug">
@@ -174,6 +174,7 @@ import { computed, getCurrentInstance, onMounted, reactive, ref, watch } from "v
 import { useStore } from "vuex";
 import _ from "lodash";
 import { PhInfo } from "@phosphor-icons/vue";
+import Loading from './Loading.vue';
 import { useTheme } from "../composables/useTheme.js";
 import { helpers } from "../utils/helpers.js";
 
