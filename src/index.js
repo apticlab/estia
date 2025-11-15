@@ -23,6 +23,7 @@ import components, {
   ViewResource,
   EditResource
 } from "./components/index.js";
+import Icon from "./components/Icon.vue";
 import { SideNav as SideNavMixin } from "./mixins/index.js";
 import Validators from "./validators/index.js";
 import _ from 'lodash';
@@ -96,6 +97,7 @@ export default {
 };
 
 export {
+  Icon,
   RouterView,
   EditResource,
   ViewResource,

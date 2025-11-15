@@ -35,9 +35,13 @@
 </template>
 
 <script>
+import Icon from './Icon.vue';
+
 export default {
   name: "pagination",
-  template: "#pagination",
+  components: {
+    icon: Icon,
+  },
   props: {
     limit: {
       type: Number,
@@ -69,7 +73,7 @@ export default {
     };
   },
   created() {
-    if(!this.numPages) {
+    if (!this.numPages) {
       this.numPages = Math.ceil(this.totalItems / this.perPage);
     }
 

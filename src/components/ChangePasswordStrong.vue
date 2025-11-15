@@ -108,8 +108,12 @@
   </div>
 </template>
 <script>
+import Icon from '@/components/Icon.vue';
 export default {
   name: 'ChangePasswordStrong',
+  components: {
+    icon: Icon
+  },
   props: {
     params: {
       required: true,

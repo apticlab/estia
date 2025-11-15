@@ -174,12 +174,14 @@
 import ActionsMixin from "@/mixins/actions.mixin.js";
 import _ from "lodash";
 import Pagination from '@/components/Pagination.vue';
+import Icon from '@/components/Icon.vue';
 
 export default {
   name: "ListResourceBase",
   mixins: [ActionsMixin],
   components: {
     't-pagination': Pagination,
+    icon: Icon,
   },
   props: {
     tableClass: {
