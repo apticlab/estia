@@ -1,155 +1,75 @@
 <template>
   <div :id="id">
     <loading v-if="loading" />
-    <FormulateForm
-      v-if="!loading"
-      name="aw-form"
-      :id="id + '-form'"
-      class="w-full grid grid-cols-12 gap-x-6"
-      :values="dataForm"
-    >
+    <FormulateForm v-if="!loading" name="aw-form" :id="id + '-form'" class="w-full grid grid-cols-12 gap-x-6"
+      :values="dataForm">
       <pre v-if="debug">
         form: {{ dataForm }}
         valid: {{ form_is_valid }}
         visible_headers: {{ visible_headers.length }}
       </pre>
-      <div
-        :id="'aw-' + getIdName(header, index)"
-        v-for="(header, index) in visible_headers"
-        :key="index"
-        class="relative focus-within:text-blue-600"
-        :class="formFieldClass(header)"
-      >
-        <slot
-          :class="getLabelClass(header)"
-          name="label"
-          :header="header"
-          :isRequired="
-            header.validator
+      <div :id="'aw-' + getIdName(header, index)" v-for="(header, index) in visible_headers" :key="index"
+        class="relative focus-within:text-blue-600" :class="formFieldClass(header)">
+        <slot :class="getLabelClass(header)" name="label" :header="header" :isRequired="header.validator
+            ? header.validator.indexOf('required') != -1
+            : false
+          ">
+          <component :header="header" :isRequired="header.validator
               ? header.validator.indexOf('required') != -1
               : false
-          "
-        >
-          <component
-            :header="header"
-            :isRequired="
-              header.validator
-                ? header.validator.indexOf('required') != -1
-                : false
-            "
-            :class="getLabelClass(header)"
-            :is="getLabelComponentName(header.label)"
-            v-if="isLabelComponent(header.label)"
-          />
+            " :class="getLabelClass(header)" :is="getLabelComponentName(header.label)"
+            v-if="isLabelComponent(header.label)" />
           <div class="flex flex-row items-center" v-else-if="header.label">
             <label :class="getLabelClass(header)" :for="header.field">
               {{ isObject(header.label) ? header.label.value : header.label }}
-              <span
-                v-if="
-                  header.validator
-                    ? header.validator.indexOf('required') != -1
-                    : false
-                "
-                class="ml-1 font-bold text-orange-600"
-                >*</span
-              >
+              <span v-if="
+                header.validator
+                  ? header.validator.indexOf('required') != -1
+                  : false
+              " class="ml-1 font-bold text-orange-600">*</span>
             </label>
-            <icon
-              v-if="header.label.help"
-              name="information-circle"
-              size="l"
-              class="text-gray-400 ml-2 cursor-pointer"
-              :title="header.label.help.value"
-            />
+            <PhInfo v-if="header.label.help" class="text-gray-400 ml-2 cursor-pointer size-6"
+              :title="header.label.help.value" />
           </div>
         </slot>
 
         <div v-if="$editFields[header.type]" class="w-full">
-          <component
-            :is="$editFields[header.type]"
-            :disabled="fieldIsReadonly(header)"
-            :resources="filterOptions(header)"
-            :header="header"
-            :form-data="dataForm"
-            :value="deepPick(dataForm, header.field)"
-            :labelClass="getLabelClass(header)"
-            @change="($event) => updateNested(header.field, $event)"
-          />
+          <component :is="$editFields[header.type]" :disabled="fieldIsReadonly(header)"
+            :resources="filterOptions(header)" :header="header" :form-data="dataForm"
+            :value="deepPick(dataForm, header.field)" :labelClass="getLabelClass(header)"
+            @change="($event) => updateNested(header.field, $event)" />
         </div>
         <template v-else-if="header.field && header.field.includes('.')">
-          <resource-select
-            v-if="header.type == 'select'"
-            :disabled="fieldIsReadonly(header)"
-            :resources="form_options[header.code] || filterOptions(header)"
-            :header="header"
-            :placeholder="header.placeholder"
-            :value="deepPick(dataForm, header.field)"
-            @change="($event) => updateNested(header.field, $event)"
-          />
-          <input
-            v-if="header.type == 'text'"
-            type="text"
-            :value="deepPick(dataForm, header.field)"
-            @input="($event) => updateNested(header.field, $event.target.value)"
-          />
-          <input
-            v-if="header.type == 'password'"
-            type="password"
-            :value="deepPick(dataForm, header.field)"
-            @input="($event) => updateNested(header.field, $event.target.value)"
-          />
-          <input
-            v-if="header.type == 'number'"
-            type="number"
-            :value="deepPick(dataForm, header.field)"
-            @input="($event) => updateNested(header.field, $event.target.value)"
-          />
+          <resource-select v-if="header.type == 'select'" :disabled="fieldIsReadonly(header)"
+            :resources="form_options[header.code] || filterOptions(header)" :header="header"
+            :placeholder="header.placeholder" :value="deepPick(dataForm, header.field)"
+            @change="($event) => updateNested(header.field, $event)" />
+          <input v-if="header.type == 'text'" type="text" :value="deepPick(dataForm, header.field)"
+            @input="($event) => updateNested(header.field, $event.target.value)" />
+          <input v-if="header.type == 'password'" type="password" :value="deepPick(dataForm, header.field)"
+            @input="($event) => updateNested(header.field, $event.target.value)" />
+          <input v-if="header.type == 'number'" type="number" :value="deepPick(dataForm, header.field)"
+            @input="($event) => updateNested(header.field, $event.target.value)" />
           <template v-if="header.type == 'boolean'">
-            <label
-              class="flex custom-label"
-              @click="handleBooleanClick(header)"
-            >
-              <div
-                class="flex items-center justify-center w-6 h-6 p-1 mr-2 bg-white shadow"
-              >
-                <svg
-                  :class="!!deepPick(dataForm, header.field) ? '' : 'hidden'"
-                  class="w-4 h-4 text-green-600 pointer-events-none"
-                  viewBox="0 0 172 172"
-                >
-                  <g
-                    fill="none"
-                    stroke-width="none"
-                    stroke-miterlimit="10"
-                    font-family="none"
-                    font-weight="none"
-                    font-size="none"
-                    text-anchor="none"
-                    style="mix-blend-mode: normal"
-                  >
+            <label class="flex custom-label" @click="handleBooleanClick(header)">
+              <div class="flex items-center justify-center w-6 h-6 p-1 mr-2 bg-white shadow">
+                <svg :class="!!deepPick(dataForm, header.field) ? '' : 'hidden'"
+                  class="w-4 h-4 text-green-600 pointer-events-none" viewBox="0 0 172 172">
+                  <g fill="none" stroke-width="none" stroke-miterlimit="10" font-family="none" font-weight="none"
+                    font-size="none" text-anchor="none" style="mix-blend-mode: normal">
                     <path d="M0 172V0h172v172z" />
-                    <path
-                      d="M145.433 37.933L64.5 118.8658 33.7337 88.0996l-10.134 10.1341L64.5 139.1341l91.067-91.067z"
-                      fill="currentColor"
-                      stroke-width="1"
-                    />
+                    <path d="M145.433 37.933L64.5 118.8658 33.7337 88.0996l-10.134 10.1341L64.5 139.1341l91.067-91.067z"
+                      fill="currentColor" stroke-width="1" />
                   </g>
                 </svg>
               </div>
             </label>
           </template>
-          <textarea
-            v-if="header.type == 'textarea'"
+          <textarea v-if="header.type == 'textarea'" :value="deepPick(dataForm, header.field)"
+            @input="($event) => updateNested(header.field, $event.target.value)" />
+          <v-date-picker v-if="header.type == 'date'" locale="it" :min-date="header.minDate"
             :value="deepPick(dataForm, header.field)"
-            @input="($event) => updateNested(header.field, $event.target.value)"
-          />
-          <v-date-picker
-            v-if="header.type == 'date'"
-            locale="it"
-            :min-date="header.minDate"
-            :value="deepPick(dataForm, header.field)"
-            @input="($event) => updateNested(header.field, formatDate($event))"
-          >
+            @input="($event) => updateNested(header.field, formatDate($event))">
             <template v-slot="{ inputValue, inputEvents }">
               <input :value="inputValue" v-on="inputEvents" />
             </template>
@@ -157,160 +77,73 @@
         </template>
         <div v-else-if="header.type !== 'fieldset'">
           <template v-if="header.type == 'form'">
-            <awesome-form
-              class="px-10 w-12/12"
-              :form="dataForm[header.field]"
-              :headers="header.headers"
-              :validate="header.validate"
-              @change="(value) => updateNested(header.field, value)"
-            />
+            <awesome-form class="px-10 w-12/12" :form="dataForm[header.field]" :headers="header.headers"
+              :validate="header.validate" @change="(value) => updateNested(header.field, value)" />
           </template>
           <template v-else-if="header.type == 'dynamicRadio'">
             <p v-if="!form_options[header.field]">
               {{ header.info }}
             </p>
-            <FormulateInput
-              v-if="form_options[header.field]"
-              :id="header.field"
-              :key="header.field"
-              :readonly="fieldIsReadonly(header)"
-              type="radio"
-              :placeholder="header.placeholder"
-              :name="header.field"
-              :header="header"
-              :options="form_options[header.field]"
-              @input="(value) => updateNested(header.field, value)"
-            />
+            <FormulateInput v-if="form_options[header.field]" :id="header.field" :key="header.field"
+              :readonly="fieldIsReadonly(header)" type="radio" :placeholder="header.placeholder" :name="header.field"
+              :header="header" :options="form_options[header.field]"
+              @input="(value) => updateNested(header.field, value)" />
           </template>
           <template v-else-if="header.type == 'select'">
-            <FormulateInput
-              type="resource-select"
-              class="flex-grow"
-              :disabled="fieldIsReadonly(header)"
-              :name="header.field"
-              :resources="form_options[header.code] || filterOptions(header)"
-              :option-field="header.select.option"
-              :placeholder="header.placeholder"
-              :select="header.select"
-              @input="(value) => updateNested(header.field, value)"
-            />
+            <FormulateInput type="resource-select" class="flex-grow" :disabled="fieldIsReadonly(header)"
+              :name="header.field" :resources="form_options[header.code] || filterOptions(header)"
+              :option-field="header.select.option" :placeholder="header.placeholder" :select="header.select"
+              @input="(value) => updateNested(header.field, value)" />
           </template>
-          <template
-            v-else-if="header.type == 'dynamic-select' || header.type == 'user'"
-          >
-            <FormulateInput
-              :key="header.field"
-              type="dynamic-select"
-              :name="header.field"
-              :header="header"
-              :readonly="fieldIsReadonly(header)"
-              @input="(value) => updateNested(header.field, value)"
-            />
+          <template v-else-if="header.type == 'dynamic-select' || header.type == 'user'">
+            <FormulateInput :key="header.field" type="dynamic-select" :name="header.field" :header="header"
+              :readonly="fieldIsReadonly(header)" @input="(value) => updateNested(header.field, value)" />
           </template>
           <template v-else-if="header.type == 'balance'">
             <div class="flex">
-              <FormulateInput
-                :id="header.field"
-                :key="header.field"
-                type="number"
-                :readonly="fieldIsReadonly(header)"
-                :placeholder="header.placeholder"
-                :name="header.field"
-                class="flex-grow rounded-r-none"
-                @input="(value) => updateNested(header.field, value)"
-              />
+              <FormulateInput :id="header.field" :key="header.field" type="number" :readonly="fieldIsReadonly(header)"
+                :placeholder="header.placeholder" :name="header.field" class="flex-grow rounded-r-none"
+                @input="(value) => updateNested(header.field, value)" />
               <div
-                class="flex items-center bg-gray-200 border border-l-0 border-gray-300 rounded rounded-l-none border-l-none"
-              >
+                class="flex items-center bg-gray-200 border border-l-0 border-gray-300 rounded rounded-l-none border-l-none">
                 <span class="px-3 text-gray-600">{{ header.udm }}</span>
               </div>
             </div>
           </template>
           <template v-else-if="header.type == 'boolean'">
             <label class="flex custom-label">
-              <div
-                id="checkbox-container"
-                class="flex items-center justify-center w-6 h-6 p-1 mr-2 bg-white shadow"
-              >
-                <FormulateInput
-                  :id="header.field"
-                  :readonly="fieldIsReadonly(header)"
-                  type="checkbox"
-                  class="hidden"
-                  :name="header.field"
-                  @input="(value) => updateNested(header.field, value)"
-                />
-                <svg
-                  id="checkbox-check"
-                  :class="!!deepFind(dataForm, header.field) ? '' : 'hidden'"
-                  class="w-4 h-4 text-green-600 pointer-events-none"
-                  viewBox="0 0 172 172"
-                >
-                  <g
-                    fill="none"
-                    stroke-width="none"
-                    stroke-miterlimit="10"
-                    font-family="none"
-                    font-weight="none"
-                    font-size="none"
-                    text-anchor="none"
-                    style="mix-blend-mode: normal"
-                  >
+              <div id="checkbox-container" class="flex items-center justify-center w-6 h-6 p-1 mr-2 bg-white shadow">
+                <FormulateInput :id="header.field" :readonly="fieldIsReadonly(header)" type="checkbox" class="hidden"
+                  :name="header.field" @input="(value) => updateNested(header.field, value)" />
+                <svg id="checkbox-check" :class="!!deepFind(dataForm, header.field) ? '' : 'hidden'"
+                  class="w-4 h-4 text-green-600 pointer-events-none" viewBox="0 0 172 172">
+                  <g fill="none" stroke-width="none" stroke-miterlimit="10" font-family="none" font-weight="none"
+                    font-size="none" text-anchor="none" style="mix-blend-mode: normal">
                     <path d="M0 172V0h172v172z" />
-                    <path
-                      d="M145.433 37.933L64.5 118.8658 33.7337 88.0996l-10.134 10.1341L64.5 139.1341l91.067-91.067z"
-                      fill="currentColor"
-                      stroke-width="1"
-                    />
+                    <path d="M145.433 37.933L64.5 118.8658 33.7337 88.0996l-10.134 10.1341L64.5 139.1341l91.067-91.067z"
+                      fill="currentColor" stroke-width="1" />
                   </g>
                 </svg>
               </div>
             </label>
           </template>
           <template v-else-if="header.type == 'image_upload'">
-            <FormulateInput
-              :id="header.field"
-              :key="header.field"
-              type="image-uploader"
-              :readonly="fieldIsReadonly(header)"
-              :placeholder="header.placeholder"
-              :name="header.field"
-              @input="(value) => updateNested(header.field, value)"
-            />
+            <FormulateInput :id="header.field" :key="header.field" type="image-uploader"
+              :readonly="fieldIsReadonly(header)" :placeholder="header.placeholder" :name="header.field"
+              @input="(value) => updateNested(header.field, value)" />
           </template>
-          <FormulateInput
-            v-else
-            :key="header.field"
-            :readonly="fieldIsReadonly(header)"
-            :type="header.type"
-            :placeholder="header.placeholder"
-            :name="header.field"
-            :header="header"
-            :resource="header.resource"
-            :options="header.options"
-            @blur-context="setDirty(header.field)"
-            @input="(value) => updateNested(header.field, value)"
-          />
+          <FormulateInput v-else :key="header.field" :readonly="fieldIsReadonly(header)" :type="header.type"
+            :placeholder="header.placeholder" :name="header.field" :header="header" :resource="header.resource"
+            :options="header.options" @blur-context="setDirty(header.field)"
+            @input="(value) => updateNested(header.field, value)" />
         </div>
         <div class="ml-2 mt-2 mr-auto error-container" v-if="header.type !== 'fieldset'">
-          <slot
-            name="errors"
-            :status="deepPick(form_validation_status, header.field)"
-            :field="header"
-          >
-            <div
-              v-if="deepPick(form_validation_status, header.field)"
-              class="flex flex-col items-center"
-            >
-              <span
-                v-for="(error, index) in deepPick(
-                  form_validation_status,
-                  header.field
-                ).errors"
-                :key="index"
-                class="mb-2 text-red-600"
-                >{{ error }}</span
-              >
+          <slot name="errors" :status="deepPick(form_validation_status, header.field)" :field="header">
+            <div v-if="deepPick(form_validation_status, header.field)" class="flex flex-col items-center">
+              <span v-for="(error, index) in deepPick(
+                form_validation_status,
+                header.field
+              ).errors" :key="index" class="mb-2 text-red-600">{{ error }}</span>
             </div>
           </slot>
         </div>
@@ -336,11 +169,15 @@
 </template>
 
 <script>
+import { PhInfo } from "@phosphor-icons/vue";
 import _ from "lodash";
 import { mapState } from "vuex";
 
 export default {
   name: "AwesomeForm",
+  components: {
+    PhInfo,
+  },
   props: {
     id: {
       required: false,
@@ -348,10 +185,10 @@ export default {
     },
     debug: { required: false, default: false },
     isEdit: { required: false, default: false },
-    form: { required: true, default: () => {} },
+    form: { required: true, default: () => { } },
     readonly: { required: false, default: false },
     validate: { required: false, default: false },
-    headers: { required: true, default: () => {} },
+    headers: { required: true, default: () => { } },
     layout: {
       required: false,
       default: "vertical",
@@ -727,7 +564,7 @@ export default {
                 validationStatus.validationStatus = false;
                 validationStatus.errors.push(
                   "La data deve essere maggiore o uguale a: " +
-                    referencedHeaderName
+                  referencedHeaderName
                 );
               }
               break;
@@ -809,8 +646,7 @@ export default {
                 this.form_is_valid = false;
                 validationStatus.valid = false;
                 validationStatus.errors.push(
-                  `Non puoi impostare un numero più ${
-                    ruleCode == "max" ? "alto" : "basso"
+                  `Non puoi impostare un numero più ${ruleCode == "max" ? "alto" : "basso"
                   } di: `,
                   comparator
                 );
@@ -974,7 +810,7 @@ export default {
 
       let layout = header.layout || this.layout;
 
-      if(header.type) {
+      if (header.type) {
         formFieldClass += " " + header.type;
       }
 
