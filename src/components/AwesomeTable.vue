@@ -91,12 +91,12 @@
                   </span>
                   <span v-else class="text-gray-400">{{
                     header.on_empty
-                    }}</span>
+                  }}</span>
                 </div>
 
                 <div v-if="header.type == 'hashtag'" class="flex flex-row items-end">
                   <span class="font-medium text-blue-600-700 underline cursor-pointer">#{{ deepPick(row, header.field)
-                    }}</span>
+                  }}</span>
                 </div>
 
                 <template v-if="header.type == 'details'">
@@ -114,14 +114,14 @@
                   <div class="flex flex-row">
                     <span class="text-base font-bold">{{
                       deepPick(row, header.fields.current_value)
-                      }}</span>
+                    }}</span>
                     <div class="ml-2" :class="deepPick(row, header.fields.flow) == 'plus'
-                        ? 'text--600'
-                        : 'text-red-500'
+                      ? 'text--600'
+                      : 'text-red-500'
                       ">
                       <i class="mx-1" :class="deepPick(row, header.fields.flow) == 'plus'
-                          ? 'hi-trending-up'
-                          : 'hi-trending-down'
+                        ? 'hi-trending-up'
+                        : 'hi-trending-down'
                         " />
                       <span>{{ deepPick(row, header.fields.trend) }}%</span>
                     </div>
@@ -147,15 +147,15 @@
 
                 <div v-if="header.type == 'friendship'" class="flex flex-row justify-center h-full w-full items-center">
                   <span class="rounded-full h-5 w-5" :class="deepPick(row, header.field)
-                      ? 'bg-green-300'
-                      : 'bg-gray-200'
+                    ? 'bg-green-300'
+                    : 'bg-gray-200'
                     " />
                 </div>
 
                 <div v-if="header.type == 'boolean'" class="flex flex-row justify-center h-full w-full items-center">
                   <span class="rounded-full h-5 w-5" :class="deepPick(row, header.field)
-                      ? 'bg-green-300'
-                      : 'bg-red-300'
+                    ? 'bg-green-300'
+                    : 'bg-red-300'
                     " />
                 </div>
 
@@ -193,12 +193,12 @@
                     <div class="popper shadow-md bg-white text-gray-700 rounded py-1 px-2">
                       {{ action.label }}
                     </div>
-                    <span slot="reference">
+                    <template #reference>
                       <icon slot="reference" :name="action.icon" :class="action.class"
                         :size="action.size || $theme.aw_table.actionDefaultSize" :color="action.color || $theme.aw_table.actionDefaultColor
                           " class="mr-1 focus:outline-none p-1" :stop-propagation="true"
                         @click="actOnRow(action, index)" />
-                    </span>
+                    </template>
                   </popper>
                 </template>
               </div>
@@ -285,7 +285,6 @@ import {
 } from "@/filters";
 import {
   deepPick,
-  evaluateCondition,
   itemIsVisible,
 } from "@/utils/helpers.js";
 
