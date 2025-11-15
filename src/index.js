@@ -15,6 +15,8 @@ import filters from "./filters/index.js";
 import resources from "./resources/index.js";
 import router from "./router/index.js";
 import store from "./store/index.js";
+import i18n from "./i18n/index.js";
+
 import viewFields from "./view-fields/index.js";
 import editFields from "./edit-fields/index.js";
 import modalWidgets from "./modal-widgets/index.js";
@@ -87,6 +89,8 @@ export default {
         }
       }
     }));
+
+    app.use(i18n);
 
     // Add default routes and router configuration
     if (options.router) {

@@ -25,7 +25,7 @@
             class="px-4 py-3 font-semibold text-md"
           >
             <div class="flex flex-row" :class="getHeaderClass(header)">
-              {{ header.label | translate }}
+              {{ $t(header.label) }}
             </div>
           </th>
           <th
@@ -55,49 +55,6 @@
                 :class="getRowClass(header)"
               >
                 <div
-                  v-if="header.type == 'avatar'"
-                  class="flex flex-row items-center"
-                >
-                  <img
-                    :src="deepPick(row, header.fields.image)"
-                    class="w-12 h-12 mr-4 bg-gray-400 bg-no-repeat bg-auto rounded-full"
-                  />
-                  <div class="flex flex-col">
-                    <div class="flex flex-row items-center mb-1">
-                      <a
-                        target="_blank"
-                        :href="
-                          ig_usr_url + '/' + deepPick(row, header.fields.title)
-                        "
-                        class="mr-2 text-base text-blue-600-500 hover:text-blue-600-600"
-                        >{{ deepPick(row, header.fields.title) }}</a
-                      >
-                      <span
-                        v-if="deepPick(row, 'usr.is_verified')"
-                        class="w-4 h-4"
-                      >
-                        <svg-icon
-                          name="verified-badge"
-                          width="w-4"
-                          height="h-4"
-                        />
-                      </span>
-                      <span v-if="false" class="w-4 h-4">
-                        <svg-icon
-                          name="friendship-badge"
-                          width="w-4"
-                          height="h-4"
-                          class="bg-blue-600-400"
-                        />
-                      </span>
-                    </div>
-                    <div class="text-xs text-gray-500">
-                      {{ deepPick(row, header.fields.description) }}
-                    </div>
-                  </div>
-                </div>
-
-                <div
                   v-if="header.type == 'image' || header.type == 'ig-media'"
                   class="flex flex-row items-center justify-center flex-grow"
                 >
@@ -115,10 +72,9 @@
                     class="px-4 py-2 text-white bg-blue-600-500 btn rounded-md"
                     target="_blank"
                     :href="
-                      'https://www.instagram.com/p/' +
                       deepPick(row, header.fields.url_link)
                     "
-                    >{{ deepPick(row, header.fields.url_name) | translate }}</a
+                    >{{ $t(deepPick(row, header.fields.url_name)) }}</a
                   >
                 </div>
 
@@ -491,16 +447,16 @@
 </template>
 <script>
 import Popper from "@/components/Popper.vue";
-import SvgIcon from "@/components/SvgIcon.vue";
 import { isObject } from "lodash";
 import ActionsMixin from "@/mixins/actions.mixin.js";
 import _ from "lodash";
+import Icon from "@/components/Icon.vue";
 
 export default {
   name: "AwesomeTable",
   components: {
-    "svg-icon": SvgIcon,
     popper: Popper,
+    icon: Icon,
   },
   mixins: [ActionsMixin],
   props: {
