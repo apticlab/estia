@@ -24,17 +24,9 @@
     </div>
   </div>
 </template>
-<script>
-export default {
-  name: "PageError",
-  props: {
-    error: { required: true }
-  },
-  mounted() {},
-  data() {
-    return {};
-  },
-  methods: {},
-  computed: {}
-};
+
+<script setup>
+defineProps({
+  error: { type: Number, required: true }
+});
 </script>

@@ -54,8 +54,8 @@
   </div>
 </template>
 
-<script>
-export default {};
+<script setup>
+// No props or logic needed - component only uses slots
 </script>
 
 <style></style>
