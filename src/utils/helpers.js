@@ -3,34 +3,15 @@ import moment from 'moment';
 
 moment.locale('it')
 
-const helpers = {
-  getNestedField,
-  getInfoFromOptions,
-  clone,
-  sleep,
-  deepFind,
-  getColor,
-  createRandomArray,
-  evaluateCondition,
-  dateFromConditionValue,
-  deepPick,
-  moment,
-  getDayWeekNumber,
-  getVisibleItemsByRole,
-  itemIsVisible
+export function getDayWeekNumber(_date) {
+  return moment(_date).day()
 }
 
-export { helpers }
-
-function getDayWeekNumber(_date) {
-  return this.moment(_date).day()
-}
-
-function clone(value) {
+export function clone(value) {
   return JSON.parse(JSON.stringify(value))
 }
 
-function getNestedField(resource, field) {
+export function getNestedField(resource, field) {
   if (!field) {
     return ''
   }
@@ -46,7 +27,7 @@ function getNestedField(resource, field) {
   return resource
 }
 
-function getInfoFromOptions(resource, header, infoType) {
+export function getInfoFromOptions(resource, header, infoType) {
   let tagId = getNestedField(resource, header.value)
   let tagField = 'name'
   let currentTag = {}
@@ -74,11 +55,11 @@ function getInfoFromOptions(resource, header, infoType) {
   }
 }
 
-function sleep(ms) {
+export function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-function deepFind(obj, path) {
+export function deepFind(obj, path) {
   var paths = path.split('.')
   var current = obj
   var i
@@ -101,11 +82,11 @@ function deepFind(obj, path) {
  * @ deprecated because the new version of tailwind (v3) doesn't compute colors as they are defined inside ColorSwatch component
  * so this function dosen't return a correct color
  */
-function getColor(colorString, v1 = false) {
+export function getColor(colorString, v1 = false) {
   return colorString;
 }
 
-function createRandomArray(min, max, number) {
+export function createRandomArray(min, max, number) {
   let array = []
 
   for (var i = 0; i < number; i++) {
@@ -115,7 +96,7 @@ function createRandomArray(min, max, number) {
   return array
 }
 
-function deepPick(object, nestedField) {
+export function deepPick(object, nestedField) {
   if (nestedField == '.') {
     return object
   }
@@ -124,7 +105,7 @@ function deepPick(object, nestedField) {
 }
 
 /*
-function evaluateCondition(condition, object, reference = null) {
+export function evaluateCondition(condition, object, reference = null) {
   const conditionValueDefaults = {
     NULL: null,
     UNDEFINED: undefined,
@@ -356,7 +337,7 @@ function evaluateCondition(condition, object, reference = null) {
   return conditionIsMet
 }
 
-function dateFromConditionValue(dateString) {
+export function dateFromConditionValue(dateString) {
   let date = null
 
   switch (dateString) {
@@ -378,13 +359,13 @@ function dateFromConditionValue(dateString) {
   return date
 }
 
-function getVisibleItemsByRole(items, user) {
+export function getVisibleItemsByRole(items, user) {
   return items.filter((item) => {
     return !item.roles || item.roles.includes(user.role.code)
   })
 }
 
-function itemIsVisible(item, reference, other = null) {
+export function itemIsVisible(item, reference, other = null) {
   if (!item.visible || !Array.isArray(item.visible)) {
     return true
   }
@@ -393,8 +374,27 @@ function itemIsVisible(item, reference, other = null) {
 
   item.visible.forEach((condition) => {
     isVisible =
-      isVisible && this.evaluateCondition(condition, reference, other)
+      isVisible && evaluateCondition(condition, reference, other)
   })
 
   return isVisible
 }
+
+export const helpers = {
+  getNestedField,
+  getInfoFromOptions,
+  clone,
+  sleep,
+  deepFind,
+  getColor,
+  createRandomArray,
+  evaluateCondition,
+  dateFromConditionValue,
+  deepPick,
+  moment,
+  getDayWeekNumber,
+  getVisibleItemsByRole,
+  itemIsVisible
+}
+
+export default helpers
