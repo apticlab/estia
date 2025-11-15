@@ -12,7 +12,6 @@ import theme from "./theme/index.js";
 import { ThemeSymbol } from "./composables/useTheme.js";
 import mixins from "./mixins/index.js";
 import plugins from "./plugins/index.js";
-import filters from "./filters/index.js";
 import resources from "./resources/index.js";
 import router from "./router/index.js";
 import store from "./store/index.js";
@@ -52,7 +51,6 @@ export default {
     components(app);
     mixins(app);
     plugins(app);
-    filters(app, options.filters || {});
     resources(app, options.resources || {});
     store(app, options.store);
     viewFields(app, options);
@@ -79,10 +77,6 @@ export default {
         "recursivity-picker": {
           type: 'input',
           component: "recursivity-picker"
-        },
-        json: {
-          type: 'input',
-          component: "resource-json"
         },
         "image-uploader": {
           type: 'input',
