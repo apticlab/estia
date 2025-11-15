@@ -59,7 +59,6 @@
         </div>
         <awesome-form
           v-if="!loading"
-          :debug="debug"
           class="pb-5"
           :form.sync="resource"
           :is_edit="is_edit"

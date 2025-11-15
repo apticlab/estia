@@ -1,7 +1,6 @@
 <template>
   <div>
     <awesome-table
-      :debug="true"
       :headers="headers"
       :actions="actions"
       :fields="fields"
