@@ -1,5 +1,7 @@
 <template>
-  <div @click="focusInput()" class="
+  <div
+    @click="focusInput"
+    class="
       px-2
       h-11
       text-sm
@@ -9,96 +11,122 @@
       items-center
       bg-white
       cursor-text
-    ">
-    <icon name="search" color="text-gray-300" size="m" class="mr-3"></icon>
-    <input ref="input" class="
+    "
+  >
+    <Icon name="search" color="text-gray-300" size="m" class="mr-3" />
+    <input
+      ref="inputRef"
+      class="
         m-0
         p-0
         bg-transparent
         border-none
         focus:outline-none
         active:outline-none
-      " style="height: initial" type="text" :placeholder="placeholder" @input="onInput" v-on:keyup.enter="onEnter"
-      v-model="inputValue" :focus="focus" />
-    <span class="text-xs text-gray-400 cursor-pointer" v-show="inputValue" @click="clearInput()">
+      "
+      style="height: initial"
+      type="text"
+      :placeholder="placeholder"
+      @input="onInput"
+      @keyup.enter="onEnter"
+      v-model="inputValue"
+    />
+    <span
+      class="text-xs text-gray-400 cursor-pointer"
+      v-show="inputValue"
+      @click="clearInput"
+    >
       Cancella
     </span>
   </div>
 </template>
-<script>
-import _ from "lodash";
+
+<script setup>
+import { onBeforeUnmount, ref, watch } from "vue";
+import debounce from "lodash/debounce";
 import Icon from "@/components/Icon.vue";
 
-export default {
-  name: "SearchInput",
-  components: {
-    icon: Icon,
+defineOptions({ name: "SearchInput" });
+
+const props = defineProps({
+  modelValue: {
+    type: String,
+    default: null,
   },
-  props: {
-    value: {
-      type: String,
-      required: false,
-    },
-    focus: {
-      type: Boolean,
-      required: false,
-    },
-    placeholder: {
-      type: String,
-      required: false,
-      default: "Cerca",
-    },
-    mode: {
-      type: String,
-      required: false,
-      default: "enter",
-      validator: (mode) => {
-        return ["enter", "debounce"].includes(mode);
-      },
+  focus: {
+    type: Boolean,
+    default: false,
+  },
+  placeholder: {
+    type: String,
+    default: "Cerca",
+  },
+  mode: {
+    type: String,
+    default: "enter",
+    validator: (mode) => {
+      return ["enter", "debounce"].includes(mode);
     },
   },
-  data() {
-    return {
-      inputValue: null,
-    };
-  },
-  async mounted() {
-    this.inputValue = this.value;
-  },
-  methods: {
-    onInput(value) {
-      if (this.inputValue == "") {
-        this.inputValue = null;
-      }
-      if (this.mode == "debounce") {
-        this.debounceInput(this.debounce);
-      }
-    },
-    onEnter() {
-      if (this.mode == "enter") {
-        this.$emit("input", this.inputValue);
-      }
-    },
-    debounceInput: _.debounce(function () {
-      this.$emit("input", this.inputValue);
-    }, 350),
-    clearInput() {
-      this.inputValue = null;
-      this.$emit("input", this.inputValue);
-    },
-    focusInput() {
-      this.$refs.input.focus();
-    },
-  },
-  computed: {},
-  watch: {
-    focus(newv) {
-      if (newv) {
-        this.$refs.input.focus();
-      } else {
-        this.$refs.input.blur();
-      }
-    },
-  },
+});
+
+const emit = defineEmits(["update:modelValue", "input"]);
+
+const inputValue = ref(props.modelValue ?? null);
+const inputRef = ref(null);
+
+const emitValue = () => {
+  emit("update:modelValue", inputValue.value);
+  emit("input", inputValue.value);
 };
+
+const debounceInput = debounce(emitValue, 350);
+
+const onInput = () => {
+  if (inputValue.value === "") {
+    inputValue.value = null;
+  }
+  if (props.mode === "debounce") {
+    debounceInput();
+  }
+};
+
+const onEnter = () => {
+  if (props.mode === "enter") {
+    emitValue();
+  }
+};
+
+const clearInput = () => {
+  inputValue.value = null;
+  emitValue();
+};
+
+const focusInput = () => {
+  inputRef.value?.focus();
+};
+
+watch(
+  () => props.focus,
+  (newVal) => {
+    if (newVal) {
+      focusInput();
+    } else {
+      inputRef.value?.blur();
+    }
+  }
+);
+
+watch(
+  () => props.modelValue,
+  (newValue) => {
+    if (newValue !== inputValue.value) {
+      inputValue.value = newValue ?? null;
+    }
+  }
+);
+
+onBeforeUnmount(() => {
+  debounceInput.cancel();
+});
 </script>
