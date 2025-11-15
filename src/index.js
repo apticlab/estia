@@ -9,6 +9,7 @@ import { EventBus } from "./utils/event-bus.js";
 import api from "./utils/api.js";
 import { getProfile, logout } from "./utils/auth.js";
 import theme from "./theme/index.js";
+import { ThemeSymbol } from "./composables/useTheme.js";
 import mixins from "./mixins/index.js";
 import plugins from "./plugins/index.js";
 import filters from "./filters/index.js";
@@ -37,7 +38,11 @@ export default {
     $api = api(options);
     app.config.globalProperties.$api = $api;
     app.config.globalProperties.EventBus = EventBus;
-    app.config.globalProperties.$theme = theme(options);
+
+    const themeConfig = theme(options);
+    app.config.globalProperties.$theme = themeConfig;
+    app.provide(ThemeSymbol, themeConfig);
+    
     app.config.globalProperties.$actions = options.actions ? options.actions : {};
     app.config.globalProperties.$moment = moment;
     app.config.globalProperties.$roleLookup = options.roleLookup;
