@@ -1,5 +1,6 @@
 import { computed, getCurrentInstance } from "vue";
 import { itemIsVisible as defaultItemIsVisible } from "../utils/helpers";
+import { useCurrentUser } from "./useCurrentUser.js";
 
 export function useActions({
   actions,
@@ -9,10 +10,12 @@ export function useActions({
   itemIsVisible = defaultItemIsVisible,
   proxy = getCurrentInstance()?.proxy,
 }) {
+  const { getUserRole: currentUserRole } = useCurrentUser();
+
   const resolveUserRole = () =>
     (typeof getUserRole === "function"
       ? getUserRole()
-      : proxy?.getUserRole?.()) || "";
+      : proxy?.getUserRole?.() || currentUserRole()) || "";
 
   const normalizedActions = computed(() =>
     actions?.value !== undefined ? actions.value : actions || []

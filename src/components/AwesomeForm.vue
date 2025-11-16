@@ -171,12 +171,12 @@
 
 <script setup>
 import { computed, getCurrentInstance, onMounted, reactive, ref, watch } from "vue";
-import { useStore } from "vuex";
 import _ from "lodash";
 import { PhInfo } from "@phosphor-icons/vue";
 import Loading from './Loading.vue';
 import { useTheme } from "../composables/useTheme.js";
 import { helpers } from "../utils/helpers.js";
+import { useCurrentUser } from "../composables/useCurrentUser.js";
 
 defineOptions({ name: "AwesomeForm" });
 
@@ -198,13 +198,12 @@ const props = defineProps({
 const emit = defineEmits(["change", "valid"]);
 
 const theme = useTheme();
-const store = useStore();
 const instance = getCurrentInstance();
 const proxy = instance?.proxy;
+const { getUserRole } = useCurrentUser();
 const $editFields = proxy?.$editFields ?? {};
 const apiClient = proxy?.$api;
 const validators = proxy?.$validators ?? {};
-const roleLookup = proxy?.$roleLookup;
 const deepPickFn = proxy?.deepPick ?? helpers.deepPick;
 const deepFindFn = proxy?.deepFind ?? helpers.deepFind;
 const evaluateConditionFn = proxy?.evaluateCondition ?? helpers.evaluateCondition;
@@ -272,19 +271,7 @@ onMounted(async () => {
   loading.value = false;
 });
 
-const getUserRoleValue = () => {
-  if (proxy?.getUserRole) {
-    return proxy.getUserRole();
-  }
-
-  const user = store?.state?.user?.user;
-
-  if (roleLookup && user) {
-    return roleLookup(user);
-  }
-
-  return user?.role?.code?.toLowerCase() ?? "";
-};
+const getUserRoleValue = () => getUserRole();
 
 function setDirty(field) {
   _.set(form_dirty_status, field, true);

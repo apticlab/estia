@@ -59,6 +59,7 @@ import { computed, getCurrentInstance } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 import { useSideNav } from '@/composables/useSideNav';
+import { useCurrentUser } from '@/composables/useCurrentUser';
 
 const props = defineProps({
   bgColor: { type: String, required: false, default: "bg-white" },
@@ -70,6 +71,7 @@ const route = useRoute();
 const router = useRouter();
 const store = useStore();
 const instance = getCurrentInstance();
+const { getUserRole } = useCurrentUser();
 
 const { is_collapsed, show_text, collapseSideBar, listenForSideNavCollapseEvent } = useSideNav();
 
@@ -157,10 +159,6 @@ const linkIsCurrentLink = (link) => {
   if (link.meta && link.meta.sectionName) {
     return routesNames.value.includes(link.meta.sectionName);
   }
-};
-
-const getUserRole = () => {
-  return instance.appContext.config.globalProperties.getUserRole?.();
 };
 
 // Initialize side nav collapse listener

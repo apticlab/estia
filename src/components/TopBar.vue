@@ -38,6 +38,7 @@ import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 import { getProfile } from "@/utils/auth";
 import { useSideNav } from "@/composables/useSideNav";
+import { useCurrentUser } from "@/composables/useCurrentUser";
 
 const props = defineProps({
   shift: { type: String, required: false, default: "sm:w-16" },
@@ -47,6 +48,7 @@ const router = useRouter();
 const store = useStore();
 const instance = getCurrentInstance();
 const EventBus = instance.appContext.config.globalProperties.EventBus;
+const { getUserRole } = useCurrentUser();
 
 const { is_collapsed, show_text, collapseSideBar, listenForSideNavCollapseEvent } = useSideNav();
 
@@ -105,10 +107,6 @@ const logoutUser = () => {
 const reloadUser = async () => {
   let userProfile = getProfile();
   await store.dispatch('user/set_user', userProfile);
-};
-
-const getUserRole = () => {
-  return instance.appContext.config.globalProperties.getUserRole?.();
 };
 
 onMounted(() => {

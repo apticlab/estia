@@ -1,5 +1,5 @@
 import { inject, getCurrentInstance } from "vue";
-import { ResourcesSymbol } from "@/resources/index.js";
+import { ResourcesSymbol } from "../resources/index.js";
 
 export function useResources() {
   const injected =

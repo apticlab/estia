@@ -72,6 +72,7 @@
 import { ref, computed, onMounted, getCurrentInstance } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useTheme } from '@/composables/useTheme';
+import { useCurrentUser } from '@/composables/useCurrentUser';
 
 const props = defineProps({
   scope: { type: String, default: "view" },
@@ -85,11 +86,11 @@ const route = useRoute();
 const router = useRouter();
 const theme = useTheme();
 const instance = getCurrentInstance();
+const { getUserRole } = useCurrentUser();
 
 const $api = instance?.appContext.config.globalProperties.$api;
 const resources = instance?.appContext.config.globalProperties.resources;
 const log = instance?.appContext.config.globalProperties.log;
-const getUserRole = instance?.appContext.config.globalProperties.getUserRole;
 const evaluateCondition = instance?.appContext.config.globalProperties.evaluateCondition;
 const $icon = instance?.appContext.config.globalProperties.$icon;
 const act = instance?.appContext.config.globalProperties.act;
@@ -151,7 +152,7 @@ const fieldIsVisible = (header) => {
   let isScopeVisible = true;
 
   if (header.roles) {
-    isRoleVisible = header.roles.includes(getUserRole?.());
+    isRoleVisible = header.roles.includes(getUserRole());
   }
 
   if (header.visible) {

@@ -283,10 +283,8 @@ import {
   count,
   percentage,
 } from "@/filters";
-import {
-  deepPick,
-  itemIsVisible,
-} from "@/utils/helpers.js";
+import { deepPick, itemIsVisible } from "@/utils/helpers.js";
+import { useCurrentUser } from "@/composables/useCurrentUser.js";
 
 defineOptions({ name: "AwesomeTable" });
 
@@ -310,6 +308,7 @@ const props = defineProps({
 const emit = defineEmits(["act", "click", "selected", "row-added", "row-deleted"]);
 
 const { proxy } = getCurrentInstance();
+const { getUserRole } = useCurrentUser();
 
 const defaultAction = ref(null);
 const selected_row = ref(null);
@@ -329,7 +328,7 @@ const visibleHeaders = computed(() =>
   })
 );
 
-const getUserRoleValue = () => proxy?.getUserRole?.() ?? "";
+const getUserRoleValue = () => getUserRole();
 
 watch(
   () => props.actions,

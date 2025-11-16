@@ -23,9 +23,10 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, getCurrentInstance } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useStore } from 'vuex';
+import { useCurrentUser } from '@/composables/useCurrentUser';
 
 const props = defineProps({
   initialTabIndex: { type: Number, required: false, default: null },
@@ -37,7 +38,7 @@ const emit = defineEmits(['tab-change']);
 const route = useRoute();
 const router = useRouter();
 const store = useStore();
-const instance = getCurrentInstance();
+const { getUserRole } = useCurrentUser();
 
 const basePath = ref("");
 const currentResource = ref(null);
@@ -58,10 +59,6 @@ const visibleTabs = computed(() => {
     return tab.roles.includes(getUserRole());
   });
 });
-
-const getUserRole = () => {
-  return instance?.appContext.config.globalProperties.getUserRole?.();
-};
 
 const fetchTabs = () => {
   if (props.externalTabs) {

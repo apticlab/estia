@@ -7,6 +7,7 @@ import style from "./style.css";
 import { helpers } from "./utils/helpers.js";
 import { EventBus } from "./utils/event-bus.js";
 import api, { ApiSymbol } from "./utils/api.js";
+import { provideCurrentUser } from "./composables/useCurrentUser.js";
 import { getProfile, logout } from "./utils/auth.js";
 import theme from "./theme/index.js";
 import { ThemeSymbol } from "./composables/useTheme.js";
@@ -53,7 +54,13 @@ export default {
     mixins(app);
     plugins(app);
     resources(app, options.resources || {});
-    store(app, options.store);
+    if (options.store) {
+      store(app, options.store);
+      app.config.globalProperties.$store = options.store;
+      provideCurrentUser(app, options.store, options.roleLookup);
+    } else {
+      app.config.globalProperties.getUserRole = () => "";
+    }
     viewFields(app, options);
     editFields(app, options);
     modalWidgets(app, options);

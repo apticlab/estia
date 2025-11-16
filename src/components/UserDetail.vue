@@ -122,6 +122,7 @@
 <script setup>
 import { ref, onMounted, getCurrentInstance } from 'vue';
 import { getProfile } from "../utils/auth.js";
+import { useCurrentUser } from "@/composables/useCurrentUser";
 
 const props = defineProps({
   user: { type: Object, required: true, default: () => ({}) }
@@ -129,7 +130,7 @@ const props = defineProps({
 
 const instance = getCurrentInstance();
 const deepFind = instance?.appContext.config.globalProperties.deepFind;
-const getUserRole = instance?.appContext.config.globalProperties.getUserRole;
+const { getUserRole } = useCurrentUser();
 
 const infoFields = [
   { name: "name", label: "Nome", type: "text" },
@@ -151,7 +152,7 @@ const instagramFields = [
 const loggedUser = ref({});
 
 const userCanSee = (field) => {
-  return field.roles.includes(getUserRole?.());
+  return field.roles.includes(getUserRole());
 };
 
 onMounted(() => {
