@@ -12,62 +12,61 @@
     ></awesome-table>
   </div>
 </template>
-<script>
+
+<script setup>
+import { ref, onMounted, getCurrentInstance } from 'vue';
 import _ from "lodash";
 
-export default {
-  name: "ResourceEditor",
-  props: {
-    context: {
-      type: Object,
-      required: false,
-    },
-    resource: {
-      required: false,
-      type: String,
-    },
-    readonly: {
-      required: false,
-      default: false,
-    },
-    values: {
-      required: false,
-    },
+const props = defineProps({
+  context: {
+    type: Object,
+    required: false,
   },
-  data() {
-    return {
-      headers: [],
-      actions: [],
-      fields: [],
-      rows: [],
-    };
+  resource: {
+    type: String,
+    required: false,
   },
-  mounted() {
-    let resourceName = "";
-
-    if (this.context) {
-      resourceName = this.context.attributes.resource.name;
-      this.rows = _.clone(this.context.model || []);
-    } else {
-      resourceName = this.resource;
-      this.rows = this.values;
-    }
-
-    this.headers = this.resources[resourceName].headers;
-    this.actions = this.readonly ? [] : this.resources[resourceName].actions;
-    this.fields = this.resources[resourceName].fields;
+  readonly: {
+    type: Boolean,
+    required: false,
+    default: false,
   },
-  methods: {
-    reloadRows(rows) {
-      this.context.model = null;
-      this.context.model = rows;
-
-      this.rows = null;
-      this.rows = rows;
-
-      this.$forceUpdate();
-    },
+  values: {
+    required: false,
   },
-  computed: {},
+});
+
+const instance = getCurrentInstance();
+const resources = instance?.appContext.config.globalProperties.resources;
+
+const headers = ref([]);
+const actions = ref([]);
+const fields = ref([]);
+const rows = ref([]);
+
+const reloadRows = (newRows) => {
+  if (props.context) {
+    props.context.model = null;
+    props.context.model = newRows;
+  }
+
+  rows.value = null;
+  rows.value = newRows;
 };
+
+onMounted(() => {
+  let resourceName = "";
+
+  if (props.context) {
+    resourceName = props.context.attributes.resource.name;
+    rows.value = _.clone(props.context.model || []);
+  } else {
+    resourceName = props.resource;
+    rows.value = props.values;
+  }
+
+  headers.value = resources[resourceName].headers;
+  actions.value = props.readonly ? [] : resources[resourceName].actions;
+  fields.value = resources[resourceName].fields;
+});
 </script>
