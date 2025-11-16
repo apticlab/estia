@@ -155,228 +155,232 @@
   </div>
 </template>
 
-<script>
-import { mapState } from "vuex";
-import _ from "lodash";
+<script setup>
+import {
+  computed,
+  defineExpose,
+  getCurrentInstance,
+  onMounted,
+  ref,
+} from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { useApi, useResources } from "@apticlab/estia/composables";
+import clone from "lodash/clone";
 
 const rest_resources = {
   profile: "users",
 };
 
-export default {
-  name: "ResourceEdit",
-  props: {
-    component: { required: false, default: false },
-    propResourceName: {
-      required: false,
-      type: String,
-      default: null,
-    },
-    propResourceId: {
-      required: false,
-      type: Number,
-      default: null,
-    },
-    propResourceValue: {
-      required: false,
-      type: () => {},
-      default: null,
-    },
-    layout: {
-      required: false,
-      default: "vertical",
-    },
-    debug: {
-      required: false,
-      default: false,
-    },
-    hideActions: {
-      required: false,
-      default: false,
-    },
-    commandPosition: {
-      required: false,
-      default: () => {
-        return ["bottom"];
-      },
-    },
-    event: {
-      required: false,
-      default: false,
-    },
-  },
-  data() {
-    return {
-      resourceErrors: null,
-      changedResource: {},
-      error: null,
-      loading: true,
-      saving: false,
-      resource: {},
-      resource_rest_name: null,
-      resource_name: null,
-      actions: [],
-      is_edit: false,
-      valid: false,
-      routerBased: true,
-    };
-  },
-  async mounted() {
-    this.loading = true;
+defineOptions({ name: "ResourceEdit" });
 
-    if (this.propResourceName) {
-      this.routerBased = false;
-      this.resource_id = this.propResourceId;
-      this.resource_name = this.propResourceName;
-      this.resource = this.propResourceValue;
-    } else {
-      this.resource_id = this.$route.params.id;
-      this.resource_name =
-        this.$route.params.resource || this.$route.meta.resource;
+const props = defineProps({
+  component: { type: Boolean, default: false },
+  propResourceName: {
+    type: String,
+    default: null,
+  },
+  propResourceId: {
+    type: Number,
+    default: null,
+  },
+  propResourceValue: {
+    type: [Object, Array, String, Number, Boolean],
+    default: null,
+  },
+  layout: {
+    type: String,
+    default: "vertical",
+  },
+  debug: {
+    type: Boolean,
+    default: false,
+  },
+  hideActions: {
+    type: Boolean,
+    default: false,
+  },
+  commandPosition: {
+    type: Array,
+    default: () => ["bottom"],
+  },
+  event: {
+    type: Boolean,
+    default: false,
+  },
+});
+
+const route = useRoute();
+const router = useRouter();
+const api = useApi();
+const resources = useResources();
+const { proxy } = getCurrentInstance();
+const emit = defineEmits(["save", "close"]);
+
+const resourceErrors = ref(null);
+const changedResource = ref({});
+const error = ref(null);
+const loading = ref(true);
+const saving = ref(false);
+const resource = ref({});
+const resourceRestName = ref(null);
+const resourceName = ref(null);
+const actions = ref([]);
+const isEdit = ref(false);
+const valid = ref(false);
+const routerBased = ref(true);
+const resourceId = ref(null);
+
+const actualResourceName = computed(() => resourceName.value);
+
+const form_fields = computed(() => {
+  const fields = resources[actualResourceName.value]?.fields || [];
+  return fields.filter((field) => {
+    if (!field.scopes) {
+      return true;
     }
+    return field.scopes.includes("edit");
+  });
+});
 
-    this.resource_rest_name =
-      rest_resources[this.resource_name] || this.resource_name;
+const button_label = computed(() => "Conferma");
+const action_name = computed(() => (isEdit.value ? "Modifica" : "Nuova"));
+const resourceInfo = computed(
+  () => resources[actualResourceName.value]?.info || {}
+);
+const options = computed(() => resourceInfo.value.singular || "Risorsa");
 
-    this.actions = this.resources[this.resource_name].actions || [];
+const visibleActions = computed(() =>
+  actions.value.filter(
+    (action) =>
+      !action.scopes ||
+      action.scopes.includes(isEdit.value ? "edit" : "create")
+  )
+);
 
-    if (this.debug) {
-      this.log("ResourceName: " + this.resource_name);
-      this.log("ResourceId: " + this.resource_id);
-    }
+const getResourceName = () => {
+  if (props.propResourceName) {
+    routerBased.value = false;
+    resourceId.value = props.propResourceId;
+    resourceName.value = props.propResourceName;
+    resource.value = props.propResourceValue || {};
+  } else {
+    resourceId.value = route.params.id;
+    resourceName.value = route.params.resource || route.meta.resource;
+  }
 
-    if (this.resource_id) {
-      this.is_edit = true;
-      this.resource = await this.$api.get(
-        this.resource_rest_name,
-        this.resource_id
-      );
-    }
-
-    this.loading = false;
-  },
-  methods: {
-    async saveResource() {
-      this.saving = true;
-      this.resourceErrors = null;
-      let resource_name = this.resource_rest_name || this.resource_name;
-
-      try {
-        if (this.is_edit) {
-          await this.$api.update(
-            resource_name,
-            this.resource_id,
-            this.changedResource
-          );
-        } else {
-          let resource = _.clone(this.changedResource);
-          await this.$api.create(resource_name, resource);
-        }
-
-        if (this.event) {
-          this.$emit("save", true);
-          return;
-        }
-
-        this.$router.back();
-        this.saving = false;
-      } catch (err) {
-        if (err.errors) {
-          this.resourceErrors = [];
-
-          Object.keys(err.errors).map((e) => {
-            console.log(err.errors[e]);
-            this.resourceErrors = this.resourceErrors.concat(err.errors[e]);
-          });
-
-          return;
-        }
-
-        this.saving = false;
-
-        switch (err.message) {
-          case "The given data was invalid.":
-            this.error = "Alcuni campi non sono validi.";
-            break;
-
-          default:
-            this.error = "Ops! C'è stato un errore.";
-        }
-      }
-    },
-    async retry() {
-      this.error = null;
-
-      await this.saveResource();
-    },
-    back() {
-      if (!this.routerBased) {
-        this.$emit("close");
-        return;
-      }
-
-      this.$router.back();
-    },
-    updateResource(newResource) {
-      if (this.debug) {
-        this.log("NewResource");
-        this.log(newResource);
-      }
-
-      this.changedResource = newResource;
-    },
-    act(action) {
-      if (this[action.callback]) {
-        this[action.callback]();
-      }
-    },
-    delete() {
-      if (confirm("Vuoi davvero eliminare questa risorsa?")) {
-        this.isLoading = true;
-        this.$api.delete(this.resource_name, this.resource_id);
-        this.isLoading = false;
-
-        this.$router.push("../list");
-      }
-    },
-  },
-  computed: {
-    ...mapState("user", {
-      user: (state) => state.user,
-    }),
-    form_fields() {
-      let fields = this.resources[this.resource_name].fields || [];
-
-      return fields.filter((field) => {
-        if (!field.scopes) {
-          return true;
-        }
-
-        return field.scopes.includes("edit");
-      });
-    },
-    button_label() {
-      return this.is_edit ? "Conferma" : "Conferma";
-    },
-    action_name() {
-      return this.is_edit ? "Modifica" : "Nuova";
-    },
-    resourceInfo() {
-      return this.resources[this.resource_name].info || {};
-    },
-    options() {
-      return this.resourceInfo.singular || "Risorsa";
-    },
-    visibleActions() {
-      return this.actions.filter((action) => {
-        return (
-          !action.scopes ||
-          action.scopes.includes(this.is_edit ? "edit" : "create")
-        );
-      });
-    },
-  },
+  resourceRestName.value =
+    rest_resources[resourceName.value] || resourceName.value;
 };
+
+const loadResource = async () => {
+  if (resourceId.value) {
+    isEdit.value = true;
+    resource.value = await api.get(
+      resourceRestName.value,
+      resourceId.value
+    );
+  }
+};
+
+const logDebug = (...args) => {
+  if (props.debug) {
+    proxy?.log?.(...args);
+  }
+};
+
+const saveResource = async () => {
+  saving.value = true;
+  resourceErrors.value = null;
+  const targetResourceName = resourceRestName.value || resourceName.value;
+
+  try {
+    if (isEdit.value) {
+      await api.update(
+        targetResourceName,
+        resourceId.value,
+        changedResource.value
+      );
+    } else {
+      const cloned = clone(changedResource.value);
+      await api.create(targetResourceName, cloned);
+    }
+
+    if (props.event) {
+      emit("save", true);
+      saving.value = false;
+      return;
+    }
+
+    router.back();
+    saving.value = false;
+  } catch (err) {
+    if (err?.errors) {
+      resourceErrors.value = [];
+      Object.keys(err.errors).forEach((key) => {
+        resourceErrors.value = resourceErrors.value.concat(err.errors[key]);
+      });
+      saving.value = false;
+      return;
+    }
+
+    saving.value = false;
+    error.value =
+      err?.message === "The given data was invalid."
+        ? "Alcuni campi non sono validi."
+        : "Ops! C'è stato un errore.";
+  }
+};
+
+const retry = async () => {
+  error.value = null;
+  await saveResource();
+};
+
+const back = () => {
+  if (!routerBased.value) {
+    emit("close");
+    return;
+  }
+  router.back();
+};
+
+const updateResource = (newResource) => {
+  logDebug("NewResource", newResource);
+  changedResource.value = newResource;
+};
+
+const act = (action) => {
+  if (!action?.callback) return;
+  const handler = proxy?.[action.callback];
+  if (typeof handler === "function") {
+    handler();
+  }
+};
+
+const deleteResource = () => {
+  if (confirm("Vuoi davvero eliminare questa risorsa?")) {
+    loading.value = true;
+    api.delete(resourceName.value, resourceId.value);
+    loading.value = false;
+    router.push("../list");
+  }
+};
+
+onMounted(async () => {
+  loading.value = true;
+  getResourceName();
+
+  actions.value = resources[resourceName.value]?.actions || [];
+  logDebug("ResourceName:", resourceName.value);
+  logDebug("ResourceId:", resourceId.value);
+
+  await loadResource();
+  loading.value = false;
+});
+
+defineExpose({
+  delete: deleteResource,
+});
 </script>
 
 <style></style>
