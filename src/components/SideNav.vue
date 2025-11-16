@@ -54,100 +54,117 @@
   </div>
 </template>
 
-<script>
-import { mapState } from "vuex";
+<script setup>
+import { computed, getCurrentInstance } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { useStore } from 'vuex';
+import { useSideNav } from '@/composables/useSideNav';
 
-export default {
-  name: "SideNav",
-  props: {
-    bgColor: { required: false, default: "bg-white", type: String },
-    shadow: { required: false, default: "shadow-xs", type: String },
-    width: { required: false, default: "", type: String },
-  },
-  data: () => ({
-    value: 0,
-    item: 0,
-    mini_variant: false,
-    selected_action: {},
-  }),
-  computed: {
-    ...mapState("user", {
-      user: (state) => state.user,
-    }),
-    currentPath() {
-      return this.$router.name;
-    },
-    items() {
-      if (!this.$routes.length) {
-        return [];
-      }
+const props = defineProps({
+  bgColor: { type: String, required: false, default: "bg-white" },
+  shadow: { type: String, required: false, default: "shadow-xs" },
+  width: { type: String, required: false, default: "" },
+});
 
-      return this.$routes
-        .filter((route) => {
-          // Only routes with the meta.label have to be present
-          // in the SideNav
-          return route.meta && route.meta.label !== undefined;
-        })
-        .filter((route) => {
-          if (route.meta.roles) {
-            if (!this.user) {
-              return false;
-            }
+const route = useRoute();
+const router = useRouter();
+const store = useStore();
+const instance = getCurrentInstance();
 
-            let userRole = this.getUserRole();
+const { is_collapsed, show_text, collapseSideBar, listenForSideNavCollapseEvent } = useSideNav();
 
-            return route.meta.roles.includes(userRole);
-          }
+const user = computed(() => store.state.user?.user);
 
-          return true;
-        });
-    },
-    version() {
-      return import.meta.env.VITE_APP_VERSION;
-    },
-    routesNames() {
-      return this.$route.matched
-        .filter((l) => {
-          return l.meta && l.meta.sectionName;
-        })
-        .map((l) => l.meta.sectionName);
-    },
-  },
-  created() {
-    this.listenForSideNavCollapseEvent();
-  },
-  methods: {
-    doUserAction(action) {
-      this.$router.push(action.path);
-    },
-    navigateTo(link) {
-      // Don't navigate to same route or root route
-      if (
-        link.path != this.$route.name &&
-        link.path != this.$route.redirectedFrom
-      ) {
-        if (this.is_mobile) {
-          this.collapseSideBar();
+const currentPath = computed(() => route.name);
+
+const items = computed(() => {
+  const routes = instance.appContext.config.globalProperties.$routes;
+  
+  if (!routes || !routes.length) {
+    return [];
+  }
+
+  return routes
+    .filter((route) => {
+      // Only routes with the meta.label have to be present in the SideNav
+      return route.meta && route.meta.label !== undefined;
+    })
+    .filter((route) => {
+      if (route.meta.roles) {
+        if (!user.value) {
+          return false;
         }
-        if (link.name) {
-          this.$router.push({
-            name: link.name,
-          });
-        } else {
-          this.$router.push(link.path);
-        }
+
+        let userRole = getUserRole();
+        return route.meta.roles.includes(userRole);
       }
-    },
-    linkIsCurrentLink(link) {
-      if (link.name) {
-        return this.$route.matched.map((l) => l.name).indexOf(link.name) != -1;
-      }
-      if (link.meta && link.meta.sectionName) {
-        return this.routesNames.includes(link.meta.sectionName);
-      }
-    },
-  },
+
+      return true;
+    });
+});
+
+const version = computed(() => {
+  return import.meta.env.VITE_APP_VERSION;
+});
+
+const routesNames = computed(() => {
+  return route.matched
+    .filter((l) => {
+      return l.meta && l.meta.sectionName;
+    })
+    .map((l) => l.meta.sectionName);
+});
+
+const is_mobile = computed(() => {
+  const windowWidth = instance.appContext.config.globalProperties.windowWidth;
+  if (navigator) {
+    if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+      return true;
+    } else {
+      return windowWidth < 640;
+    }
+  }
+  return windowWidth < 640;
+});
+
+const doUserAction = (action) => {
+  router.push(action.path);
 };
+
+const navigateTo = (link) => {
+  // Don't navigate to same route or root route
+  if (
+    link.path != route.name &&
+    link.path != route.redirectedFrom
+  ) {
+    if (is_mobile.value) {
+      collapseSideBar();
+    }
+    if (link.name) {
+      router.push({
+        name: link.name,
+      });
+    } else {
+      router.push(link.path);
+    }
+  }
+};
+
+const linkIsCurrentLink = (link) => {
+  if (link.name) {
+    return route.matched.map((l) => l.name).indexOf(link.name) != -1;
+  }
+  if (link.meta && link.meta.sectionName) {
+    return routesNames.value.includes(link.meta.sectionName);
+  }
+};
+
+const getUserRole = () => {
+  return instance.appContext.config.globalProperties.getUserRole?.();
+};
+
+// Initialize side nav collapse listener
+listenForSideNavCollapseEvent();
 </script>
 
 <style>

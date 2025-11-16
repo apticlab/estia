@@ -45,89 +45,82 @@
   </transition>
 </template>
 
-<script>
+<script setup>
+import { ref, computed, onMounted, onBeforeUnmount, getCurrentInstance } from 'vue';
 import Dialog from "../plugins/dialog";
 import ChangePassword from "@/components/ChangePassword.vue";
 import { PhX } from '@phosphor-icons/vue';
 
-export default {
-  name: "DialogModal",
-  components: {
-    "change-password": ChangePassword,
-    PhX,
-  },
-  data() {
-    return {
-      // variable that shows/hides modal
-      visible: false,
-      type: "",
-      params: {},
-      defaultCancelText: "Annulla",
-      defaultConfirmText: "Conferma",
-      onConfirm: {},
-      onHide: null,
-      theme: {},
-      exitKeyEvent: null,
-    };
-  },
-  mounted() {
-    let that = this;
-    this.exitKeyEvent = document.addEventListener("keyup", function (evt) {
-      if (evt.keyCode === 27) {
-        that.hide();
-      }
-    });
-  },
-  computed: {
-    themeTitle() {
-      return this.theme.title || this.$theme.modal.title;
-    },
-  },
-  mounted() {
-    Dialog.EventBus.on("show", this.show);
-    Dialog.EventBus.on("hide", this.hide);
-  },
-  beforeUnmount() {
-    document.removeEventListener("keyup", this.exitKeyEvent);
-    Dialog.EventBus.off("show", this.show);
-    Dialog.EventBus.off("hide", this.hide);
-  },
-  methods: {
-    hide() {
-      // method for closing modal
-      this.log("hide");
-      if (this.onHide) {
-        this.onHide();
-      }
+const instance = getCurrentInstance();
+const is_mobile = computed(() => instance?.appContext.config.globalProperties.is_mobile);
+const log = instance?.appContext.config.globalProperties.log;
 
-      this.visible = false;
-    },
-    confirm(result) {
-      this.log("confirm");
-      this.hide();
-      this.onConfirm(result);
-    },
-    show(params) {
-      this.params = params;
-      this.type = params.type;
-      this.onConfirm = params.onConfirm;
-      this.onHide = params.onHide;
-      this.theme = params.theme;
+const backdrop = ref(null);
+const visible = ref(false);
+const type = ref("");
+const params = ref({});
+const defaultCancelText = "Annulla";
+const defaultConfirmText = "Conferma";
+const onConfirm = ref(() => {});
+const onHide = ref(null);
+const theme = ref({});
+const exitKeyEvent = ref(null);
 
-      // making modal visible
-      this.visible = true;
-    },
-    handleBackdropClick(event) {
-      if (this.params.disableBackdropHide) {
-        return;
-      }
+const themeTitle = computed(() => {
+  return theme.value.title || instance?.appContext.config.globalProperties.$theme.modal.title;
+});
 
-      if (this.$refs.backdrop == event.target) {
-        this.hide();
-      }
-    },
-  },
+const hide = () => {
+  log?.("hide");
+  if (onHide.value) {
+    onHide.value();
+  }
+
+  visible.value = false;
 };
+
+const confirm = (result) => {
+  log?.("confirm");
+  hide();
+  onConfirm.value(result);
+};
+
+const show = (p) => {
+  params.value = p;
+  type.value = p.type;
+  onConfirm.value = p.onConfirm;
+  onHide.value = p.onHide;
+  theme.value = p.theme;
+
+  visible.value = true;
+};
+
+const handleBackdropClick = (event) => {
+  if (params.value.disableBackdropHide) {
+    return;
+  }
+
+  if (backdrop.value == event.target) {
+    hide();
+  }
+};
+
+onMounted(() => {
+  exitKeyEvent.value = document.addEventListener("keyup", function (evt) {
+    if (evt.keyCode === 27) {
+      hide();
+    }
+  });
+
+  Dialog.EventBus.on("show", show);
+  Dialog.EventBus.on("hide", hide);
+});
+
+onBeforeUnmount(() => {
+  document.removeEventListener("keyup", exitKeyEvent.value);
+  Dialog.EventBus.off("show", show);
+  Dialog.EventBus.off("hide", hide);
+});
 </script>
 
 <style scoped>
