@@ -34,132 +34,136 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, computed, onMounted } from 'vue';
 import Icon from './Icon.vue';
 
-export default {
-  name: "pagination",
-  components: {
-    icon: Icon,
+const props = defineProps({
+  limit: {
+    type: Number,
+    required: false,
+    default: 5,
   },
-  props: {
-    limit: {
-      type: Number,
-      required: false,
-      default: 5,
-    },
-    totalItems: {
-      type: Number,
-      required: true,
-    },
-    perPage: {
-      type: Number,
-      required: true,
-    },
-    value: {
-      type: Number,
-      required: true,
-    },
-    classes: {
-      type: Object,
-      required: false,
-      default: () => { },
-    },
+  totalItems: {
+    type: Number,
+    required: true,
   },
-  data() {
-    return {
-      visibleButtons: 0,
-      numPages: 0,
-    };
+  perPage: {
+    type: Number,
+    required: true,
   },
-  created() {
-    if (!this.numPages) {
-      this.numPages = Math.ceil(this.totalItems / this.perPage);
-    }
+  value: {
+    type: Number,
+    required: true,
+  },
+  classes: {
+    type: Object,
+    required: false,
+    default: () => {},
+  },
+});
 
-    if (this.numPages < this.limit) {
-      this.visibleButtons = this.numPages;
-    } else {
-      this.visibleButtons = this.limit;
-    }
-  },
-  computed: {
-    visible() {
-      return (
-        this.numPages &&
-        this.totalItems &&
-        this.perPage &&
-        this.value &&
-        this.totalItems > this.perPage
-      );
-    },
-    startPage() {
-      if (this.value === 1) {
-        return 1;
-      }
+const emit = defineEmits(['change']);
 
-      if (this.value === this.numPages) {
-        return this.numPages - this.visibleButtons + 1;
-      }
+const visibleButtons = ref(0);
+const numPages = ref(0);
 
-      return this.value - 1;
-    },
-    endPage() {
-      return Math.min(
-        this.startPage + this.visibleButtons - 1,
-        this.numPages
-      );
-    },
-    pages() {
-      const range = [];
+onMounted(() => {
+  if (!numPages.value) {
+    numPages.value = Math.ceil(props.totalItems / props.perPage);
+  }
 
-      for (
-        let i = this.startPage;
-        i <=
-        Math.min(this.startPage + this.visibleButtons - 1, this.numPages);
-        i++
-      ) {
-        range.push({
-          name: i,
-          isDisabled: i === this.value,
-        });
-      }
+  if (numPages.value < props.limit) {
+    visibleButtons.value = numPages.value;
+  } else {
+    visibleButtons.value = props.limit;
+  }
+});
 
-      return range;
-    },
-    isInFirstPage() {
-      return this.value === 1;
-    },
-    isInLastPage() {
-      return this.value >= this.numPages;
-    },
-    from() {
-      return this.perPage * (this.value - 1) + 1
-    },
-    to() {
-      return this.totalItems < this.perPage ? this.totalItems : this.perPage * this.value
-    }
-  },
-  methods: {
-    onClickFirstPage() {
-      this.$emit("change", 1);
-    },
-    onClickPreviousPage() {
-      this.$emit("change", this.value - 1);
-    },
-    onClickPage(page) {
-      this.$emit("change", page);
-    },
-    onClickNextPage() {
-      this.$emit("change", this.value + 1);
-    },
-    onClickLastPage() {
-      this.$emit("change", this.numPages);
-    },
-    isPageActive(page) {
-      return this.value === page;
-    },
-  },
+const visible = computed(() => {
+  return (
+    numPages.value &&
+    props.totalItems &&
+    props.perPage &&
+    props.value &&
+    props.totalItems > props.perPage
+  );
+});
+
+const startPage = computed(() => {
+  if (props.value === 1) {
+    return 1;
+  }
+
+  if (props.value === numPages.value) {
+    return numPages.value - visibleButtons.value + 1;
+  }
+
+  return props.value - 1;
+});
+
+const endPage = computed(() => {
+  return Math.min(
+    startPage.value + visibleButtons.value - 1,
+    numPages.value
+  );
+});
+
+const pages = computed(() => {
+  const range = [];
+
+  for (
+    let i = startPage.value;
+    i <= Math.min(startPage.value + visibleButtons.value - 1, numPages.value);
+    i++
+  ) {
+    range.push({
+      name: i,
+      isDisabled: i === props.value,
+    });
+  }
+
+  return range;
+});
+
+const isInFirstPage = computed(() => {
+  return props.value === 1;
+});
+
+const isInLastPage = computed(() => {
+  return props.value >= numPages.value;
+});
+
+const from = computed(() => {
+  return props.perPage * (props.value - 1) + 1;
+});
+
+const to = computed(() => {
+  return props.totalItems < props.perPage ? props.totalItems : props.perPage * props.value;
+});
+
+const onClickFirstPage = () => {
+  emit("change", 1);
+};
+
+const onClickPreviousPage = () => {
+  emit("change", props.value - 1);
+};
+
+const onClickPage = (page) => {
+  emit("change", page);
+};
+
+const onClickNextPage = () => {
+  emit("change", props.value + 1);
+};
+
+const onClickLastPage = () => {
+  emit("change", numPages.value);
+};
+
+const isPageActive = (page) => {
+  return props.value === page;
 };
 </script>
 <style>
