@@ -21,32 +21,24 @@
     </div>
   </div>
 </template>
-<script>
-export default {
-  name: "Confirm",
-  props: {
-    params: {
-      required: true,
-      type: Object,
-      default() {
-        return {
-          title: "Titolo",
-          text: "Testo"
-        };
-      }
+
+<script setup>
+const props = defineProps({
+  params: {
+    type: Object,
+    required: true,
+    default() {
+      return {
+        title: "Titolo",
+        text: "Testo"
+      };
     }
-  },
-  data() {
-    return {
-      chosenFolder: null
-    };
-  },
-  async mounted() {},
-  methods: {
-    confirm(result) {
-      this.$emit("done", result);
-    }
-  },
-  computed: {}
+  }
+});
+
+const emit = defineEmits(['done']);
+
+const confirm = (result) => {
+  emit("done", result);
 };
 </script>

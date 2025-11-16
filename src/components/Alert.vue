@@ -60,101 +60,89 @@
   </transition>
 </template>
 
-<script>
+<script setup>
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import AwAlert from "../plugins/alert";
 
-export default {
-  name: "aw-alert",
-  components: {},
-  data() {
-    return {
-      // variable that shows/hides modal
-      visible: false,
-      type: "",
-      params: {},
-      cancelText: "Annulla",
-      confirmText: "Conferma",
-      onConfirm: {},
-    };
-  },
-  methods: {
-    hide() {
-      // method for closing modal
-      this.visible = false;
-      this.params = {};
-    },
-    confirm(result) {
-      this.hide();
-      this.onConfirm(result);
-    },
-    show(params) {
-      this.params = params;
-      this.type = params.type;
-      this.onConfirm = params.onConfirm;
+const visible = ref(false);
+const type = ref("");
+const params = ref({});
+const cancelText = ref("Annulla");
+const confirmText = ref("Conferma");
+const onConfirm = ref(() => {});
 
-      // making modal visible
-      this.visible = true;
-
-      setTimeout(() => {
-        this.hide();
-      }, params.time || 1500);
-    },
-    handleBackdropClick(event) {
-      if (this.$refs.backdrop == event.target) {
-        this.hide();
-      }
-    },
-  },
-  mounted() {
-    AwAlert.EventBus.on("show", this.show);
-  },
-  beforeUnmount() {
-    AwAlert.EventBus.off("show", this.show);
-  },
-  computed: {
-    icon() {
-      switch (this.type) {
-        case "success":
-          return "fas fa-check";
-        case "error":
-          return "fas fa-times";
-        case "warn":
-          return "fas fa-exclamation";
-        default:
-          return "fas fa-info";
-      }
-    },
-    theming() {
-      let theme_color = "info";
-      switch (this.type) {
-        case "success":
-          theme_color = "green";
-          break;
-        case "warn":
-          theme_color = "orange";
-          break;
-        case "error":
-          theme_color = "red";
-          break;
-        default:
-          theme_color = "blue";
-          break;
-      }
-
-      return {
-        close: `text-${theme_color}-800`,
-        title: `text-${theme_color}-700`,
-        side_bar: `bg-${theme_color}-500`,
-        text: `text-${theme_color}-700`,
-        icon: {
-          id: this.icon,
-          bg: `bg-${theme_color}-500`,
-        },
-        bg: `bg-${theme_color}-100`,
-      };
-    },
-  },
+const hide = () => {
+  visible.value = false;
+  params.value = {};
 };
+
+const confirm = (result) => {
+  hide();
+  onConfirm.value(result);
+};
+
+const show = (p) => {
+  params.value = p;
+  type.value = p.type;
+  onConfirm.value = p.onConfirm;
+
+  visible.value = true;
+
+  setTimeout(() => {
+    hide();
+  }, p.time || 1500);
+};
+
+const icon = computed(() => {
+  switch (type.value) {
+    case "success":
+      return "fas fa-check";
+    case "error":
+      return "fas fa-times";
+    case "warn":
+      return "fas fa-exclamation";
+    default:
+      return "fas fa-info";
+  }
+});
+
+const theming = computed(() => {
+  let theme_color = "info";
+  switch (type.value) {
+    case "success":
+      theme_color = "green";
+      break;
+    case "warn":
+      theme_color = "orange";
+      break;
+    case "error":
+      theme_color = "red";
+      break;
+    default:
+      theme_color = "blue";
+      break;
+  }
+
+  return {
+    close: `text-${theme_color}-800`,
+    title: `text-${theme_color}-700`,
+    side_bar: `bg-${theme_color}-500`,
+    text: `text-${theme_color}-700`,
+    icon: {
+      id: icon.value,
+      bg: `bg-${theme_color}-500`,
+    },
+    bg: `bg-${theme_color}-100`,
+  };
+});
+
+onMounted(() => {
+  AwAlert.EventBus.on("show", show);
+});
+
+onBeforeUnmount(() => {
+  AwAlert.EventBus.off("show", show);
+});
 </script>
 
 <style scoped>
