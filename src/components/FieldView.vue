@@ -79,70 +79,68 @@
     </div>
   </div>
 </template>
-<script>
-export default {
-  name: "FieldView",
-  props: {
-    data: { required: true },
-    field: { required: true },
-  },
-  components: {},
-  data() {
-    return {
-      example:
-        '{"status":200,"error":"","data":[{"news_id":51184,"title":"iPhone X Review: Innovative future with real black technology","source":"Netease phone"},{"news_id":51183,"title":"Traffic paradise: How to design streets for people and unmanned vehicles in the future?","source":"Netease smart","link":"http://netease.smart/traffic-paradise/1235"},{"news_id":51182,"title":"Teslamasks American Business Relations: The government does not pay billions to build factories","source":"AI Finance","members":["Daniel","Mike","John"]}]}',
-    };
-  },
-  mounted() {},
-  methods: {
-    getFieldNameFromType(field) {
-      switch (field.type) {
-        case "user":
-          if (field.select.multi) {
-            return field.field;
-          }
+<script setup>
+import { computed, getCurrentInstance } from 'vue';
 
-          return field.field + ".text";
-        case "select":
-          return field.code + "." + field.select.option;
-        default:
-          return null;
+const props = defineProps({
+  data: { required: true },
+  field: { required: true },
+});
+
+const instance = getCurrentInstance();
+const deepPick = instance?.appContext.config.globalProperties.deepPick;
+const $viewFields = instance?.appContext.config.globalProperties.$viewFields;
+const $filters = instance?.appContext.config.globalProperties.$filters;
+
+const getFieldNameFromType = (field) => {
+  switch (field.type) {
+    case "user":
+      if (field.select?.multi) {
+        return field.field;
       }
-    },
-  },
-  computed: {
-    value() {
-      let fieldName = this.getFieldNameFromType(this.field) || this.field.field;
+      return field.field + ".text";
+    case "select":
+      return field.code + "." + field.select.option;
+    default:
+      return null;
+  }
+};
 
-      switch (this.field.type) {
-        case "fieldset":
-          return this.field.label;
+const value = computed(() => {
+  let fieldName = getFieldNameFromType(props.field) || props.field.field;
 
-        case "image_upload":
-          return {
-            "background-image":
-              "url(" + this.deepPick(this.data, fieldName) + ")",
-          };
+  switch (props.field.type) {
+    case "fieldset":
+      return props.field.label;
 
-        case "choices":
-          let choice = this.field.choices.find(
-            (val) => this.deepPick(this.data, fieldName) == val.code
-          );
+    case "image_upload":
+      return {
+        "background-image":
+          "url(" + deepPick?.(props.data, fieldName) + ")",
+      };
 
-          if (choice) {
-            return choice.value;
-          }
+    case "choices":
+      let choice = props.field.choices?.find(
+        (val) => deepPick?.(props.data, fieldName) == val.code
+      );
 
-          return null;
-
-        case "json":
-          return;
-          JSON.parse(JSON.stringify(this.deepPick(this.data, fieldName))) || "";
-
-        default:
-          return this.deepPick(this.data, fieldName);
+      if (choice) {
+        return choice.value;
       }
-    },
-  },
+
+      return null;
+
+    case "json":
+      return JSON.parse(JSON.stringify(deepPick?.(props.data, fieldName) || ""));
+
+    default:
+      return deepPick?.(props.data, fieldName);
+  }
+});
+
+const goToCustomerDetail = (field, data) => {
+  // Implementation would be injected via global properties if needed
+  const goToCustomerDetailFn = instance?.appContext.config.globalProperties.goToCustomerDetail;
+  goToCustomerDetailFn?.(field, data);
 };
 </script>

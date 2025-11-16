@@ -81,75 +81,79 @@
     </div>
   </div>
 </template>
-<script>
-export default {
-  props: {
-    params: { required: true, default: {} }
-  },
-  data () {
-    return {
-      state: 'idle',
-      newPassword: '',
-      cancelText: 'Annulla'
-    }
-  },
-  computed: {
-    confirmText () {
-      let confirmText = ''
+<script setup>
+import { ref, computed, getCurrentInstance } from 'vue';
 
-      switch (this.state) {
-        case 'idle':
-          confirmText = 'Cambia'
-          break
-        case 'loading':
-          confirmText = 'Cambiando...'
-          break
-        case 'passwordChanged':
-          confirmText = 'Chiudi'
-          break
-      }
+const props = defineProps({
+  params: { required: true, default: () => ({}) }
+});
 
-      return confirmText
-    },
-    btnDisabled () {
-      switch (this.state) {
-        case 'idle':
-          return this.newPassword == ''
-        case 'loading':
-          return true
-        case 'passwordChanged':
-          return false
-      }
-    }
-  },
-  mounted () {},
-  methods: {
-    confirm (result) {
-      this.$emit('done', { result: result })
-    },
-    handleChangePassword () {
-      switch (this.state) {
-        case 'idle':
-          this.state = 'loading'
-          this.changePassword()
-          break
-        case 'passwordChanged':
-          this.confirm(true)
-          break
-      }
-    },
-    async changePassword () {
-      let result = await this.$api.act(
-        'users',
-        this.params.user_id,
-        'change_password',
-        {
-          new_password: this.newPassword
-        }
-      )
+const emit = defineEmits(['done']);
 
-      this.state = 'passwordChanged'
-    }
+const instance = getCurrentInstance();
+const $api = instance?.appContext.config.globalProperties.$api;
+
+const state = ref('idle');
+const newPassword = ref('');
+const cancelText = ref('Annulla');
+
+const confirmText = computed(() => {
+  let text = '';
+
+  switch (state.value) {
+    case 'idle':
+      text = 'Cambia';
+      break;
+    case 'loading':
+      text = 'Cambiando...';
+      break;
+    case 'passwordChanged':
+      text = 'Chiudi';
+      break;
   }
-}
+
+  return text;
+});
+
+const btnDisabled = computed(() => {
+  switch (state.value) {
+    case 'idle':
+      return newPassword.value === '';
+    case 'loading':
+      return true;
+    case 'passwordChanged':
+      return false;
+    default:
+      return false;
+  }
+});
+
+const confirm = (result) => {
+  emit('done', { result: result });
+};
+
+const handleChangePassword = () => {
+  switch (state.value) {
+    case 'idle':
+      state.value = 'loading';
+      changePassword();
+      break;
+    case 'passwordChanged':
+      confirm(true);
+      break;
+  }
+};
+
+const changePassword = async () => {
+  await $api?.act(
+    'users',
+    props.params.user_id,
+    'change_password',
+    {
+      new_password: newPassword.value
+    }
+  );
+
+  state.value = 'passwordChanged';
+};
 </script>
