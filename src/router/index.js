@@ -136,6 +136,7 @@ export default function (options) {
 
   // In Vue Router 4, addRoutes is replaced with addRoute for individual routes
   routes.forEach(route => {
+    console.log('Adding route:', route);
     router.addRoute(route)
   })
 
