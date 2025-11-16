@@ -107,148 +107,153 @@
     </div>
   </div>
 </template>
-<script>
+<script setup>
+import { ref, computed } from 'vue';
 import Icon from '@/components/Icon.vue';
-export default {
-  name: 'ChangePasswordStrong',
-  components: {
-    icon: Icon
-  },
-  props: {
-    params: {
-      required: true,
-      type: Object,
-      default () {
-        return {
-          title: 'Titolo',
-          text: 'Testo'
-        }
-      }
-    }
-  },
-  data () {
-    return {
-      isLoading: false,
-      password: '',
-      state: 'idle',
-      confirmPassword: '',
-      inputType: 'password',
-      title: 'Cambia Password',
-      confirmText: 'Cambia',
-      errors: {},
-      rules: [
-        {
-          code: 'equal',
-          label: 'Le password devono coincidere'
-        },
-        {
-          code: 'length',
-          label: 'La password deve essere lunga almeno 8 caratteri'
-        },
-        {
-          code: 'number',
-          label: 'La password deve contenere almeno 1 numero'
-        },
-        {
-          code: 'uppercase',
-          label: 'La password deve contenere almeno 1 lettera maiuscola'
-        },
-        {
-          code: 'special',
-          label:
-            'La password deve contenere almeno uno tra i seguenti caratteri: !#@?_-;:'
-        }
-      ]
-    }
-  },
-  computed: {
-    passwordsAreEqual () {
-      if (!this.password && !this.confirmPassword) {
-        return false
-      }
 
-      return this.password === this.confirmPassword
-    },
-    passwordIsPristine () {
-      return !this.password && !this.confirmPassword
-    },
-    passwordError () {
-      if (this.passwordIsPristine) {
-        return null
-      }
-
-      let errors = {}
-
-      if (!this.passwordsAreEqual) {
-        errors.equal = true
-      }
-
-      if (this.password == this.password.toLowerCase()) {
-        errors.uppercase = true
-      }
-
-      if (this.password.length < 8) {
-        errors.length = true
-      }
-
-      if (!/\d/.test(this.password)) {
-        errors.number = true
-      }
-
-      this.errors = errors
-
-      return Object.keys(errors).length > 0
-    },
-    confirmIsDisabled () {
-      switch (this.state) {
-        case 'idle':
-          return this.passwordError || this.passwordIsPristine
-        case 'loading':
-          return true
-        case 'success':
-          return false
-      }
-    }
-  },
-  async mounted () {},
-  methods: {
-    async forward () {
-      switch (this.state) {
-        case 'idle':
-          await this.changePassword()
-          break
-        case 'success':
-          await this.confirm(true)
-          break
-      }
-    },
-    async changePassword () {
-      this.isLoading = true
-      this.confirmText = 'Caricamento'
-      this.state = 'loading'
-
-      try {
-        let response = await this.$api.act(
-          this.params.resourceName,
-          this.params.accountId,
-          this.params.action,
-          {
-            password: this.password
-          }
-        )
-
-        this.state = 'success'
-        this.confirmText = 'Chiudi'
-      } catch (e) {
-        this.confirmText = 'Cambia'
-        this.state = 'idle'
-      }
-
-      this.isLoading = false
-    },
-    confirm (result) {
-      this.$emit('done', result)
+const props = defineProps({
+  params: {
+    required: true,
+    type: Object,
+    default() {
+      return {
+        title: 'Titolo',
+        text: 'Testo'
+      };
     }
   }
-}
+});
+
+const emit = defineEmits(['done']);
+
+// Get $api from global properties
+import { getCurrentInstance } from 'vue';
+const instance = getCurrentInstance();
+const $api = instance?.appContext.config.globalProperties.$api;
+
+const isLoading = ref(false);
+const password = ref('');
+const state = ref('idle');
+const confirmPassword = ref('');
+const inputType = ref('password');
+const title = ref('Cambia Password');
+const confirmText = ref('Cambia');
+const errors = ref({});
+
+const rules = [
+  {
+    code: 'equal',
+    label: 'Le password devono coincidere'
+  },
+  {
+    code: 'length',
+    label: 'La password deve essere lunga almeno 8 caratteri'
+  },
+  {
+    code: 'number',
+    label: 'La password deve contenere almeno 1 numero'
+  },
+  {
+    code: 'uppercase',
+    label: 'La password deve contenere almeno 1 lettera maiuscola'
+  },
+  {
+    code: 'special',
+    label:
+      'La password deve contenere almeno uno tra i seguenti caratteri: !#@?_-;:'
+  }
+];
+
+const passwordsAreEqual = computed(() => {
+  if (!password.value && !confirmPassword.value) {
+    return false;
+  }
+
+  return password.value === confirmPassword.value;
+});
+
+const passwordIsPristine = computed(() => {
+  return !password.value && !confirmPassword.value;
+});
+
+const passwordError = computed(() => {
+  if (passwordIsPristine.value) {
+    return null;
+  }
+
+  let errorsObj = {};
+
+  if (!passwordsAreEqual.value) {
+    errorsObj.equal = true;
+  }
+
+  if (password.value === password.value.toLowerCase()) {
+    errorsObj.uppercase = true;
+  }
+
+  if (password.value.length < 8) {
+    errorsObj.length = true;
+  }
+
+  if (!/\d/.test(password.value)) {
+    errorsObj.number = true;
+  }
+
+  errors.value = errorsObj;
+
+  return Object.keys(errorsObj).length > 0;
+});
+
+const confirmIsDisabled = computed(() => {
+  switch (state.value) {
+    case 'idle':
+      return passwordError.value || passwordIsPristine.value;
+    case 'loading':
+      return true;
+    case 'success':
+      return false;
+    default:
+      return false;
+  }
+});
+
+const forward = async () => {
+  switch (state.value) {
+    case 'idle':
+      await changePassword();
+      break;
+    case 'success':
+      await confirm(true);
+      break;
+  }
+};
+
+const changePassword = async () => {
+  isLoading.value = true;
+  confirmText.value = 'Caricamento';
+  state.value = 'loading';
+
+  try {
+    await $api?.act(
+      props.params.resourceName,
+      props.params.accountId,
+      props.params.action,
+      {
+        password: password.value
+      }
+    );
+
+    state.value = 'success';
+    confirmText.value = 'Chiudi';
+  } catch (e) {
+    confirmText.value = 'Cambia';
+    state.value = 'idle';
+  }
+
+  isLoading.value = false;
+};
+
+const confirm = (result) => {
+  emit('done', result);
+};
 </script>
