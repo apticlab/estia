@@ -1,5 +1,5 @@
 import { inject, getCurrentInstance } from "vue";
-import { ApiSymbol } from "@/utils/api.js";
+import { ApiSymbol } from "../utils/api.js";
 
 export function useApi() {
   const api =
