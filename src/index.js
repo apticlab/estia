@@ -6,7 +6,7 @@ import style from "./style.css";
 
 import { helpers } from "./utils/helpers.js";
 import { EventBus } from "./utils/event-bus.js";
-import api from "./utils/api.js";
+import api, { ApiSymbol } from "./utils/api.js";
 import { getProfile, logout } from "./utils/auth.js";
 import theme from "./theme/index.js";
 import { ThemeSymbol } from "./composables/useTheme.js";
@@ -36,6 +36,7 @@ export default {
   install(app, options) {
     $api = api(options);
     app.config.globalProperties.$api = $api;
+    app.provide(ApiSymbol, $api);
     app.config.globalProperties.EventBus = EventBus;
 
     const themeConfig = theme(options);

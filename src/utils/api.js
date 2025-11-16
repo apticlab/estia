@@ -2,6 +2,8 @@ import axios from 'axios'
 import { getToken, hasActiveRole, getActiveRole, setProfile } from './auth.js'
 import { EventBus } from './event-bus.js'
 
+export const ApiSymbol = Symbol("api");
+
 var ENV = process.env.NODE_ENV || 'development';
 var HOST = "";
 var BASE_URL = "";
@@ -71,6 +73,7 @@ export default function (options) {
 
   return api
 }
+
 
 async function login(username, password) {
   let loginFormData = new FormData();
