@@ -15,7 +15,7 @@
   >
     <div
       :class="{
-        [cardClass]: true,
+        [cardClassComputed]: true,
       }"
     >
       <div class="flex flex-row items-center justify-center w-full">
@@ -142,7 +142,10 @@
     </div>
   </div>
 </template>
-<script>
+<script setup>
+import { ref, computed, onMounted, getCurrentInstance } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
+import { useTheme } from '../composables/useTheme';
 import { resetPassword } from "../utils/auth";
 
 const defaultErrorTexts = {
@@ -150,137 +153,140 @@ const defaultErrorTexts = {
   "generic-error": "Errore generico",
 };
 
-export default {
-  name: "Login",
-  props: {
-    cardClass: {
-      required: false,
-      type: String,
-      default() {
-        return this.$theme.loginCardClass;
-      },
-    },
-    bgImage: {
-      required: false,
-      type: String,
-      default: "",
-    },
-    bgColor: {
-      required: false,
-      type: String,
-      default: "bg-white",
-    },
-    errorTexts: {
-      required: false,
-      type: Object,
-    },
+const props = defineProps({
+  cardClass: {
+    required: false,
+    type: String,
+    default: undefined,
   },
-  data() {
-    return {
-      email: "",
-      loginStep: "login",
-      credentials: {
-        username: "",
-        password: "",
-      },
-      isLoading: false,
-      mergedErrorTexts: {},
-      errorText: "",
-      errorCodeDict: {
-        user_not_found: "Matricola non appartenente a nessun utente",
-        username_not_sent: "Inserisci una matricola nel campo di testo",
-        password_not_insert: "Inserire la password",
-      },
-    };
+  bgImage: {
+    required: false,
+    type: String,
+    default: "",
   },
-  computed: {
-    canLogin: function () {
-      return (
-        this.credentials.username !== "" && this.credentials.password !== ""
-      );
-    },
-    submitDisabled: function () {
-      return !this.canLogin || this.isLoading;
-    },
-    submitText: function () {
-      if (this.isLoading) {
-        return "Caricamento";
-      }
+  bgColor: {
+    required: false,
+    type: String,
+    default: "bg-white",
+  },
+  errorTexts: {
+    required: false,
+    type: Object,
+  },
+});
 
-      return this.errorText === "" ? "Login" : "Errore";
+const router = useRouter();
+const route = useRoute();
+const theme = useTheme();
+const instance = getCurrentInstance();
+const $api = instance.appContext.config.globalProperties.$api;
+
+const username = ref(null);
+const email = ref("");
+const loginStep = ref("login");
+const credentials = ref({
+  username: "",
+  password: "",
+});
+const isLoading = ref(false);
+const mergedErrorTexts = ref({});
+const errorText = ref("");
+const errorCodeDict = {
+  user_not_found: "Matricola non appartenente a nessun utente",
+  username_not_sent: "Inserisci una matricola nel campo di testo",
+  password_not_insert: "Inserire la password",
+};
+
+const cardClassComputed = computed(() => {
+  return props.cardClass || theme.loginCardClass;
+});
+
+const canLogin = computed(() => {
+  return (
+    credentials.value.username !== "" && credentials.value.password !== ""
+  );
+});
+
+const submitDisabled = computed(() => {
+  return !canLogin.value || isLoading.value;
+});
+
+const submitText = computed(() => {
+  if (isLoading.value) {
+    return "Caricamento";
+  }
+
+  return errorText.value === "" ? "Login" : "Errore";
+});
+
+onMounted(() => {
+  if (username.value) {
+    username.value.focus();
+  }
+
+  mergedErrorTexts.value = {
+    ...defaultErrorTexts,
+    ...props.errorTexts,
+  };
+});
+
+const login = async () => {
+  errorText.value = "";
+  isLoading.value = true;
+
+  let loginData = await $api.login(
+    credentials.value.username,
+    credentials.value.password
+  );
+
+  let errorCode = loginData.error || "generic-error";
+
+  // Try to look up for error messages from props and default ones
+  if (!(errorCode in mergedErrorTexts.value)) {
+    // revert to "generic-error" when errorCode is not recognized
+    errorCode = "generic-error";
+  }
+
+  errorText.value = mergedErrorTexts.value[errorCode];
+
+  var redirect = route.query.redirect || "";
+
+  isLoading.value = false;
+
+  if (!loginData.error) {
+    router.push("/" + redirect);
+  }
+};
+
+const sendPasswordReset = () => {
+  isLoading.value = true;
+  errorText.value = "";
+
+  resetPassword(email.value).then(
+    (data) => {
+      isLoading.value = false;
+      email.value = "";
+      loginStep.value = "success";
     },
-  },
-  mounted() {
-    if (this.$refs.username) {
-      this.$refs.username.focus();
+    (err) => {
+      email.value = "";
+      errorText.value = errorCodeDict[err.code];
+      isLoading.value = false;
     }
+  );
+};
 
-    this.mergedErrorTexts = {
-      ...defaultErrorTexts,
-      ...this.errorTexts,
-    };
-  },
-  methods: {
-    async login() {
-      var $route = this.$route;
-      var $router = this.$router;
+const resetPasswordHandler = ($event) => {
+  $event.stopPropagation();
+  $event.preventDefault();
 
-      this.errorText = "";
+  errorText.value = "";
+  loginStep.value = "passwordreset";
+};
 
-      this.isLoading = true;
-
-      let loginData = await this.$api.login(
-        this.credentials.username,
-        this.credentials.password
-      );
-
-      let errorCode = loginData.error || "generic-error";
-
-      // Try to look up for error messages from props and default ones
-      if (!(errorCode in this.mergedErrorTexts)) {
-        // revert to "generic-error" when errorCode is not recognized
-        errorCode = "generic-error";
-      }
-
-      this.errorText = this.mergedErrorTexts[errorCode];
-
-      var redirect = $route.query.redirect || "";
-
-      this.isLoading = false;
-
-      if (!loginData.error) {
-        $router.push("/" + redirect);
-      }
-    },
-    sendPasswordReset: function () {
-      this.isLoading = true;
-      this.errorText = "";
-
-      resetPassword(this.email).then(
-        (data) => {
-          this.isLoading = false;
-          this.email = "";
-          this.loginStep = "success";
-        },
-        (err) => {
-          this.email = "";
-          this.errorText = this.errorCodeDict[err.code];
-          this.isLoading = false;
-        }
-      );
-    },
-    resetPassword: function ($event) {
-      $event.stopPropagation();
-      $event.preventDefault();
-
-      this.errorText = "";
-      this.loginStep = "passwordreset";
-    },
-    goBack: function () {
-      this.loginStep = "login";
-      this.errorText = "";
-    },
-  },
+const goBack = () => {
+  loginStep.value = "login";
+  errorText.value = "";
 };
 </script>
 <style>
