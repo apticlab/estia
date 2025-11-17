@@ -13,34 +13,33 @@
     </v-date-picker>
   </div>
 </template>
-<script>
-export default {
-  name: "DatePicker",
-  props: {
-    context: {
-      type: Object,
-      required: true,
-    },
+
+<script setup>
+import { computed, getCurrentInstance } from 'vue';
+
+const props = defineProps({
+  context: {
+    type: Object,
+    required: true,
   },
-  mounted() {},
-  data() {
-    return {};
-  },
-  methods: {
-    updateDate($event) {
-      this.context.model = this.formatDate($event);
-    },
-    formatDate(newDate) {
-      return this.moment(newDate).format("YYYY-MM-DD");
-    },
-  },
-  computed: {
-    attributes() {
-      return this.context.attributes;
-    },
-    headers() {
-      return this.attributes.headers;
-    },
-  },
+});
+
+const instance = getCurrentInstance();
+const moment = instance.appContext.config.globalProperties.$moment;
+
+const attributes = computed(() => {
+  return props.context.attributes;
+});
+
+const headers = computed(() => {
+  return attributes.value.headers;
+});
+
+const formatDate = (newDate) => {
+  return moment(newDate).format("YYYY-MM-DD");
+};
+
+const updateDate = ($event) => {
+  props.context.model = formatDate($event);
 };
 </script>

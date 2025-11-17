@@ -22,96 +22,100 @@
   </div>
 </template>
 
-<script>
-import { mapState } from "vuex";
+<script setup>
+import { ref, computed, onMounted } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { useStore } from 'vuex';
+import { useCurrentUser } from '@/composables/useCurrentUser';
 
-export default {
-  name: "tab-view",
-  props: {
-    initialTabIndex: { required: false, default: null },
-    externalTabs: { required: false }
-  },
-  data() {
-    return {
-      basePath: "",
-      currentResource: null,
-      tabs: null,
-      tabsFromRouter: false,
-      currentTab: null
-    };
-  },
-  beforeMount() {
-    this.fetchTabs();
-  },
-  mounted() {
-    if (this.tabsFromRouter && this.$route.params.resource) {
-      this.currentResource = this.$route.params.resource;
-      this.goToTab(this.tabs.find(tab => tab.code == this.currentResource));
-      return;
+const props = defineProps({
+  initialTabIndex: { type: Number, required: false, default: null },
+  externalTabs: { type: Array, required: false }
+});
+
+const emit = defineEmits(['tab-change']);
+
+const route = useRoute();
+const router = useRouter();
+const store = useStore();
+const { getUserRole } = useCurrentUser();
+
+const basePath = ref("");
+const currentResource = ref(null);
+const tabs = ref(null);
+const tabsFromRouter = ref(false);
+const currentTab = ref(null);
+
+const user = computed(() => store.state.user?.user);
+
+const visibleTabs = computed(() => {
+  if (!tabs.value) return [];
+  
+  return tabs.value.filter(tab => {
+    if (!tab.roles) {
+      return true;
     }
 
-    if (!this.initialTabIndex) {
-      this.goToTab(this.visibleTabs[0]);
-      return;
-    }
+    return tab.roles.includes(getUserRole());
+  });
+});
 
-    this.goToTab(this.visibleTabs[this.initialTabIndex]);
-  },
-  methods: {
-    fetchTabs() {
-      if (this.externalTabs) {
-        this.tabs = this.externalTabs;
-        return;
-      }
+const fetchTabs = () => {
+  if (props.externalTabs) {
+    tabs.value = props.externalTabs;
+    return;
+  }
 
-      this.tabsFromRouter = true;
+  tabsFromRouter.value = true;
 
-      let routeWithTabDefinition = this.$route.matched.find(route =>
-        route.meta ? route.meta.tabs : null
-      );
+  let routeWithTabDefinition = route.matched.find(r =>
+    r.meta ? r.meta.tabs : null
+  );
 
-      this.basePath = routeWithTabDefinition.path;
-      this.tabs = routeWithTabDefinition.meta.tabs || [];
-    },
-    goToTab(tab, fromTapAction = false) {
-      if (!tab) {
-        return;
-      }
-
-      this.currentTab = tab;
-
-      // Don't go to this tab if we're already there
-      if (this.currentResource && this.currentResource == tab.code) {
-        return;
-      }
-
-      if (this.tabsFromRouter) {
-        this.$router.push({
-          path: `${this.basePath}/${tab.code}/list`
-        });
-      }
-
-      if (fromTapAction) {
-        this.$emit("tab-change", tab);
-      }
-    }
-  },
-  computed: {
-    ...mapState("user", {
-      user: state => state.user
-    }),
-    visibleTabs() {
-      return this.tabs.filter(tab => {
-        if (!tab.roles) {
-          return true;
-        }
-
-        return tab.roles.includes(this.getUserRole());
-      });
-    }
-  },
-  watch: {}
+  basePath.value = routeWithTabDefinition.path;
+  tabs.value = routeWithTabDefinition.meta.tabs || [];
 };
+
+const goToTab = (tab, fromTapAction = false) => {
+  if (!tab) {
+    return;
+  }
+
+  currentTab.value = tab;
+
+  // Don't go to this tab if we're already there
+  if (currentResource.value && currentResource.value == tab.code) {
+    return;
+  }
+
+  if (tabsFromRouter.value) {
+    router.push({
+      path: `${basePath.value}/${tab.code}/list`
+    });
+  }
+
+  if (fromTapAction) {
+    emit("tab-change", tab);
+  }
+};
+
+// Initialize
+fetchTabs();
+
+onMounted(() => {
+  if (tabsFromRouter.value && route.params.resource) {
+    currentResource.value = route.params.resource;
+    goToTab(tabs.value.find(tab => tab.code == currentResource.value));
+    return;
+  }
+
+  if (!props.initialTabIndex) {
+    goToTab(visibleTabs.value[0]);
+    return;
+  }
+
+  goToTab(visibleTabs.value[props.initialTabIndex]);
+});
 </script>
 
 <style></style>

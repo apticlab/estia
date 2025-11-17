@@ -170,185 +170,294 @@
     <loading v-if="isLoading" class="flex-grow w-full h-64" />
   </div>
 </template>
-<script>
-import ActionsMixin from "@/mixins/actions.mixin.js";
+<script setup>
+import { ref, computed, watch, onMounted, getCurrentInstance } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
+import { useStore } from 'vuex';
 import _ from "lodash";
 import Pagination from '@/components/Pagination.vue';
+import Icon from '@/components/Icon.vue';
+import { useTheme } from '../composables/useTheme.js';
 
-export default {
-  name: "ListResourceBase",
-  mixins: [ActionsMixin],
-  components: {
-    't-pagination': Pagination,
+const props = defineProps({
+  tableClass: {
+    required: false,
+    type: String,
+    default: undefined,
   },
-  props: {
-    tableClass: {
-      required: false,
-      type: String,
-      default() {
-        return this.$theme.tableClass;
-      },
-    },
-    headerClass: {
-      required: false,
-      type: String,
-      default: "bg-gray-500 text-white",
-    },
-    query: {
-      required: false,
-      type: String,
-      default: null,
-    },
-    rowClass: {
-      required: false,
-      type: String,
-      default: "bg-gray-100 text-gray-700",
-    },
-    multiActionClass: {
-      required: false,
-      type: String,
-      default: "bg-gray-100 text-gray-700",
-    },
-    propsResourceName: {
-      required: false,
-      type: String,
-      default: null,
-    },
-    striped: {
-      required: false,
-      type: Boolean,
-      default: false,
-    },
-    paginationClasses: {
-      required: false,
-      type: Object,
-      default() {
-        return this.$theme.paginationClasses;
-      },
-    },
+  headerClass: {
+    required: false,
+    type: String,
+    default: "bg-gray-500 text-white",
   },
-  data() {
-    return {
-      actionScope: "list",
-      pagination: null,
-      currentPage: 1,
-      isLoading: true,
-      dataLoading: true,
-      searchQuery: null,
-      rows: null,
-      headers: null,
-      actions: null,
-      filters: {},
-      resourceName: null,
-      resourceIsLoading: false,
-      baseConfig: {
-        canAdd: true,
-      },
-      card: null,
-    };
+  query: {
+    required: false,
+    type: String,
+    default: null,
   },
-  computed: {},
-  async mounted() {
-    this.resourceName =
-      this.propsResourceName ||
-      this.$route.params.resource ||
-      this.$route.meta.resource;
+  rowClass: {
+    required: false,
+    type: String,
+    default: "bg-gray-100 text-gray-700",
+  },
+  multiActionClass: {
+    required: false,
+    type: String,
+    default: "bg-gray-100 text-gray-700",
+  },
+  propsResourceName: {
+    required: false,
+    type: String,
+    default: null,
+  },
+  striped: {
+    required: false,
+    type: Boolean,
+    default: false,
+  },
+  paginationClasses: {
+    required: false,
+    type: Object,
+    default: undefined,
+  },
+});
 
-    if (!this.resourceName) {
-      return;
+const router = useRouter();
+const route = useRoute();
+const store = useStore();
+const theme = useTheme();
+
+const instance = getCurrentInstance();
+const $api = instance.appContext.config.globalProperties.$api;
+const $actions = instance.appContext.config.globalProperties.$actions;
+const deepPick = instance.appContext.config.globalProperties.deepPick;
+const resources = instance.appContext.config.globalProperties.resources;
+const getUserRole = instance.appContext.config.globalProperties.getUserRole;
+const itemIsVisible = instance.appContext.config.globalProperties.itemIsVisible;
+const is_mobile = computed(() => store.getters.is_mobile);
+
+// Provide default values using theme
+const actualTableClass = computed(() => props.tableClass || theme.tableClass);
+const actualPaginationClasses = computed(() => props.paginationClasses || theme.paginationClasses);
+
+const actionScope = ref("list");
+const pagination = ref(null);
+const currentPage = ref(1);
+const isLoading = ref(true);
+const dataLoading = ref(true);
+const searchQuery = ref(null);
+const rows = ref(null);
+const headers = ref(null);
+const actions = ref(null);
+const filters = ref({});
+const resourceName = ref(null);
+const resourceIsLoading = ref(false);
+const baseConfig = ref({
+  canAdd: true,
+});
+const card = ref(null);
+const resourceInfo = ref(null);
+const config = ref(null);
+
+// Actions mixin functionality
+const actOnRow = (event) => {
+  let action = event.action;
+  let index = event.index;
+  
+  const methods = {
+    addResource,
+    view,
+    edit,
+    delete: deleteResource,
+  };
+
+  if (methods[action.callback]) {
+    let row = rows.value[index];
+    methods[action.callback](row);
+    return;
+  }
+
+  if ($actions[action.callback]) {
+    let row = rows.value[index];
+    $actions[action.callback](instance, row);
+    return;
+  }
+};
+
+const act = (action, data = null) => {
+  const methods = {
+    addResource,
+    view,
+    edit,
+    delete: deleteResource,
+  };
+
+  if (methods[action.callback]) {
+    methods[action.callback](data);
+    return;
+  }
+
+  if ($actions[action.callback]) {
+    $actions[action.callback](instance, data);
+  }
+};
+
+const isActionVisible = (action, row) => {
+  if (!action.visible) {
+    return true;
+  }
+
+  return itemIsVisible(action, row, instance);
+};
+
+const visibleActions = computed(() => {
+  if (!actions.value) return [];
+  
+  return actions.value.filter((action) => {
+    if (action.multi) {
+      return false;
     }
 
-    this.headers = this.resources[this.resourceName].headers || [];
-    this.actions = this.resources[this.resourceName].actions || [];
-    this.resourceInfo = this.resources[this.resourceName].info || {};
-    this.config = this.resources[this.resourceName].config || this.baseConfig;
-    this.card = this.resources[this.resourceName].card || null;
+    let roleBasedFilter = !action.roles || action.roles.includes(getUserRole());
+    let scopeBasedFilter = !action.scopes || action.scopes.includes(actionScope.value);
+    let visibilityFilter = itemIsVisible(action, instance);
 
-    this.isLoading = true;
-    await this.loadData();
-    this.isLoading = false;
-  },
-  methods: {
-    getPillBgColor(color) {
-      if (!color) {
-        return "bg-gray-500";
-      }
-      return color;
-    },
-    search: _.debounce(async function () {
-      // When searching "reset" pagination
-      this.currentPage = 1;
-      await this.loadData();
-    }, 350),
-    async changePage(newCurrentPage) {
-      this.currentPage = newCurrentPage;
-      await this.loadData();
-    },
-    async loadData() {
-      this.dataLoading = true;
-      try {
-        let response = await this.$api.list(this.resourceName, {
-          q: this.searchQuery,
-          filters: this.filters,
-          page: this.currentPage,
-        });
+    return roleBasedFilter && scopeBasedFilter && visibilityFilter;
+  });
+});
 
-        if (response.data) {
-          this.pagination = {
-            totalItems: response.total,
-            perPage: response.per_page,
-          };
+const scopedActions = computed(() => {
+  if (!actions.value) return [];
+  
+  return actions.value.filter((action) => {
+    if (action.multi) {
+      return false;
+    }
 
-          this.rows = response.data;
-        } else {
-          this.rows = response || [];
-        }
-      } catch (e) {
-        this.rows = [];
-      }
+    let roleBasedFilter = !action.roles || action.roles.includes(getUserRole());
+    let scopeBasedFilter = true;
+    if (!action.default) {
+      scopeBasedFilter = !action.scopes || action.scopes.includes(actionScope.value);
+    }
+    return roleBasedFilter && scopeBasedFilter;
+  });
+});
 
-      this.dataLoading = false;
-    },
-    async filterData(filters) {
-      this.filters = filters;
-      await this.loadData();
-    },
-    addResource() {
-      this.$router.push({
-        name: `create_${this.resourceName}`,
-      });
-    },
-    view(resource) {
-      this.$router.push({
-        name: `view_${this.resourceName}`,
-        params: {
-          id: resource.id,
-        },
-      });
-    },
-    edit(resource) {
-      this.$router.push({
-        name: `edit_${this.resourceName}`,
-        params: {
-          id: resource.id,
-        },
-      });
-    },
-    async delete(resource) {
-      if (confirm("Vuoi davvero eliminare questa risorsa?")) {
-        this.isLoading = true;
-        this.$api.delete(this.resourceName, resource.id);
-        this.isLoading = false;
+const multiActions = computed(() => {
+  if (!actions.value) return [];
+  
+  return actions.value.filter((action) => {
+    let roleBasedFilter = !action.roles || action.roles.includes(getUserRole());
+    return action.multi && roleBasedFilter;
+  });
+});
 
-        await this.loadData();
-      }
-    },
-  },
-  watch: {
-    query(newV, oldV) {
-      this.searchQuery = newV;
-      this.search();
-    },
-  },
+const getPillBgColor = (color) => {
+  if (!color) {
+    return "bg-gray-500";
+  }
+  return color;
 };
+
+const search = _.debounce(async function () {
+  // When searching "reset" pagination
+  currentPage.value = 1;
+  await loadData();
+}, 350);
+
+const changePage = async (newCurrentPage) => {
+  currentPage.value = newCurrentPage;
+  await loadData();
+};
+
+const loadData = async () => {
+  dataLoading.value = true;
+  try {
+    let response = await $api.list(resourceName.value, {
+      q: searchQuery.value,
+      filters: filters.value,
+      page: currentPage.value,
+    });
+
+    if (response.data) {
+      pagination.value = {
+        totalItems: response.total,
+        perPage: response.per_page,
+      };
+
+      rows.value = response.data;
+    } else {
+      rows.value = response || [];
+    }
+  } catch (e) {
+    rows.value = [];
+  }
+
+  dataLoading.value = false;
+};
+
+const filterData = async (filtersData) => {
+  filters.value = filtersData;
+  await loadData();
+};
+
+const addResource = () => {
+  router.push({
+    name: `create_${resourceName.value}`,
+  });
+};
+
+const view = (resource) => {
+  router.push({
+    name: `view_${resourceName.value}`,
+    params: {
+      id: resource.id,
+    },
+  });
+};
+
+const edit = (resource) => {
+  router.push({
+    name: `edit_${resourceName.value}`,
+    params: {
+      id: resource.id,
+    },
+  });
+};
+
+const deleteResource = async (resource) => {
+  if (confirm("Vuoi davvero eliminare questa risorsa?")) {
+    isLoading.value = true;
+    $api.delete(resourceName.value, resource.id);
+    isLoading.value = false;
+
+    await loadData();
+  }
+};
+
+watch(() => props.query, (newV, oldV) => {
+  searchQuery.value = newV;
+  search();
+});
+
+onMounted(async () => {
+  resourceName.value =
+    props.propsResourceName ||
+    route.params.resource ||
+    route.meta.resource;
+
+  if (!resourceName.value) {
+    return;
+  }
+
+  headers.value = resources[resourceName.value].headers || [];
+  actions.value = resources[resourceName.value].actions || [];
+  resourceInfo.value = resources[resourceName.value].info || {};
+  config.value = resources[resourceName.value].config || baseConfig.value;
+  card.value = resources[resourceName.value].card || null;
+
+  isLoading.value = true;
+  await loadData();
+  isLoading.value = false;
+});
 </script>

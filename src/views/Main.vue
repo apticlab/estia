@@ -18,44 +18,40 @@
     <color-swatch />
   </div>
 </template>
-<script>
-import SideNavMixin from '@/mixins/sidenav.mixin.js'
 
-export default {
-  name: 'Main',
-  mixins: [SideNavMixin],
-  data: () => ({
-    path: []
-  }),
-  watch: {
-    $route: {
-      handler () {
-        this.format_path_for_breadcrumbs(this.$route.fullPath)
-      }
-    }
-  },
-  beforeMount () {
-    this.format_path_for_breadcrumbs(this.$route.fullPath)
-    this.listenForSideNavCollapseEvent()
-  },
-  methods: {
-    format_path_for_breadcrumbs (path) {
-      const splitted_full_path = path
-        .trim()
-        .split('/')
-        .map((item) => {
-          return {
-            disabled: false,
-            exact: false,
-            href: '/' + item,
-            text: item,
-            to: item
-          }
-        })
+<script setup>
+import { ref, watch } from 'vue';
+import { useRoute } from 'vue-router';
+import { useSideNav } from '@/composables/useSideNav';
 
-      this.path = splitted_full_path
-    }
-  }
-}
+const route = useRoute();
+const { is_collapsed, listenForSideNavCollapseEvent } = useSideNav();
+
+const path = ref([]);
+
+const format_path_for_breadcrumbs = (routePath) => {
+  const splitted_full_path = routePath
+    .trim()
+    .split('/')
+    .map((item) => {
+      return {
+        disabled: false,
+        exact: false,
+        href: '/' + item,
+        text: item,
+        to: item
+      };
+    });
+
+  path.value = splitted_full_path;
+};
+
+// Initialize
+format_path_for_breadcrumbs(route.fullPath);
+listenForSideNavCollapseEvent();
+
+watch(() => route.fullPath, (newPath) => {
+  format_path_for_breadcrumbs(newPath);
+});
 </script>
 <style></style>

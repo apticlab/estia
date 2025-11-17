@@ -9,7 +9,7 @@
         <span class="text-indigo-300 font-medium">
           {{ story.user.username }}
         </span>
-        <small class="text-gray-200"> {{ story.created_at | moment }} </small>
+        <small class="text-gray-200"> {{ $filters.moment(story.created_at) }} </small>
       </div>
     </div>
     <div class="rounded-lg mt-4 h-72">
@@ -22,13 +22,10 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: "ig-story",
-  props: {
-    story: { required: true, default: null }
-  }
-};
+<script setup>
+defineProps({
+  story: { type: Object, required: true, default: null }
+});
 </script>
 
 <style></style>

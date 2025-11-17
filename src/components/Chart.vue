@@ -12,8 +12,33 @@
     </canvas>
   </div>
 </template>
-<script>
-import Chart from "chart.js";
+<script setup>
+import { ref, watch, onMounted, getCurrentInstance } from 'vue';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  LineElement,
+  PointElement,
+  ArcElement,
+  Title,
+  Tooltip,
+  Legend
+} from 'chart.js';
+
+// Register Chart.js components
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  LineElement,
+  PointElement,
+  ArcElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 const typeHasFill = {
   bar: (fill = true) => fill,
@@ -67,179 +92,171 @@ const chartType = {
   stacked_bar: "bar",
 };
 
-export default {
-  props: {
-    type: {},
-    datasets: {},
-    labels: {},
-    height: { required: false, default: 300 },
-    width: { required: false, default: 300 },
-    rim: { required: false, default: 70 },
-    grid: { required: false, default: true },
-    fill: { required: false, default: false },
-    title: { required: false, default: null },
-  },
-  data() {
-    return {
-      typeConfig: {},
-      chart: null,
-      ctx: null,
-      sets: [],
-    };
-  },
-  mounted() {
-    this.ctx = this.$refs.chart;
+const props = defineProps({
+  type: {},
+  datasets: {},
+  labels: {},
+  height: { type: Number, required: false, default: 300 },
+  width: { type: Number, required: false, default: 300 },
+  rim: { type: Number, required: false, default: 70 },
+  grid: { type: Boolean, required: false, default: true },
+  fill: { type: Boolean, required: false, default: false },
+  title: { type: String, required: false, default: null },
+});
 
-    this.loadDataSets();
+const chart = ref(null);
+const ctx = ref(null);
+const sets = ref([]);
+const typeConfig = ref({});
+const chartInstance = ref(null);
 
-    this.typeConfig = typeConfigs[this.type](this.grid);
+const instance = getCurrentInstance();
+const getColor = instance.appContext.config.globalProperties.getColor;
 
-    this.chart = new Chart(this.ctx, {
-      type: chartType[this.type] || this.type,
-      data: {
-        labels: this.labels,
-        datasets: this.sets,
+const marshallSet = (ds) => {
+  let gradientFill;
+  switch (props.type) {
+    case "line":
+      gradientFill = ctx.value
+        .getContext("2d")
+        .createLinearGradient(0, 0, 0, 180);
+
+      gradientFill.addColorStop(0, getColor(ds.color));
+      gradientFill.addColorStop(1, "rgba(255,255,255,0.0)");
+
+      return {
+        label: ds.label,
+        data: ds.data,
+        fill: typeHasFill[props.type](props.fill) || false,
+        borderColor: getColor(ds.color),
+        // backgroundColor: "rgba(255, 255, 255, 0.0)",
+        backgroundColor: gradientFill,
+        borderWidth: 2,
+        pointBackgroundColor: getColor(ds.color),
+        pointHoverRadius: 5,
+        pointRadius: 0,
+        title: ds.title,
+      };
+    case "stacked_bar":
+    case "bar":
+      return {
+        label: ds.label,
+        data: ds.data,
+        fill: typeHasFill[props.type](),
+        borderColor: getColor(ds.color),
+        backgroundColor: getColor(ds.color),
+        borderWidth: 1,
+        pointBackgroundColor: getColor(ds.color),
+        pointBorderWidth: 3,
+      };
+    case "doughnut":
+      return {
+        data: ds.data,
+        backgroundColor: ds.colors,
+      };
+  }
+};
+
+const loadDataSets = (reload = false) => {
+  sets.value = [];
+  props.datasets.forEach((ds) => {
+    if (!ds.visible) {
+      return;
+    }
+
+    sets.value.push(marshallSet(ds));
+  });
+
+  if (reload && chartInstance.value) {
+    chartInstance.value.options.animation.duration = 0;
+    chartInstance.value.data.datasets = sets.value;
+    chartInstance.value.update();
+  }
+};
+
+onMounted(() => {
+  ctx.value = chart.value;
+
+  loadDataSets();
+
+  typeConfig.value = typeConfigs[props.type](props.grid);
+
+  chartInstance.value = new ChartJS(ctx.value, {
+    type: chartType[props.type] || props.type,
+    data: {
+      labels: props.labels,
+      datasets: sets.value,
+    },
+    options: {
+      hover: {
+        intersect: false,
       },
-      options: {
-        title: this.title,
-        hover: {
-          intersect: false,
+      cutout: props.type === 'doughnut' ? props.rim + '%' : undefined,
+      maintainAspectRatio: false,
+      plugins: {
+        title: {
+          display: !!props.title,
+          text: props.title
         },
-        tooltips: {
-          mode: "index",
-          intersect: false,
-        },
-        cutoutPercentage: this.rim,
-        maintainAspectRatio: false,
         legend: {
           display: false,
         },
-        layout: {
-          padding: this.typeConfig.padding,
-        },
-        scales: {
-          yAxes: [
-            {
-              stacked: this.typeConfig["stacked"] || false,
-              gridLines: {
-                tickMarkLength:
-                  this.typeConfig.tickMarkLength == undefined
-                    ? 5
-                    : this.typeConfig.tickMarkLength,
-                display: this.typeConfig["yGrid"],
-                borderDash: [6, 4],
-                color: this.getColor("gray-400"),
-                drawBorder: false,
-                zeroLineWidth: 1,
-                zeroLineColor: this.getColor("blue-700"),
-              },
-              ticks: {
-                display: this.typeConfig["yTicks"],
-                maxTicksLimit: 5,
-                fontColor: this.getColor("blue-700"),
-                fontStyle: 700,
-                fontSize: 14,
-                padding: 14,
-                beginAtZero: false,
-              },
-            },
-          ],
-          xAxes: [
-            {
-              stacked: this.typeConfig["stacked"] || false,
-              gridLines: {
-                tickMarkLength: 0,
-                display: false,
-                // drawBorder: false,
-                // drawOnChartArea: false,
-              },
-              scaleLabel: {
-                display: false,
-              },
-              ticks: {
-                display: this.typeConfig["xTicks"],
-                padding: 10,
-                fontSize: 14,
-                fontStyle: 600,
-                fontColor: this.getColor("gray-600"),
-                callback: function (value, index, values) {
-                  return value.toUpperCase();
-                },
-              },
-            },
-          ],
-        },
-      },
-    });
-  },
-  methods: {
-    loadDataSets(reload = false) {
-      this.sets = [];
-      this.datasets.forEach((ds) => {
-        if (!ds.visible) {
-          return;
+        tooltip: {
+          mode: "index",
+          intersect: false,
         }
-
-        this.sets.push(this.marshallSet(ds));
-      });
-
-      if (reload) {
-        this.chart.options.animation.duration = 0;
-        this.chart.data.datasets = this.sets;
-        this.chart.update();
-      }
-    },
-    marshallSet(ds) {
-      let gradientFill;
-      switch (this.type) {
-        case "line":
-          gradientFill = this.ctx
-            .getContext("2d")
-            .createLinearGradient(0, 0, 0, 180);
-
-          gradientFill.addColorStop(0, this.getColor(ds.color));
-          gradientFill.addColorStop(1, "rgba(255,255,255,0.0)");
-
-          return {
-            label: ds.label,
-            data: ds.data,
-            fill: typeHasFill[this.type](this.fill) || false,
-            borderColor: this.getColor(ds.color),
-            // backgroundColor: "rgba(255, 255, 255, 0.0)",
-            backgroundColor: gradientFill,
-            borderWidth: 2,
-            pointBackgroundColor: this.getColor(ds.color),
-            pointHoverRadius: 5,
-            pointRadius: 0,
-            title: ds.title,
-          };
-        case "stacked_bar":
-        case "bar":
-          return {
-            label: ds.label,
-            data: ds.data,
-            fill: typeHasFill[this.type](),
-            borderColor: this.getColor(ds.color),
-            backgroundColor: this.getColor(ds.color),
-            borderWidth: 1,
-            pointBackgroundColor: this.getColor(ds.color),
-            pointBorderWidth: 3,
-          };
-        case "doughnut":
-          return {
-            data: ds.data,
-            backgroundColor: ds.colors,
-          };
-      }
-    },
-  },
-  watch: {
-    datasets: {
-      handler(newVal, oldVal) {
-        this.loadDataSets(true);
       },
-      deep: true,
+      layout: {
+        padding: typeConfig.value.padding,
+      },
+      scales: props.type !== 'doughnut' ? {
+        y: {
+          stacked: typeConfig.value["stacked"] || false,
+          grid: {
+            tickLength: typeConfig.value.tickMarkLength === undefined
+              ? 5
+              : typeConfig.value.tickMarkLength,
+            display: typeConfig.value["yGrid"],
+            borderDash: [6, 4],
+            color: getColor("gray-400"),
+            drawBorder: false,
+          },
+          ticks: {
+            display: typeConfig.value["yTicks"],
+            maxTicksLimit: 5,
+            color: getColor("blue-700"),
+            font: {
+              weight: 700,
+              size: 14,
+            },
+            padding: 14,
+          },
+        },
+        x: {
+          stacked: typeConfig.value["stacked"] || false,
+          grid: {
+            tickLength: 0,
+            display: false,
+          },
+          ticks: {
+            display: typeConfig.value["xTicks"],
+            padding: 10,
+            font: {
+              size: 14,
+              weight: 600,
+            },
+            color: getColor("gray-600"),
+            callback: function (value, index, values) {
+              return value.toUpperCase();
+            },
+          },
+        },
+      } : undefined,
     },
-  },
-};
+  });
+});
+
+watch(() => props.datasets, (newVal, oldVal) => {
+  loadDataSets(true);
+}, { deep: true });
 </script>

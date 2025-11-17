@@ -82,29 +82,27 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: "select-menu",
-  props: {
-    actions: {
-      default: null,
-      required: true,
-      type: Array,
-    },
+<script setup>
+import { ref } from 'vue';
+
+const props = defineProps({
+  actions: {
+    type: Array,
+    default: null,
+    required: true,
   },
-  data() {
-    return {
-      isMenuVisible: false,
-    };
-  },
-  methods: {
-    showMenu() {
-      this.isMenuVisible = !this.isMenuVisible;
-    },
-    emitAction(action) {
-      this.$emit("act", action);
-    },
-  },
+});
+
+const emit = defineEmits(['act']);
+
+const isMenuVisible = ref(false);
+
+const showMenu = () => {
+  isMenuVisible.value = !isMenuVisible.value;
+};
+
+const emitAction = (action) => {
+  emit("act", action);
 };
 </script>
 

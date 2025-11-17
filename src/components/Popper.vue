@@ -1,367 +1,444 @@
 <template>
-  <component :is="tagName">
+  <component :is="tagName" ref="wrapperRef">
     <transition :name="transition" @after-leave="doDestroy">
-      <span v-show="!disabled && showPopper" ref="popper" :class="rootClass">
+      <span
+        v-show="!disabled && showPopper"
+        ref="popperRef"
+        :class="['popper', rootClass]"
+      >
         <slot>{{ content }}</slot>
       </span>
     </transition>
-    <slot name="reference" />
+    <span ref="referenceWrapper" style="display: contents">
+      <slot name="reference" />
+    </span>
   </component>
 </template>
-  
-<script>
-function on(element, event, handler) {
-  if (element && event && handler) {
-    document.addEventListener
-      ? element.addEventListener(event, handler, false)
-      : element.attachEvent("on" + event, handler);
-  }
-}
 
-function off(element, event, handler) {
-  if (element && event) {
-    document.removeEventListener
-      ? element.removeEventListener(event, handler, false)
-      : element.detachEvent("on" + event, handler);
-  }
-}
-
+<script setup>
+import {
+  getCurrentInstance,
+  nextTick,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  watch,
+} from "vue";
 import { createPopper } from "@popperjs/core";
 
-export default {
-  props: {
-    toggler: {
-      type: Boolean,
-      default: false,
-    },
-    tagName: {
-      type: String,
-      default: "span",
-    },
-    trigger: {
-      type: String,
-      default: "hover",
-      validator: (value) =>
-        [
-          "clickToOpen",
-          "click", // Same as clickToToggle, provided for backwards compatibility.
-          "clickToToggle",
-          "hover",
-          "toggler",
-          "focus",
-        ].indexOf(value) > -1,
-    },
-    delayOnMouseOver: {
-      type: Number,
-      default: 10,
-    },
-    delayOnMouseOut: {
-      type: Number,
-      default: 10,
-    },
-    disabled: {
-      type: Boolean,
-      default: false,
-    },
-    content: String,
-    enterActiveClass: String,
-    leaveActiveClass: String,
-    boundariesSelector: String,
-    reference: {},
-    forceShow: {
-      type: Boolean,
-      default: false,
-    },
-    dataValue: {
-      default: null,
-    },
-    appendToBody: {
-      type: Boolean,
-      default: false,
-    },
-    visibleArrow: {
-      type: Boolean,
-      default: true,
-    },
-    transition: {
-      type: String,
-      default: "",
-    },
-    stopPropagation: {
-      type: Boolean,
-      default: false,
-    },
-    preventDefault: {
-      type: Boolean,
-      default: false,
-    },
-    options: {
-      type: Object,
-      default() {
-        return {};
-      },
-    },
-    rootClass: {
-      type: String,
-      default: "",
-    },
+const props = defineProps({
+  toggler: {
+    type: Boolean,
+    default: false,
   },
+  tagName: {
+    type: String,
+    default: "span",
+  },
+  trigger: {
+    type: String,
+    default: "hover",
+    validator: (value) =>
+      [
+        "clickToOpen",
+        "click",
+        "clickToToggle",
+        "hover",
+        "toggler",
+        "focus",
+      ].includes(value),
+  },
+  delayOnMouseOver: {
+    type: Number,
+    default: 10,
+  },
+  delayOnMouseOut: {
+    type: Number,
+    default: 10,
+  },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
+  content: String,
+  enterActiveClass: String,
+  leaveActiveClass: String,
+  boundariesSelector: String,
+  reference: {
+    type: Object,
+    default: null,
+  },
+  forceShow: {
+    type: Boolean,
+    default: false,
+  },
+  dataValue: {
+    default: null,
+  },
+  appendToBody: {
+    type: Boolean,
+    default: false,
+  },
+  visibleArrow: {
+    type: Boolean,
+    default: true,
+  },
+  transition: {
+    type: String,
+    default: "",
+  },
+  stopPropagation: {
+    type: Boolean,
+    default: false,
+  },
+  preventDefault: {
+    type: Boolean,
+    default: false,
+  },
+  options: {
+    type: Object,
+    default: () => ({}),
+  },
+  rootClass: {
+    type: String,
+    default: "",
+  },
+});
 
-  data() {
-    return {
-      referenceElm: null,
-      popperJS: null,
-      showPopper: false,
-      currentPlacement: "",
-      popperOptions: {
-        placement: "bottom",
-        computeStyle: {
-          gpuAcceleration: false,
-        },
-      },
+const emit = defineEmits(["show", "hide", "created", "documentClick"]);
+
+const instance = getCurrentInstance();
+const componentProxy = instance?.proxy;
+
+const wrapperRef = ref(null);
+const referenceWrapper = ref(null);
+const popperRef = ref(null);
+const referenceElm = ref(null);
+const popperJS = ref(null);
+const showPopper = ref(false);
+const appendedArrow = ref(false);
+const appendedToBody = ref(false);
+const appendedNode = ref(null);
+let hoverTimer = null;
+
+const popperOptions = ref({
+  placement: "bottom",
+  computeStyle: {
+    gpuAcceleration: false,
+  },
+  ...props.options,
+});
+
+watch(
+  () => props.options,
+  (opts) => {
+    popperOptions.value = {
+      ...popperOptions.value,
+      ...opts,
     };
-  },
-
-  watch: {
-    showPopper(value) {
-      if (value) {
-        this.$emit("show", this);
-        this.updatePopper();
-      } else {
-        this.$emit("hide", this);
-      }
-    },
-
-    forceShow: {
-      handler(value) {
-        this[value ? "doShow" : "doClose"]();
-      },
-      immediate: true,
-    },
-
-    toggler(value) {
-      if (this.showPopper != value) {
-        this.showPopper = value;
-      }
-    },
-
-    disabled(value) {
-      if (value) {
-        this.showPopper = false;
-      }
-    },
-  },
-
-  created() {
-    this.appendedArrow = false;
-    this.appendedToBody = false;
-    this.popperOptions = Object.assign(this.popperOptions, this.options);
-  },
-
-  mounted() {
-    this.referenceElm = this.reference || this.$slots.reference[0].elm;
-    this.popper = this.$slots.default[0].elm;
-
-    switch (this.trigger) {
-      case "clickToOpen":
-        on(this.referenceElm, "click", this.doShow);
-        on(document, "click", this.handleDocumentClick);
-        break;
-      case "click": // Same as clickToToggle, provided for backwards compatibility.
-      case "clickToToggle":
-        on(this.referenceElm, "click", this.doToggle);
-        on(document, "click", this.handleDocumentClick);
-        break;
-      case "hover":
-        on(this.referenceElm, "mouseover", this.onMouseOver);
-        on(this.popper, "mouseover", this.onMouseOver);
-        on(this.referenceElm, "mouseout", this.onMouseOut);
-        on(this.popper, "mouseout", this.onMouseOut);
-        break;
-      case "focus":
-        on(this.referenceElm, "focus", this.onMouseOver);
-        on(this.popper, "focus", this.onMouseOver);
-        on(this.referenceElm, "blur", this.onMouseOut);
-        on(this.popper, "blur", this.onMouseOut);
-        break;
-      case "toggler":
-        on(document, "click", this.handleDocumentClick);
-        break;
+    if (popperJS.value) {
+      popperJS.value.setOptions(popperOptions.value);
     }
   },
+  { deep: true }
+);
 
-  destroyed() {
-    this.destroyPopper();
+watch(showPopper, (value) => {
+  if (value) {
+    emit("show", componentProxy);
+    updatePopper();
+  } else {
+    emit("hide", componentProxy);
+  }
+});
+
+watch(
+  () => props.forceShow,
+  (value) => {
+    value ? doShow() : doClose();
   },
+  { immediate: true }
+);
 
-  methods: {
-    doToggle(event) {
-      if (this.stopPropagation) {
-        event.stopPropagation();
-      }
+watch(
+  () => props.toggler,
+  (value) => {
+    if (showPopper.value !== value) {
+      showPopper.value = value;
+    }
+  }
+);
 
-      if (this.preventDefault) {
-        event.preventDefault();
-      }
+watch(
+  () => props.disabled,
+  (value) => {
+    if (value) {
+      showPopper.value = false;
+    }
+  }
+);
 
-      if (!this.forceShow) {
-        this.showPopper = !this.showPopper;
-      }
-    },
+watch(
+  () => props.reference,
+  () => {
+    referenceElm.value = resolveReferenceElement();
+  }
+);
 
-    doShow() {
-      this.showPopper = true;
-    },
+onMounted(() => {
+  referenceElm.value = resolveReferenceElement();
+  addTriggerListeners();
+});
 
-    doClose() {
-      this.showPopper = false;
-    },
+onBeforeUnmount(() => {
+  destroyPopper();
+  clearTimeout(hoverTimer);
+});
 
-    doDestroy() {
-      if (this.showPopper) {
-        return;
-      }
+function addEvent(element, event, handler) {
+  if (element && event && handler) {
+    element.addEventListener(event, handler, false);
+  }
+}
 
-      if (this.popperJS) {
-        this.popperJS.destroy();
-        this.popperJS = null;
-      }
+function removeEvent(element, event, handler) {
+  if (element && event && handler) {
+    element.removeEventListener(event, handler, false);
+  }
+}
 
-      if (this.appendedToBody) {
-        this.appendedToBody = false;
-        document.body.removeChild(this.popper.parentElement);
-      }
-    },
+function resolveReferenceElement() {
+  if (props.reference) {
+    return props.reference;
+  }
 
-    createPopper() {
-      this.$nextTick(() => {
-        if (this.visibleArrow) {
-          this.appendArrow(this.popper);
-        }
+  if (referenceWrapper.value?.firstElementChild) {
+    return referenceWrapper.value.firstElementChild;
+  }
 
-        if (this.appendToBody && !this.appendedToBody) {
-          this.appendedToBody = true;
-          document.body.appendChild(this.popper.parentElement);
-        }
+  return referenceWrapper.value || wrapperRef.value || null;
+}
 
-        if (this.popperJS && this.popperJS.destroy) {
-          this.popperJS.destroy();
-        }
+function addTriggerListeners() {
+  const reference = referenceElm.value;
+  const popperEl = popperRef.value;
+  if (!reference) {
+    return;
+  }
 
-        if (this.boundariesSelector) {
-          const boundariesElement = document.querySelector(
-            this.boundariesSelector
-          );
+  switch (props.trigger) {
+    case "clickToOpen":
+      addEvent(reference, "click", doShow);
+      addEvent(document, "click", handleDocumentClick);
+      break;
+    case "click":
+    case "clickToToggle":
+      addEvent(reference, "click", doToggle);
+      addEvent(document, "click", handleDocumentClick);
+      break;
+    case "hover":
+      addEvent(reference, "mouseover", onMouseOver);
+      addEvent(reference, "mouseout", onMouseOut);
+      addEvent(popperEl, "mouseover", onMouseOver);
+      addEvent(popperEl, "mouseout", onMouseOut);
+      break;
+    case "focus":
+      addEvent(reference, "focus", onMouseOver);
+      addEvent(reference, "blur", onMouseOut);
+      addEvent(popperEl, "focus", onMouseOver);
+      addEvent(popperEl, "blur", onMouseOut);
+      break;
+    case "toggler":
+      addEvent(document, "click", handleDocumentClick);
+      break;
+  }
+}
 
-          if (boundariesElement) {
-            this.popperOptions.modifiers = Object.assign(
-              {},
-              this.popperOptions.modifiers
-            );
-            this.popperOptions.modifiers.preventOverflow = Object.assign(
-              {},
-              this.popperOptions.modifiers.preventOverflow
-            );
-            this.popperOptions.modifiers.preventOverflow.boundariesElement =
-              boundariesElement;
-          }
-        }
+function doToggle(event) {
+  if (props.stopPropagation && event) {
+    event.stopPropagation();
+  }
 
-        this.popperOptions.onCreate = () => {
-          this.$emit("created", this);
-          this.$nextTick(this.updatePopper);
+  if (props.preventDefault && event) {
+    event.preventDefault();
+  }
+
+  if (!props.forceShow) {
+    showPopper.value = !showPopper.value;
+  }
+}
+
+function doShow() {
+  showPopper.value = true;
+}
+
+function doClose() {
+  showPopper.value = false;
+}
+
+function doDestroy() {
+  if (showPopper.value) {
+    return;
+  }
+
+  if (popperJS.value) {
+    popperJS.value.destroy();
+    popperJS.value = null;
+  }
+
+  if (appendedToBody.value && appendedNode.value) {
+    appendedToBody.value = false;
+    if (appendedNode.value.parentNode === document.body) {
+      document.body.removeChild(appendedNode.value);
+    }
+    appendedNode.value = null;
+  }
+}
+
+function createPopperInstance() {
+  nextTick(() => {
+    const popperEl = popperRef.value;
+    const reference = referenceElm.value;
+    if (!popperEl || !reference) {
+      return;
+    }
+
+    if (props.visibleArrow) {
+      appendArrow(popperEl);
+    }
+
+    if (props.appendToBody && !appendedToBody.value) {
+      appendedNode.value = popperEl.parentElement || popperEl;
+      appendedToBody.value = true;
+      document.body.appendChild(appendedNode.value);
+    }
+
+    if (popperJS.value) {
+      popperJS.value.destroy();
+      popperJS.value = null;
+    }
+
+    if (props.boundariesSelector) {
+      const boundariesElement = document.querySelector(
+        props.boundariesSelector
+      );
+      if (boundariesElement) {
+        popperOptions.value.modifiers = {
+          ...(popperOptions.value.modifiers || {}),
+          preventOverflow: {
+            ...((popperOptions.value.modifiers || {}).preventOverflow || {}),
+            boundariesElement,
+          },
         };
-
-        this.popperJS = new createPopper(
-          this.referenceElm,
-          this.popper,
-          this.popperOptions
-        );
-
-        this.log(this.popperJS);
-      });
-    },
-
-    destroyPopper() {
-      off(this.referenceElm, "click", this.doToggle);
-      off(this.referenceElm, "mouseup", this.doClose);
-      off(this.referenceElm, "mousedown", this.doShow);
-      off(this.referenceElm, "focus", this.doShow);
-      off(this.referenceElm, "blur", this.doClose);
-      off(this.referenceElm, "mouseout", this.onMouseOut);
-      off(this.referenceElm, "mouseover", this.onMouseOver);
-      off(document, "click", this.handleDocumentClick);
-
-      this.showPopper = false;
-      this.doDestroy();
-    },
-
-    appendArrow(element) {
-      if (this.appendedArrow) {
-        return;
       }
+    }
 
-      this.appendedArrow = true;
+    popperOptions.value.onCreate = () => {
+      emit("created", componentProxy);
+      nextTick(() => updatePopper());
+    };
 
-      const arrow = document.createElement("div");
-      arrow.setAttribute("x-arrow", "");
-      arrow.className = "popper__arrow";
-      element.appendChild(arrow);
-    },
+    popperJS.value = createPopper(reference, popperEl, popperOptions.value);
+  });
+}
 
-    updatePopper() {
-      this.popperJS ? this.popperJS.scheduleUpdate() : this.createPopper();
-    },
+function destroyPopper() {
+  const reference = referenceElm.value;
+  const popperEl = popperRef.value;
 
-    onMouseOver() {
-      clearTimeout(this._timer);
-      this._timer = setTimeout(() => {
-        this.showPopper = true;
-      }, this.delayOnMouseOver);
-    },
+  removeEvent(reference, "click", doToggle);
+  removeEvent(reference, "click", doShow);
+  removeEvent(reference, "mouseup", doClose);
+  removeEvent(reference, "mousedown", doShow);
+  removeEvent(reference, "focus", onMouseOver);
+  removeEvent(reference, "blur", onMouseOut);
+  removeEvent(reference, "mouseout", onMouseOut);
+  removeEvent(reference, "mouseover", onMouseOver);
 
-    onMouseOut() {
-      clearTimeout(this._timer);
-      this._timer = setTimeout(() => {
-        this.showPopper = false;
-      }, this.delayOnMouseOut);
-    },
+  removeEvent(popperEl, "mouseover", onMouseOver);
+  removeEvent(popperEl, "mouseout", onMouseOut);
+  removeEvent(popperEl, "focus", onMouseOver);
+  removeEvent(popperEl, "blur", onMouseOut);
 
-    handleDocumentClick(e) {
-      // Close popper if we click inside the popper content
-      if (
-        !this.$el ||
-        !this.referenceElm ||
-        //this.elementContains(this.$el, e.target) ||
-        this.elementContains(this.referenceElm, e.target) ||
-        !this.popper
-        // this.elementContains(this.popper, e.target)
-      ) {
-        return;
-      }
+  removeEvent(document, "click", handleDocumentClick);
 
-      this.$emit("documentClick", this);
+  showPopper.value = false;
+  doDestroy();
+}
 
-      if (this.forceShow) {
-        return;
-      }
+function appendArrow(element) {
+  if (appendedArrow.value || !element) {
+    return;
+  }
 
-      this.showPopper = false;
-    },
+  appendedArrow.value = true;
 
-    elementContains(elm, otherElm) {
-      if (typeof elm.contains === "function") {
-        return elm.contains(otherElm);
-      }
+  const arrow = document.createElement("div");
+  arrow.setAttribute("data-popper-arrow", "");
+  arrow.className = "popper__arrow";
+  element.appendChild(arrow);
+}
 
-      return false;
-    },
-  },
-};
+function updatePopper() {
+  if (popperJS.value) {
+    popperJS.value.update();
+  } else {
+    createPopperInstance();
+  }
+}
+
+function onMouseOver() {
+  clearTimeout(hoverTimer);
+  hoverTimer = setTimeout(() => {
+    showPopper.value = true;
+  }, props.delayOnMouseOver);
+}
+
+function onMouseOut() {
+  clearTimeout(hoverTimer);
+  hoverTimer = setTimeout(() => {
+    showPopper.value = false;
+  }, props.delayOnMouseOut);
+}
+
+function handleDocumentClick(event) {
+  const root = wrapperRef.value;
+  const reference = referenceElm.value;
+  const popperEl = popperRef.value;
+
+  if (
+    !root ||
+    !reference ||
+    elementContains(reference, event.target) ||
+    (popperEl && elementContains(popperEl, event.target)) ||
+    elementContains(root, event.target)
+  ) {
+    return;
+  }
+
+  emit("documentClick", componentProxy);
+
+  if (props.forceShow) {
+    return;
+  }
+
+  showPopper.value = false;
+}
+
+function elementContains(elm, otherElm) {
+  return typeof elm?.contains === "function" ? elm.contains(otherElm) : false;
+}
+
+defineExpose({
+  doToggle,
+  doShow,
+  doClose,
+  updatePopper,
+});
 </script>
 
 
-  <style>
+<style>
 .popper {
   width: auto;
   display: inline-block;

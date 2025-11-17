@@ -119,80 +119,43 @@
     </div> -->
   </div>
 </template>
-<script>
+<script setup>
+import { ref, onMounted, getCurrentInstance } from 'vue';
 import { getProfile } from "../utils/auth.js";
+import { useCurrentUser } from "@/composables/useCurrentUser";
 
-export default {
-  props: {
-    user: { required: true, default: {} }
-  },
-  data() {
-    return {
-      infoFields: [
-        {
-          name: "name",
-          label: "Nome",
-          type: "text"
-        },
-        {
-          name: "surname",
-          label: "Cognome",
-          type: "text"
-        },
-        {
-          name: "email",
-          label: "Email",
-          type: "email"
-        },
-        {
-          name: "created_at",
-          label: "Iscritto il",
-          type: "date"
-        }
-      ],
-      accountField: [
-        {
-          name: "role.code",
-          label: "Ruolo",
-          type: "role"
-        },
-        {
-          name: "payment_status",
-          label: "Stato Pagamenti",
-          type: "select"
-        }
-      ],
-      instagramFields: [
-        {
-          name: "username",
-          label: "Username",
-          type: "text"
-        },
-        {
-          name: "pk",
-          label: "id",
-          type: "text",
-          roles: ["superadmin"]
-        }
-        /*
-        {
-          name: "password",
-          label: "Password",
-          type: "text"
-        }
-        */
-      ],
-      loggedUser: {}
-    };
-  },
-  beforeMount() {
-    this.loggedUser = getProfile();
-  },
-  methods: {
-    userCanSee(field) {
-      return field.roles.includes(this.getUserRole());
-    }
-  },
-  computed: {}
+const props = defineProps({
+  user: { type: Object, required: true, default: () => ({}) }
+});
+
+const instance = getCurrentInstance();
+const deepFind = instance?.appContext.config.globalProperties.deepFind;
+const { getUserRole } = useCurrentUser();
+
+const infoFields = [
+  { name: "name", label: "Nome", type: "text" },
+  { name: "surname", label: "Cognome", type: "text" },
+  { name: "email", label: "Email", type: "email" },
+  { name: "created_at", label: "Iscritto il", type: "date" }
+];
+
+const accountField = [
+  { name: "role.code", label: "Ruolo", type: "role" },
+  { name: "payment_status", label: "Stato Pagamenti", type: "select" }
+];
+
+const instagramFields = [
+  { name: "username", label: "Username", type: "text" },
+  { name: "pk", label: "id", type: "text", roles: ["superadmin"] }
+];
+
+const loggedUser = ref({});
+
+const userCanSee = (field) => {
+  return field.roles.includes(getUserRole());
 };
+
+onMounted(() => {
+  loggedUser.value = getProfile();
+});
 </script>

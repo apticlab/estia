@@ -1,3 +1,3 @@
-export default function (Vue, options) {
-  Vue.prototype.$editFields = options.editFields ? options.editFields : {};
+export default function (app, options) {
+  app.config.globalProperties.$editFields = options.editFields ? options.editFields : {};
 }

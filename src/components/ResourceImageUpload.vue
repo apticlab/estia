@@ -19,54 +19,51 @@
   </div>
 </template>
 
-<script>
-import axios from "axios";
-import _ from "lodash";
+<script setup>
+import { ref, computed, getCurrentInstance } from 'vue';
 
-export default {
-  name: "resource-image-upload",
-  props: {
-    context: {
-      type: Object,
-      required: true
-    }
-  },
-  data() {
-    return {};
-  },
-  beforeMount() {},
-  mounted() {},
-  methods: {
-    triggerFileChooser() {
-      this.log(this.$refs.file_input);
-      this.$refs.file_input.click();
-    },
-    addImageOnDrop(e) {
-      let droppedFiles = e.dataTransfer.files;
-      if (!droppedFiles) return;
-      [...droppedFiles].forEach(f => {
-        this.context.model = f;
-      });
-    },
-    addImage(e) {
-      let files = e.target.files;
-      if (!files) return;
-      [...files].forEach(f => {
-        this.context.model = f;
-      });
-    }
-  },
-  computed: {
-    model() {
-      return this.context.model;
-    },
-    header() {
-      return this.context.attributes.header;
-    },
-    attributes() {
-      return this.context.attributes;
-    }
-  },
-  watch: {}
+const props = defineProps({
+  context: {
+    type: Object,
+    required: true
+  }
+});
+
+const instance = getCurrentInstance();
+const log = instance?.appContext.config.globalProperties.log;
+
+const file_input = ref(null);
+
+const model = computed(() => {
+  return props.context.model;
+});
+
+const header = computed(() => {
+  return props.context.attributes.header;
+});
+
+const attributes = computed(() => {
+  return props.context.attributes;
+});
+
+const triggerFileChooser = () => {
+  log?.(file_input.value);
+  file_input.value?.click();
+};
+
+const addImageOnDrop = (e) => {
+  let droppedFiles = e.dataTransfer.files;
+  if (!droppedFiles) return;
+  [...droppedFiles].forEach(f => {
+    props.context.model = f;
+  });
+};
+
+const addImage = (e) => {
+  let files = e.target.files;
+  if (!files) return;
+  [...files].forEach(f => {
+    props.context.model = f;
+  });
 };
 </script>

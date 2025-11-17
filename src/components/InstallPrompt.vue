@@ -38,51 +38,74 @@
   </div>
 </template>
 
-<script>
-import updateMixin from '@/mixin/sw-update.mixin';
+<script setup>
+import { ref, onMounted } from 'vue';
 
 const actions = {
   INSTALL: "install",
   UPDATE: "update"
 };
 
-let installEvent;
-export default {
-  name: "installPrompt",
-  mixins: [updateMixin],
-  data() {
-    return {
-      show_banner: false,
-      refreshing: false,
-      registration: null,
-      action: null,
-      actions: actions
-    };
-  },
-  created() {
-    window.addEventListener("beforeinstallprompt", e => {
-      e.preventDefault();
-      installEvent = e;
-      this.show_banner = true;
-      this.action = actions.INSTALL;
-    });
+const show_banner = ref(false);
+const refreshing = ref(false);
+const registration = ref(null);
+const action = ref(null);
+const updateExists = ref(false);
 
-  },
-  methods: {
-    install() {
-      this.show_banner = false;
-      installEvent.prompt();
-      installEvent.userChoice.then(() => {
-        installEvent = null;
-      });
-      this.hide();
-    },
-    hide() {
-      this.show_banner = false;
-      this.action = null;
-    },
+let installEvent;
+
+const install = () => {
+  show_banner.value = false;
+  installEvent.prompt();
+  installEvent.userChoice.then(() => {
+    installEvent = null;
+  });
+  hide();
+};
+
+const hide = () => {
+  show_banner.value = false;
+  action.value = null;
+};
+
+const update = () => {
+  updateExists.value = false;
+  if (registration.value && registration.value.waiting) {
+    registration.value.waiting.postMessage({ type: 'SKIP_WAITING' });
   }
 };
+
+onMounted(() => {
+  window.addEventListener("beforeinstallprompt", e => {
+    e.preventDefault();
+    installEvent = e;
+    show_banner.value = true;
+    action.value = actions.INSTALL;
+  });
+
+  // Service Worker update detection
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (refreshing.value) return;
+      refreshing.value = true;
+      window.location.reload();
+    });
+
+    navigator.serviceWorker.ready.then(reg => {
+      reg.addEventListener('updatefound', () => {
+        const newWorker = reg.installing;
+        newWorker.addEventListener('statechange', () => {
+          if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+            updateExists.value = true;
+            show_banner.value = true;
+            action.value = actions.UPDATE;
+            registration.value = reg;
+          }
+        });
+      });
+    });
+  }
+});
 </script>
 <style scoped>
 .install-prompt .close {

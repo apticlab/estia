@@ -11,23 +11,18 @@
     </div>
   </div>
 </template>
-<script>
-export default {
-  data() {
-    return {
-      colors: [
-        "blue",
-        "red",
-        "gray",
-        "orange",
-        "indigo",
-        "purple",
-        "pink",
-        "green",
-        "teal"
-      ],
-      steps: ["100", "200", "300", "400", "500", "600", "700", "800", "900"]
-    };
-  }
-};
+
+<script setup>
+const colors = [
+  "blue",
+  "red",
+  "gray",
+  "orange",
+  "indigo",
+  "purple",
+  "pink",
+  "green",
+  "teal"
+];
+const steps = ["100", "200", "300", "400", "500", "600", "700", "800", "900"];
 </script>

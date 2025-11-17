@@ -1,15 +1,8 @@
 <template>
   <div></div>
 </template>
-<script>
-export default {
-  name: '<%NAME%>',
-  props: {},
-  data() {
-    return {};
-  },
-  mounted() {},
-  methods: {},
-  computed: {},
-};
+
+<script setup>
+// Template component for creating new components
+// Replace <%NAME%> with actual component name
 </script>

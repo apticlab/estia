@@ -1,7 +1,19 @@
-export default function (Vue, resources, options = null) {
-  Vue.prototype.resources = {}
+export const ResourcesSymbol = Symbol("Resources");
+
+export default function (app, resources = {}, options = null) {
+  const globalResources =
+    app.config.globalProperties.resources ||
+    (app.config.globalProperties.resources = {});
 
   Object.keys(resources).forEach(resource => {
-    Vue.prototype.resources[resource] = resources[resource]
-  })
+    globalResources[resource] = resources[resource];
+  });
+
+  if (options && options.resources) {
+    Object.keys(options.resources).forEach((resource) => {
+      globalResources[resource] = options.resources[resource];
+    });
+  }
+
+  app.provide(ResourcesSymbol, globalResources);
 }

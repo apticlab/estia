@@ -5,27 +5,22 @@
     </div>
   </div>
 </template>
-<script>
+
+<script setup>
+import { ref, onMounted } from 'vue';
 import { getProfile } from "../utils/auth.js";
 
-export default {
-  data() {
-    return {
-      error: null,
-      isLoading: true,
-      userToShow: {}
-    };
-  },
-  async mounted() {
-    this.isLoading = true;
+const error = ref(null);
+const isLoading = ref(true);
+const userToShow = ref({});
+const state = ref(null);
 
-    this.state = "first_login";
-    this.userToShow = getProfile();
+onMounted(async () => {
+  isLoading.value = true;
 
-    this.isLoading = false;
-  },
-  methods: {},
-  watch: {},
-  computed: {}
-};
+  state.value = "first_login";
+  userToShow.value = getProfile();
+
+  isLoading.value = false;
+});
 </script>

@@ -15,7 +15,7 @@ export default {
     set_token (state, token) {
       localStorage.setItem('token', token)
       state.token = token
-      // EventBus.$emit('token-changed');
+      // EventBus.emit('token-changed');
     },
     remove_logged_account (state) {
       state.user.account = null

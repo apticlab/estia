@@ -32,81 +32,88 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, computed, onMounted, getCurrentInstance } from 'vue';
+import { useRouter } from 'vue-router';
+import { useStore } from 'vuex';
 import { getProfile } from "@/utils/auth";
-import SideNavMixin from "@/mixins/sidenav.mixin.js";
-import { mapActions, mapGetters, mapState, mapMutations } from "vuex";
+import { useSideNav } from "@/composables/useSideNav";
+import { useCurrentUser } from "@/composables/useCurrentUser";
 
-export default {
-  name: "TopBar",
-  props: {
-    shift: { required: false, default: "sm:w-16", type: String },
-  },
-  mixins: [SideNavMixin],
-  data: () => ({
-    showUserMenu: false,
-    userActions: [
-      {
-        label: "Logout",
-        icon: "hi-lock-open",
-        callback: "logout",
-        roles: ["*"]
-      }
-    ]
-  }),
-  beforeMount() {
-    this.reloadUser();
-    this.EventBus.$on("reload-user", this.reloadUser);
-    this.listenForSideNavCollapseEvent();
-  },
-  methods: {
-    ...mapActions("user", ["set_user", "set_token"]),
-    toggleUserMenu() {
-      this.showUserMenu = !this.showUserMenu;
-    },
-    doUserAction(action) {
-      this.showUserMenu = false;
+const props = defineProps({
+  shift: { type: String, required: false, default: "sm:w-16" },
+});
 
-      if (this[action.callback] != null) {
-        this[action.callback]();
-      }
-    },
-    logout() {
-      this.$router.push("./logout");
-    },
-    logoutUser() {
-      this.remove_logged_account();
-      this.$router.push("/users");
-    },
-    async reloadUser() {
-      let user = getProfile();
-      this.set_user(user);
+const router = useRouter();
+const store = useStore();
+const instance = getCurrentInstance();
+const EventBus = instance.appContext.config.globalProperties.EventBus;
+const { getUserRole } = useCurrentUser();
+
+const { is_collapsed, show_text, collapseSideBar, listenForSideNavCollapseEvent } = useSideNav();
+
+const showUserMenu = ref(false);
+const userActions = ref([
+  {
+    label: "Logout",
+    icon: "hi-lock-open",
+    callback: "logout",
+    roles: ["*"]
+  }
+]);
+
+const user = computed(() => store.state.user?.user);
+const updated_at = computed(() => store.state.page_info?.updated_at || store.state.page_info?.last_updated);
+const post_num = computed(() => store.state.page_info?.post_num);
+const story_num = computed(() => store.state.page_info?.story_num);
+const reference_period = computed(() => store.getters['page_info/reference_period']);
+
+const fullName = computed(() => {
+  return user.value?.name + " " + user.value?.surname;
+});
+
+const actions = computed(() => {
+  return userActions.value.filter(action => {
+    if (action.roles.includes("*")) {
+      return true;
     }
-  },
-  computed: {
-    ...mapState("user", {
-      user: state => state.user
-    }),
-    ...mapState("page_info", {
-      updated_at: state => state.updated_at || state.last_updated,
-      post_num: state => state.post_num,
-      story_num: state => state.story_num
-    }),
-    ...mapGetters("page_info", ["reference_period"]),
-    fullName() {
-      return this.user.name + " " + this.user.surname;
-    },
-    actions() {
-      return this.userActions.filter(action => {
-        if (action.roles.includes("*")) {
-          return true;
-        }
+    return action.roles.includes(getUserRole());
+  });
+});
 
-        return action.roles.includes(this.getUserRole());
-      });
-    }
+const toggleUserMenu = () => {
+  showUserMenu.value = !showUserMenu.value;
+};
+
+const doUserAction = (action) => {
+  showUserMenu.value = false;
+
+  if (action.callback === 'logout') {
+    logout();
+  } else if (action.callback === 'logoutUser') {
+    logoutUser();
   }
 };
+
+const logout = () => {
+  router.push("./logout");
+};
+
+const logoutUser = () => {
+  store.commit('user/remove_logged_account');
+  router.push("/users");
+};
+
+const reloadUser = async () => {
+  let userProfile = getProfile();
+  await store.dispatch('user/set_user', userProfile);
+};
+
+onMounted(() => {
+  reloadUser();
+  EventBus?.on("reload-user", reloadUser);
+  listenForSideNavCollapseEvent();
+});
 </script>
 
 <style>

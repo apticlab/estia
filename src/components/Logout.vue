@@ -1,14 +1,16 @@
 <template>
   <div />
 </template>
-<script>
-import { logout } from '../utils/auth'
 
-export default {
-  mounted () {
-    logout()
+<script setup>
+import { onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import { logout } from '../utils/auth';
 
-    this.$router.push('/login')
-  }
-}
+const router = useRouter();
+
+onMounted(() => {
+  logout();
+  router.push('/login');
+});
 </script>

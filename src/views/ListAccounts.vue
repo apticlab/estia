@@ -15,33 +15,29 @@
     </transition>
   </div>
 </template>
-<script>
-import { mapState, mapActions } from "vuex";
-import { accounts } from "@/services/headers";
 
-export default {
-  name: "ListAccounts",
-  props: {},
-  data() {
-    return {
-      isLoading: true,
-      actions: accounts.actions,
-      headers: accounts.headers
-    };
-  },
-  async mounted() {
-    this.isLoading = true;
-    await this.get_accounts();
-    this.isLoading = false;
-  },
-  methods: {
-    ...mapActions("users", ["get_accounts"]),
-    actOnRow(action, row) {}
-  },
-  computed: {
-    ...mapState("users", {
-      accounts: state => state.accounts
-    })
-  }
+<script setup>
+import { ref, computed, onMounted } from 'vue';
+import { useStore } from 'vuex';
+import { accounts as accountsConfig } from "@/services/headers";
+
+const store = useStore();
+
+const isLoading = ref(true);
+const actions = accountsConfig.actions;
+const headers = accountsConfig.headers;
+
+const accounts = computed(() => store.state.users?.accounts);
+
+const get_accounts = () => store.dispatch('users/get_accounts');
+
+const actOnRow = (action, row) => {
+  // Handle row action
 };
+
+onMounted(async () => {
+  isLoading.value = true;
+  await get_accounts();
+  isLoading.value = false;
+});
 </script>

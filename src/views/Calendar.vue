@@ -92,130 +92,139 @@
     </div>
   </div>
 </template>
-<script>
+<script setup>
+import { ref, computed, onMounted, onBeforeUnmount, getCurrentInstance } from 'vue';
+import { useRouter } from 'vue-router';
+import { useStore } from 'vuex';
 import axios from "axios";
 import moment from "moment";
 import { EventBus } from "../utils/event-bus.js";
 import MissionCard from "@/components/MissionCard.vue";
 
-export default {
-  name: "Calendar",
-  components: {
-    "mission-card": MissionCard
+const router = useRouter();
+const store = useStore();
+
+const instance = getCurrentInstance();
+const $api = instance.appContext.config.globalProperties.$api;
+const clone = instance.appContext.config.globalProperties.clone;
+const is_mobile = computed(() => store.getters.is_mobile);
+
+const date = moment();
+
+const isLoading = ref(false);
+const dayMissionLoading = ref(false);
+const event_template = ref({
+  key: null,
+  customData: {
+    title: null,
+    class: "bg-blue-600-light text-blue-600 rounded-md"
   },
-  props: {},
-  data() {
-    const date = moment();
-    return {
-      isLoading: false,
-      dayMissionLoading: false,
-      event_template: {
-        key: null,
-        customData: {
-          title: null,
-          class: "bg-blue-600-light text-blue-600 rounded-md"
-        },
-        dates: null
-      },
-      events: [],
-      selectedDate: {
-        date: date,
-        id: date.format("yyyy-MM-DD")
-      },
-      attributes: [],
-      currentView: "month",
-      tabs: [
-        {
-          code: "day",
-          label: "Giorno"
-        },
-        {
-          code: "week",
-          label: "Settimana"
-        },
-        {
-          code: "month",
-          label: "Mese"
-        }
-      ]
-    };
+  dates: null
+});
+const events = ref([]);
+const selectedDate = ref({
+  date: date,
+  id: date.format("yyyy-MM-DD")
+});
+const attributes = ref([]);
+const currentView = ref("month");
+const tabs = ref([
+  {
+    code: "day",
+    label: "Giorno"
   },
-  async mounted() {
-    EventBus.$on("reload-event-calendar", this.processEvents);
-    this.isLoading = true;
-    await this.loadMission();
-    await this.processEvents(this.events);
-    this.isLoading = false;
+  {
+    code: "week",
+    label: "Settimana"
   },
-  methods: {
-    changeView(payload) {
-      if (!payload) {
-        return;
+  {
+    code: "month",
+    label: "Mese"
+  }
+]);
+
+const day_missions = computed(() => {
+  dayMissionLoading.value = true;
+  let filtered = events.value.filter(event => {
+    let eventDate = moment(event.date);
+    let selected = moment(selectedDate.value.date);
+
+    let equal = moment(eventDate).isSame(selected, "day");
+    return equal;
+  });
+
+  dayMissionLoading.value = false;
+  return filtered;
+});
+
+const masks = computed(() => {
+  return {
+    weekdays: is_mobile.value ? "W" : "WWWW"
+  };
+});
+
+const changeView = (payload) => {
+  if (!payload) {
+    return;
+  }
+
+  currentView.value = payload.code;
+};
+
+const setDate = (day) => {
+  if (!day) {
+    return 0;
+  }
+
+  selectedDate.value = day;
+};
+
+const loadMission = async () => {
+  events.value = await $api.list("occurrences");
+};
+
+const processEvents = (eventsData) => {
+  eventsData.forEach((event, index) => {
+    let eventDate = moment(event.date).format("YYYY-MM-DD");
+    let attribute = clone(event_template.value);
+
+    attribute.customData.title = event.id;
+    attribute.key = event.id;
+    attribute.dates = eventDate;
+
+    attributes.value.push(attribute);
+  });
+};
+
+const goToResource = (event) => {
+  if (event.event_resource.value == "customer") {
+    router.push({
+      name: "customers_view",
+      params: {
+        company_id: event.company.id
       }
-
-      this.currentView = payload.code;
-    },
-    setDate(day) {
-      if (!day) {
-        return 0;
+    });
+  } else {
+    router.push({
+      name: "manage_credit",
+      params: {
+        credit_id: event.credit.id
       }
-
-      this.selectedDate = day;
-    },
-    async loadMission() {
-      this.events = await this.$api.list("occurrences");
-    },
-    processEvents(events) {
-      events.forEach((event, index) => {
-        let eventDate = moment(event.date).format("YYYY-MM-DD");
-        let attribute = this.clone(this.event_template);
-
-        attribute.customData.title = event.id;
-        attribute.key = event.id;
-        attribute.dates = eventDate;
-
-        this.attributes.push(attribute);
-      });
-    },
-    goToResource(event) {
-      if (event.event_resource.value == "customer") {
-        this.$router.push({
-          name: "customers_view",
-          params: {
-            company_id: event.company.id
-          }
-        });
-      } else {
-        this.$router.push({
-          name: "manage_credit",
-          params: {
-            credit_id: event.credit.id
-          }
-        });
-      }
-    }
-  },
-  computed: {
-    day_missions() {
-      this.dayMissionLoading = true;
-      let day_missions = this.events.filter(event => {
-        let eventDate = moment(event.date);
-        let selectedDate = moment(this.selectedDate.date);
-
-        let equal = moment(eventDate).isSame(selectedDate, "day");
-        return equal;
-      });
-
-      this.dayMissionLoading = false;
-      return day_missions;
-    },
-    masks() {
-      return {
-        weekdays: this.is_mobile ? "W" : "WWWW"
-      }
-    }
+    });
   }
 };
+
+onMounted(async () => {
+  EventBus.on("reload-event-calendar", processEvents);
+  isLoading.value = true;
+  await loadMission();
+  await processEvents(events.value);
+  isLoading.value = false;
+});
+
+onBeforeUnmount(() => {
+  EventBus.off("reload-event-calendar", processEvents);
+});
 </script>
 <style lang="scss">
 ::-webkit-scrollbar {

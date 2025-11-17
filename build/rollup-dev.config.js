@@ -23,7 +23,6 @@ export default {
         'v-lazy-image': 'v-lazy-image',
         axios: 'axios',
         vue: 'Vue',
-        '@braid/vue-formulate': '@braid/vue-formulate',
         'v-calendar': 'v-calendar',
         'vue-window-size': 'vue-window-size',
         lodash: '_',
