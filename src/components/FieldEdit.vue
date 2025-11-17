@@ -126,108 +126,111 @@
     </div>
   </div>
 </template>
-<script>
+<script setup>
+import { ref, computed, watch, onMounted, getCurrentInstance } from 'vue';
 import _ from 'lodash';
 
-export default {
-  name: 'FieldEdit',
-  props: {
-    header: {},
-    value: {}
-  },
-  data () {
-    return {
-      document: {},
-      options: []
+const props = defineProps({
+  header: {},
+  value: {}
+});
+
+const emit = defineEmits(['input']);
+
+const instance = getCurrentInstance();
+const $api = instance.appContext.config.globalProperties.$api;
+const deepPick = instance.appContext.config.globalProperties.deepPick;
+
+const document = ref({});
+const options = ref([]);
+
+const docIsPresent = computed(() => {
+  return !!props.value[props.header.field];
+});
+
+const filename = computed(() => {
+  let file = props.value[props.header.field].doc;
+  return file ? file.filename : '';
+});
+
+const timeObjectToString = (evt, header) => {
+  props.value[header.field] = evt.HH + ':' + evt.mm;
+};
+
+const fetchOptions = async () => {
+  if (props.header.type == 'select' && props.header.select) {
+    if (props.header.select.choices) {
+      options.value = props.header.select.choices;
+      return;
     }
-  },
-  computed: {
-    docIsPresent () {
-      return !!this.value[this.header.field]
-    },
-    filename () {
-      let file = this.value[this.header.field].doc
 
-      return file ? file.filename : ''
-    }
-  },
-  watch: {
-    async header (newVal, oldVal) {
-      await this.fetchOptions()
-    },
-    value (newVal, oldVal) {
-      if (this.header.type == 'file') {
-        this.document = null
-      }
-    }
-  },
-  mounted () {
-    this.fetchOptions()
-  },
-  methods: {
-    timeObjectToString (evt, header) {
-      this.value[header.field] = evt.HH + ':' + evt.mm
-    },
-    async fetchOptions () {
-      if (this.header.type == 'select' && this.header.select) {
-        if (this.header.select.choices) {
-          this.options = this.header.select.choices
-          return
-        }
-
-        try {
-          this.options = await this.$api.params(this.header.select.url)
-        } catch (err) {
-          console.log(err)
-        }
-      }
-    },
-    formatDate (date) {
-      if (!date) {
-        return
-      }
-
-      if (typeof date === 'string') {
-        return date.split(' ')[0]
-      }
-
-      return date.target.value
-    },
-    changeDate (date) {
-      this.value[this.header.field] = date.target.value
-
-      let value = _.clone(this.value)
-
-      this.$emit('input', value)
-    },
-    uploadFile (f) {
-      const reader = new FileReader()
-
-      let file = this.document.files[0].file
-
-      reader.onload = (e) => {
-        let value = _.clone(this.value)
-
-        value[this.header.field] = {
-          base64: btoa(reader.result),
-          path: f.name,
-          field: this.header.field,
-          doc: {
-            filename: f.name
-          }
-        }
-
-        this.$emit('input', value)
-      }
-
-      reader.readAsBinaryString(file)
-    },
-    deleteFile (value, field) {
-      this.document = null
-      this.value[field] = null
-
-      this.$forceUpdate()
+    try {
+      options.value = await $api.params(props.header.select.url);
+    } catch (err) {
+      console.log(err);
     }
   }
-}
+};
+
+const formatDate = (date) => {
+  if (!date) {
+    return;
+  }
+
+  if (typeof date === 'string') {
+    return date.split(' ')[0];
+  }
+
+  return date.target.value;
+};
+
+const changeDate = (date) => {
+  props.value[props.header.field] = date.target.value;
+
+  let value = _.clone(props.value);
+
+  emit('input', value);
+};
+
+const uploadFile = (f) => {
+  const reader = new FileReader();
+
+  let file = document.value.files[0].file;
+
+  reader.onload = (e) => {
+    let value = _.clone(props.value);
+
+    value[props.header.field] = {
+      base64: btoa(reader.result),
+      path: f.name,
+      field: props.header.field,
+      doc: {
+        filename: f.name
+      }
+    };
+
+    emit('input', value);
+  };
+
+  reader.readAsBinaryString(file);
+};
+
+const deleteFile = (value, field) => {
+  document.value = null;
+  props.value[field] = null;
+};
+
+watch(() => props.header, async (newVal, oldVal) => {
+  await fetchOptions();
+});
+
+watch(() => props.value, (newVal, oldVal) => {
+  if (props.header.type == 'file') {
+    document.value = null;
+  }
+});
+
+onMounted(() => {
+  fetchOptions();
+});
 </script>

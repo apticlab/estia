@@ -83,81 +83,84 @@
     </div>
   </div>
 </template>
-<script>
+<script setup>
+import { ref, computed, onMounted, onBeforeUnmount, getCurrentInstance } from 'vue';
+import { useRouter } from 'vue-router';
 import { getWidgetClass } from "../utils/helpers.js";
 import axios from "axios";
 import moment from "moment";
 import { EventBus } from "../utils/event-bus.js";
 
-export default {
-  name: "MemoCalendar",
-  props: {
-    widget: {}
-  },
-  data() {
-    return {
-      isLoading: true,
-      memos: [],
-      selectedDate: new Date(),
-      attributes: []
-    };
-  },
-  async mounted() {
-    EventBus.on("reload-memo-calendar", this.reloadMemos);
-    await this.reloadMemos();
-  },
-  methods: {
-    async reloadMemos() {
-      this.isLoading = true;
+const props = defineProps({
+  widget: {}
+});
 
-      let response = await axios.get("/ajax/memo");
-      this.memos = this.processMemos(response.data);
+const router = useRouter();
 
-      this.isLoading = false;
-    },
-    processMemos(memos) {
-      let memosForDate = {};
-      this.attributes = [];
+const isLoading = ref(true);
+const memos = ref([]);
+const selectedDate = ref(new Date());
+const attributes = ref([]);
 
-      memos.forEach(memo => {
-        let memoDate = moment(memo.date).format("YYYY-MM-DD");
+const events = computed(() => {
+  return memos.value[moment(selectedDate.value).format("YYYY-MM-DD")] || [];
+});
 
-        if (!memosForDate[memoDate]) {
-          memosForDate[memoDate] = [];
-        }
+const processMemos = (memosData) => {
+  let memosForDate = {};
+  attributes.value = [];
 
-        memosForDate[memoDate].push(memo);
-      });
+  memosData.forEach(memo => {
+    let memoDate = moment(memo.date).format("YYYY-MM-DD");
 
-      this.attributes.push({
-        dot: "red",
-        dates: Object.keys(memosForDate).map(date => new Date(date))
-      });
+    if (!memosForDate[memoDate]) {
+      memosForDate[memoDate] = [];
+    }
 
-      return memosForDate;
-    },
-    goToResource(memo) {
-      if (memo.memo_resource.value == "customer") {
-        this.$router.push({
-          name: "customers_view",
-          params: {
-            company_id: memo.company.id
-          }
-        });
-      } else {
-        this.$router.push({
-          name: "manage_credit",
-          params: {
-            credit_id: memo.credit.id
-          }
-        });
+    memosForDate[memoDate].push(memo);
+  });
+
+  attributes.value.push({
+    dot: "red",
+    dates: Object.keys(memosForDate).map(date => new Date(date))
+  });
+
+  return memosForDate;
+};
+
+const reloadMemos = async () => {
+  isLoading.value = true;
+
+  let response = await axios.get("/ajax/memo");
+  memos.value = processMemos(response.data);
+
+  isLoading.value = false;
+};
+
+const goToResource = (memo) => {
+  if (memo.memo_resource.value == "customer") {
+    router.push({
+      name: "customers_view",
+      params: {
+        company_id: memo.company.id
       }
-    }
-  },
-  computed: {
-    events() {
-      return this.memos[moment(this.selectedDate).format("YYYY-MM-DD")] || [];
-    }
+    });
+  } else {
+    router.push({
+      name: "manage_credit",
+      params: {
+        credit_id: memo.credit.id
+      }
+    });
   }
 };
+
+onMounted(async () => {
+  EventBus.on("reload-memo-calendar", reloadMemos);
+  await reloadMemos();
+});
+
+onBeforeUnmount(() => {
+  EventBus.off("reload-memo-calendar", reloadMemos);
+});
 </script>

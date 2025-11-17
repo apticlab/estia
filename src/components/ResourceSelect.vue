@@ -50,129 +50,130 @@
   </div>
 </template>
 
-<script>
-import axios from "axios";
-import _ from "lodash";
+<script setup>
+import { ref, computed, getCurrentInstance } from 'vue';
 
-export default {
-  name: "resource-select",
-  props: {
-    context: {
-      type: Object,
-      required: false,
-    },
-    value: {
-      required: false,
-    },
-    resources: {
-      required: false,
-    },
-    header: {
-      required: false,
-    },
+const props = defineProps({
+  context: {
+    type: Object,
+    required: false,
   },
-  data() {
+  value: {
+    required: false,
+  },
+  resources: {
+    required: false,
+  },
+  header: {
+    required: false,
+  },
+});
+
+const emit = defineEmits(['change']);
+
+const instance = getCurrentInstance();
+const $api = instance.appContext.config.globalProperties.$api;
+const $alert = instance.appContext.config.globalProperties.$alert;
+const $dialog = instance.appContext.config.globalProperties.$dialog;
+const deepFind = instance.appContext.config.globalProperties.deepFind;
+const deepPick = instance.appContext.config.globalProperties.deepPick;
+const log = instance.appContext.config.globalProperties.log;
+
+const optionsArray = ref(null);
+
+const attributes = computed(() => {
+  if (props.context) {
+    return props.context.attributes;
+  }
+
+  return {
+    header: props.header,
+    select: props.header.select,
+    resources: props.resources,
+    optionField: props.header.select.option,
+    placeholder: props.header.placeholder,
+  };
+});
+
+const options = computed(() => {
+  if (optionsArray.value == null) {
+    return attributes.value.resources;
+  }
+
+  return optionsArray.value;
+});
+
+const select = computed(() => {
+  return attributes.value.select;
+});
+
+const code = computed(() => {
+  return select.value.option;
+});
+
+const model = computed(() => {
+  if (props.context) {
+    return props.context.model;
+  }
+
+  return props.value || {};
+});
+
+const formattedOptions = computed(() => {
+  return options.value.map((opt) => {
     return {
-      optionsArray: null,
+      id: opt.id,
+      text: deepPick(opt),
     };
-  },
-  mounted() {},
-  methods: {
-    onChange($event) {
-      let eventValue = $event.target.value;
-      let newValue = this.options.find((o) => o.id == eventValue);
+  });
+});
 
-      this.log(this.code, eventValue, newValue);
+const onChange = ($event) => {
+  let eventValue = $event.target.value;
+  let newValue = options.value.find((o) => o.id == eventValue);
 
-      if (this.context) {
-        if (this.select.project) {
-          this.context.model = newValue[this.select.project];
-        } else {
-          this.context.model = newValue;
-        }
-      } else {
-        this.$emit("change", newValue);
-      }
+  log(code.value, eventValue, newValue);
+
+  if (props.context) {
+    if (select.value.project) {
+      props.context.model = newValue[select.value.project];
+    } else {
+      props.context.model = newValue;
+    }
+  } else {
+    emit("change", newValue);
+  }
+};
+
+const reloadOptions = async () => {
+  let url = select.value.url;
+  if (select.value.of) {
+    url = url.concat(`/${deepFind(this, props.header.select.of)}`);
+  }
+
+  let selectValues = [];
+
+  if (select.value.type && select.value.type == "param") {
+    selectValues = await $api.params(url);
+  } else {
+    selectValues = await $api.list(url);
+  }
+
+  optionsArray.value = selectValues;
+};
+
+const addResource = () => {
+  if (!select.value) {
+    $alert.show({});
+    return;
+  }
+
+  $dialog.show({
+    type: "resource-edit",
+    resource: select.value.code,
+    onConfirm: async () => {
+      await reloadOptions();
     },
-    onSearch(search, loading, param) {
-      this.onSearchDebounced(search, loading, param, this);
-    },
-    async reloadOptions() {
-      let url = this.select.url;
-      if (this.select.of) {
-        url = url.concat(`/${this.deepFind(this, header.select.of)}`);
-      }
-
-      let selectValues = [];
-
-      if (this.select.type && this.select.type == "param") {
-        selectValues = await this.$api.params(url);
-      } else {
-        selectValues = await this.$api.list(url);
-      }
-
-      this.optionsArray = selectValues;
-
-      this.$forceUpdate();
-    },
-    addResource() {
-      if (!this.select) {
-        this.$alert.show({});
-
-        return;
-      }
-
-      this.$dialog.show({
-        type: "resource-edit",
-        resource: this.select.code,
-        onConfirm: async () => {
-          await this.reloadOptions();
-        },
-      });
-    },
-  },
-  computed: {
-    options() {
-      if (this.optionsArray == null) {
-        return this.attributes.resources;
-      }
-
-      return this.optionsArray;
-    },
-    select() {
-      return this.attributes.select;
-    },
-    code() {
-      return this.select.option;
-    },
-    model() {
-      if (this.context) {
-        return this.context.model;
-      }
-
-      return this.value || {};
-    },
-    attributes() {
-      if (this.context) {
-        return this.context.attributes;
-      }
-
-      return {
-        header: this.header,
-        select: this.header.select,
-        resources: this.resources,
-        optionField: this.header.select.option,
-        placeholder: this.header.placeholder,
-      };
-    },
-    formattedOptions() {
-      return this.options.map((opt) => {
-        return {
-          id: opt.id,
-          text: this.deepPick(opt),
-        };
-      });
-    },
-  },
+  });
 };
 </script>
