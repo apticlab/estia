@@ -30,219 +30,213 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: "resource-image-upload",
-  props: {
-    context: {
-      type: Object,
-      required: true
-    }
-  },
-  data() {
-    return {
-      extensions: ".png,.jpeg,.jpg,.gif",
-      imageLoading: false,
-      dragActive: false,
-      dragAndDropCapable: false,
-      imageSrc: null,
-      isImage: false,
-      image: ""
-    };
-  },
-  mounted() {
-    this.dragAndDropCapable = this.detectDragAndDropCapable();
+<script setup>
+import { ref, computed, onMounted, watch } from 'vue';
 
-    if (this.dragAndDropCapable) {
-      [
-        "drag",
-        "dragstart",
-        "dragend",
-        "dragover",
-        "dragenter",
-        "dragleave",
-        "drop"
-      ].forEach(
-        function(evt) {
-          this.$refs.fileform.addEventListener(
-            evt,
-            function(e) {
-              e.preventDefault();
-              e.stopPropagation();
-            }.bind(this),
-            false
-          );
-        }.bind(this)
-      );
+const props = defineProps({
+  context: {
+    type: Object,
+    required: true
+  }
+});
 
-      this.$refs.fileform.addEventListener(
-        "dragenter",
-        function() {
-          this.dragActive = true;
-        }.bind(this)
-      );
+const emit = defineEmits(['input']);
 
-      this.$refs.fileform.addEventListener(
-        "dragleave",
-        function() {
-          this.dragActive = false;
-        }.bind(this)
-      );
+const extensions = ref(".png,.jpeg,.jpg,.gif");
+const imageLoading = ref(false);
+const dragActive = ref(false);
+const dragAndDropCapable = ref(false);
+const imageSrc = ref(null);
+const isImage = ref(false);
+const image = ref("");
+const fileform = ref(null);
+const hiddenInput = ref(null);
 
-      this.$refs.fileform.addEventListener(
-        "drop",
-        function(e) {
-          // Take only last file
-          this.handleInputChange(e);
-        }.bind(this)
-      );
-    }
-  },
-  methods: {
-    showUploadedImage: function() {
-      this.handleInputChange();
+const backgroundStyle = computed(() => {
+  let imageUrl = "";
+
+  if (model.value) {
+    imageUrl = model.value;
+    isImage.value = true;
+  }
+
+  if (props.context.value) {
+    imageUrl = "/avatars/" + props.context.value;
+    imageLoading.value = false;
+    isImage.value = true;
+  }
+
+  if (imageSrc.value) {
+    imageUrl = imageSrc.value;
+    isImage.value = true;
+  }
+
+  return {
+    "background-image": "url(" + imageUrl + ")"
+  };
+});
+
+const model = computed(() => {
+  return props.context.model;
+});
+
+const header = computed(() => {
+  return props.context.attributes.header;
+});
+
+const attributes = computed(() => {
+  return props.context.attributes;
+});
+
+const showUploadedImage = () => {
+  handleInputChange();
+};
+
+const detectDragAndDropCapable = () => {
+  var div = document.createElement("div");
+
+  return (
+    ("draggable" in div || ("ondragstart" in div && "ondrop" in div)) &&
+    "FormData" in window &&
+    "FileReader" in window
+  );
+};
+
+const handleImageUpload = () => {
+  hiddenInput.value.click();
+};
+
+const previewImage = () => {
+  imageSrc.value = model.value || "";
+  imageLoading.value = true;
+  dragActive.value = false;
+
+  var reader = new FileReader();
+
+  reader.addEventListener(
+    "load",
+    () => {
+      imageSrc.value = reader.result;
+      imageLoading.value = false;
+
+      emit("input", image.value);
     },
-    detectDragAndDropCapable: function() {
-      var div = document.createElement("div");
+    false
+  );
 
-      return (
-        ("draggable" in div || ("ondragstart" in div && "ondrop" in div)) &&
-        "FormData" in window &&
-        "FileReader" in window
-      );
-    },
-    handleImageUpload: function() {
-      this.$refs.hiddenInput.click();
-    },
-    previewImage: function() {
-      this.imageSrc = this.model || "";
-      this.imageLoading = true;
-      this.dragActive = false;
+  reader.readAsDataURL(image.value);
+};
 
-      var reader = new FileReader();
+const handleInputChange = (evt) => {
+  // Check if file is OK
+  image.value = null;
 
-      reader.addEventListener(
-        "load",
-        function() {
-          this.imageSrc = reader.result;
-          this.imageLoading = false;
+  let file;
 
-          this.$emit("input", this.image);
-        }.bind(this),
-        false
-      );
+  if (evt && evt.dataTransfer) {
+    file = evt.dataTransfer.files[0];
+  } else {
+    file = hiddenInput.value.files[0];
+  }
 
-      reader.readAsDataURL(this.image);
-    },
-    handleInputChange: function(evt) {
-      // Check if file is OK
-      this.image = null;
+  const fileReader = new FileReader();
+  const magicNumbers = file.slice(0, 4);
 
-      let file;
+  function getMIMEType(magicNumberSignature) {
+    switch (magicNumberSignature) {
+      case "89504E47":
+        return "png";
 
-      if (evt && evt.dataTransfer) {
-        file = evt.dataTransfer.files[0];
-      } else {
-        file = this.$refs.hiddenInput.files[0];
-      }
+      case "47494638":
+        return "gif";
 
-      const fileReader = new FileReader();
-      const magicNumbers = file.slice(0, 4);
+      case "25504446":
+        return "pdf";
 
-      function getMIMEType(magicNumberSignature) {
-        switch (magicNumberSignature) {
-          case "89504E47":
-            return "png";
+      case "FFD8FFDB":
+      case "FFD8FFE0":
+        return "jpeg";
 
-          case "47494638":
-            return "gif";
+      case "504B0506":
+      case "504B0708":
+      case "504B0304":
+        return "xlsx";
 
-          case "25504446":
-            return "pdf";
-
-          case "FFD8FFDB":
-          case "FFD8FFE0":
-            return "jpeg";
-
-          case "504B0506":
-          case "504B0708":
-          case "504B0304":
-            return "xlsx";
-
-          default:
-            return "";
-        }
-      }
-
-      fileReader.onloadend = e => {
-        if (e.target.readyState === FileReader.DONE) {
-          const uint = new Uint8Array(e.target.result);
-
-          let bytes = [];
-
-          uint.forEach(byte => {
-            let padded16bitInt = ("0" + byte.toString(16)).slice(-2);
-
-            bytes.push(padded16bitInt);
-          });
-
-          const hex = bytes.join("").toUpperCase();
-
-          const fileMIMEType = getMIMEType(hex);
-          const mimeTypes = this.extensions
-            .replace(/\./g, "")
-            .replace(/ /g, "")
-            .split(",");
-
-          if (mimeTypes.indexOf(fileMIMEType) != -1) {
-            this.image = file;
-            this.previewImage();
-          }
-        }
-      };
-
-      fileReader.readAsArrayBuffer(magicNumbers);
-    }
-  },
-  computed: {
-    backgroundStyle() {
-      let imageUrl = "";
-
-      if (this.model) {
-        imageUrl = this.model;
-        this.isImage = true;
-      }
-
-      if (this.value) {
-        imageUrl = "/avatars/" + this.value;
-        this.imageLoading = false;
-        this.isImage = true;
-      }
-
-      if (this.imageSrc) {
-        imageUrl = this.imageSrc;
-        this.isImage = true;
-      }
-
-      return {
-        "background-image": "url(" + imageUrl + ")"
-      };
-    },
-    model() {
-      return this.context.model;
-    },
-    header() {
-      return this.context.attributes.header;
-    },
-    attributes() {
-      return this.context.attributes;
-    }
-  },
-  watch: {
-    imageSrc(n, o) {
-      this.context.model = n;
+      default:
+        return "";
     }
   }
+
+  fileReader.onloadend = e => {
+    if (e.target.readyState === FileReader.DONE) {
+      const uint = new Uint8Array(e.target.result);
+
+      let bytes = [];
+
+      uint.forEach(byte => {
+        let padded16bitInt = ("0" + byte.toString(16)).slice(-2);
+
+        bytes.push(padded16bitInt);
+      });
+
+      const hex = bytes.join("").toUpperCase();
+
+      const fileMIMEType = getMIMEType(hex);
+      const mimeTypes = extensions.value
+        .replace(/\./g, "")
+        .replace(/ /g, "")
+        .split(",");
+
+      if (mimeTypes.indexOf(fileMIMEType) != -1) {
+        image.value = file;
+        previewImage();
+      }
+    }
+  };
+
+  fileReader.readAsArrayBuffer(magicNumbers);
 };
+
+watch(imageSrc, (n, o) => {
+  props.context.model = n;
+});
+
+onMounted(() => {
+  dragAndDropCapable.value = detectDragAndDropCapable();
+
+  if (dragAndDropCapable.value) {
+    [
+      "drag",
+      "dragstart",
+      "dragend",
+      "dragover",
+      "dragenter",
+      "dragleave",
+      "drop"
+    ].forEach((evt) => {
+      fileform.value.addEventListener(
+        evt,
+        (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        },
+        false
+      );
+    });
+
+    fileform.value.addEventListener("dragenter", () => {
+      dragActive.value = true;
+    });
+
+    fileform.value.addEventListener("dragleave", () => {
+      dragActive.value = false;
+    });
+
+    fileform.value.addEventListener("drop", (e) => {
+      // Take only last file
+      handleInputChange(e);
+    });
+  }
+});
 </script>
 <style></style>

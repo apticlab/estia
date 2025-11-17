@@ -164,7 +164,7 @@ import {
   ref,
 } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { useApi, useResources } from "@apticlab/estia/composables";
+import { useApi, useResources } from "../composables";
 import clone from "lodash/clone";
 
 const rest_resources = {

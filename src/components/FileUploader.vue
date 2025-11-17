@@ -152,169 +152,165 @@
     </div>
   </div>
 </template>
-<script>
-export default {
-  name: "FileUploader",
-  props: {
-    type: { required: false, default: "file" },
-    maxFileSize: { required: false, default: 1 }, // in mb
-    maxFiles: { required: false, default: 1 },
-    extensions: {
-      required: false,
-      default() {
-        return [];
-      },
+<script setup>
+import { ref, computed, onMounted, getCurrentInstance } from 'vue';
+
+const props = defineProps({
+  type: { required: false, default: "file" },
+  maxFileSize: { required: false, default: 1 }, // in mb
+  maxFiles: { required: false, default: 1 },
+  extensions: {
+    required: false,
+    default() {
+      return [];
     },
   },
-  data() {
-    return {
-      files: [],
-      isLoading: false,
-      dragActive: false,
-      dragAndDropCapable: false,
-    };
-  },
-  mounted() {
-    this.dragAndDropCapable = this.detectDragAndDropCapable();
+});
 
-    if (this.dragAndDropCapable) {
-      [
-        "drag",
-        "dragstart",
-        "dragend",
-        "dragover",
-        "dragenter",
-        "dragleave",
-        "drop",
-      ].forEach(
-        function (evt) {
-          this.$refs.fileform.addEventListener(
-            evt,
-            function (e) {
-              e.preventDefault();
-              e.stopPropagation();
-            }.bind(this),
-            false
-          );
-        }.bind(this)
-      );
+const emit = defineEmits(['input']);
 
-      this.$refs.fileform.addEventListener(
-        "dragenter",
-        function () {
-          this.dragActive = true;
-        }.bind(this)
-      );
+const instance = getCurrentInstance();
+const log = instance.appContext.config.globalProperties.log || console.log;
 
-      this.$refs.fileform.addEventListener(
-        "dragleave",
-        function () {
-          this.dragActive = false;
-        }.bind(this)
-      );
+const files = ref([]);
+const isLoading = ref(false);
+const dragActive = ref(false);
+const dragAndDropCapable = ref(false);
+const fileform = ref(null);
+const hiddenInput = ref(null);
 
-      this.$refs.fileform.addEventListener(
-        "drop",
-        function (e) {
-          // Take only last file
-          this.handleInputChange(e);
-        }.bind(this)
-      );
-    }
-  },
-  methods: {
-    sum: (prev, curr) => {
-      return (prev += curr.size);
-    },
-    removeFile(index) {
-      this.files.splice(index, 1);
-      this.$emit("input", this.fileList);
-    },
-    handleInputChange: function (evt) {
-      let files = [];
-      if (evt.dataTransfer) {
-        files = evt.dataTransfer.files;
-      } else {
-        files = this.$refs.hiddenInput.files;
-      }
-
-      let filesSizeInMB = Array.from(files).reduce(this.sum, 0) / 1000000;
-      let actualeSizeInMB = this.files.reduce(this.sum, 0) / 1000000;
-
-      this.log(filesSizeInMB, actualeSizeInMB);
-
-      if (actualeSizeInMB + filesSizeInMB > this.maxFileSize) {
-        alert(
-          "Il limite massimo per l'upload dei file è di " +
-            this.maxFileSize +
-            " MB"
-        );
-        return;
-      }
-
-      for (let i = 0; i < files.length; i++) {
-        let length = this.files.length;
-        this.files[length] = {
-          name: files[i].name,
-          style: this.getFileStyle(files[i].name),
-          size: files[i].size,
-          file: files[i],
-        };
-      }
-
-      this.$emit("input", this.files);
-      this.files = [...this.files];
-    },
-    openFileChooser: function () {
-      this.$refs.hiddenInput.click();
-    },
-    detectDragAndDropCapable: function () {
-      var div = document.createElement("div");
-
-      return (
-        ("draggable" in div || ("ondragstart" in div && "ondrop" in div)) &&
-        "FormData" in window &&
-        "FileReader" in window
-      );
-    },
-    getFileStyle(filename) {
-      let fileExtension = filename.split(".")[filename.split(".").length - 1];
-      this.log(fileExtension);
-      let style = {
-        icon: "",
-        background: "",
-      };
-
-      switch (fileExtension) {
-        case "doc":
-        case "docx":
-        case "odt":
-        case "application/msword":
-        case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-          style.icon = "text-blue-600-200";
-          style.background = "bg-blue-600-700";
-          break;
-        case "jpg":
-        case "jpeg":
-        case "png":
-        case "webp":
-          style.icon = "text-orange-200";
-          style.background = "bg-orange-500";
-          break;
-        case "pdf":
-          style.icon = "text-red-200";
-          style.background = "bg-red-500";
-          break;
-        default:
-          style.icon = "text-gray-200";
-          style.background = "bg-gray-500";
-          break;
-      }
-      return style;
-    },
-  },
-  computed: {},
+const sum = (prev, curr) => {
+  return (prev += curr.size);
 };
+
+const removeFile = (index) => {
+  files.value.splice(index, 1);
+  emit('input', files.value);
+};
+
+const handleInputChange = (evt) => {
+  let filesList = [];
+  if (evt.dataTransfer) {
+    filesList = evt.dataTransfer.files;
+  } else {
+    filesList = hiddenInput.value.files;
+  }
+
+  let filesSizeInMB = Array.from(filesList).reduce(sum, 0) / 1000000;
+  let actualeSizeInMB = files.value.reduce(sum, 0) / 1000000;
+
+  log(filesSizeInMB, actualeSizeInMB);
+
+  if (actualeSizeInMB + filesSizeInMB > props.maxFileSize) {
+    alert(
+      "Il limite massimo per l'upload dei file è di " +
+        props.maxFileSize +
+        " MB"
+    );
+    return;
+  }
+
+  for (let i = 0; i < filesList.length; i++) {
+    let length = files.value.length;
+    files.value[length] = {
+      name: filesList[i].name,
+      style: getFileStyle(filesList[i].name),
+      size: filesList[i].size,
+      file: filesList[i],
+    };
+  }
+
+  emit('input', files.value);
+  files.value = [...files.value];
+};
+
+const openFileChooser = () => {
+  hiddenInput.value.click();
+};
+
+const detectDragAndDropCapable = () => {
+  var div = document.createElement("div");
+
+  return (
+    ("draggable" in div || ("ondragstart" in div && "ondrop" in div)) &&
+    "FormData" in window &&
+    "FileReader" in window
+  );
+};
+
+const getFileStyle = (filename) => {
+  let fileExtension = filename.split(".")[filename.split(".").length - 1];
+  log(fileExtension);
+  let style = {
+    icon: "",
+    background: "",
+  };
+
+  switch (fileExtension) {
+    case "doc":
+    case "docx":
+    case "odt":
+    case "application/msword":
+    case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+      style.icon = "text-blue-600-200";
+      style.background = "bg-blue-600-700";
+      break;
+    case "jpg":
+    case "jpeg":
+    case "png":
+    case "webp":
+      style.icon = "text-orange-200";
+      style.background = "bg-orange-500";
+      break;
+    case "pdf":
+      style.icon = "text-red-200";
+      style.background = "bg-red-500";
+      break;
+    default:
+      style.icon = "text-gray-200";
+      style.background = "bg-gray-500";
+      break;
+  }
+  return style;
+};
+
+onMounted(() => {
+  dragAndDropCapable.value = detectDragAndDropCapable();
+
+  if (dragAndDropCapable.value) {
+    [
+      "drag",
+      "dragstart",
+      "dragend",
+      "dragover",
+      "dragenter",
+      "dragleave",
+      "drop",
+    ].forEach((evt) => {
+      fileform.value.addEventListener(
+        evt,
+        (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        },
+        false
+      );
+    });
+
+    fileform.value.addEventListener("dragenter", () => {
+      dragActive.value = true;
+    });
+
+    fileform.value.addEventListener("dragleave", () => {
+      dragActive.value = false;
+    });
+
+    fileform.value.addEventListener("drop", (e) => {
+      // Take only last file
+      handleInputChange(e);
+    });
+  }
+});
 </script>
 <style>
 .line-break-anywhere {
